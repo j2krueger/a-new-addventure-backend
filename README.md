@@ -30,7 +30,9 @@ At this point the original entry would look something like this:
 
 ---
  **Jerry's Journey** by *Alice*
+
  Jerry was walking along a road, when he came to a fork in the road.
+ 
  - [Jerry followed the left path](https://example.com)
  - [Jerry looked more closely at the fork in the road.](https://example.com)
 ---
