@@ -6,9 +6,9 @@ My desire to do this project has been inspired by "The Anime Addventure", a webs
 
 Out of a desire to give back to the community, and hope that I can start a new website that is at least as enjoyable as the old one, I intend to deploy this project for public use once it is in a usable state, and make it open source for anyone to download and deploy.
 
-At the very least, I want a front end dev, but I think the project is big enough for it to be worthwhile to get two front end devs, and a second back end dev.
+I'm looking for a front end or full stack dev, but I probably wouldn't say no to another back end dev.
 
-Below this point are a slightly longer description of what I want the website to do, with a small example, and a rough outline of how I think the back end will likely be put together. The first part of the project is going to be, as a group, refining this outline into a back end specification, and making a specification for the front end/UI.
+Below this point are a slightly longer description of what I want the website to do, with a small example, and a rough outline of how I think the back end will likely be put together. The first part of the project is going to be, as a team, refining this outline into a back end specification, and making a specification for the front end/UI.
 
 ---
 
