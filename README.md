@@ -125,8 +125,8 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 - node/npm
 - git/github
 - mocha/chai
-- heroku
-- pgsql
+- React
+- MongoDB
 - sequelize
 - express
 - sessions
@@ -165,7 +165,7 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 - settings: ?
 - consecutive_login_failures: int; reset to 0 on successful login
 - last_login_fail: timestamp; if n login fails, wait n seconds before allowing another login attempt, if it's been less than n seconds since the last login attempt, don't even check against the stored hash, just increment failure count and update timestamp (replace with next_allowed_login_attempt?)
-- keyword_blocking?
+- keyword_blocking
 - user_blocking?
 
 ### user_ratings schema:
@@ -201,57 +201,5 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
  - keyword_id: int
  - reason: text
 
-
----
-
-routes:
- - /entry
-	 - GET: get a list of recent entries
-	 - POST: post the start of a new story
- - /entry/:entryID
-	 - GET: get the text of the entry
-	 - POST: post a continuation of the entry
-	 - PUT: edit the entry (includes flagging an entry)
-	 - DELETE: delete the entry
- - /entry/:entryID/flag
-	 - POST: flag the entry for review by an admin/mod
- - /entry/:entryID/keyword/:keyword
-	 - GET: page for adding/deleting keywords
-	 - POST: add keywords to entry
-	 - DELETE: remove keywords from entry with special handling
-		 - Some keywords can only be deleted by mods/admins
-		 - flag those and inform user
- - /entry/:entryID/comment
-	 - GET: get comments on entry
-	 - POST: post a new comment
- - /entry/:entryID/comment/:commentID
-	 - PUT: edit a comment
-	 - DELETE: delete a comment
- - /entry/:entryID/comment/:commentID/flag
-	 - POST: flag the comment for review by an admin/mod
- - /chain/:entryID
-	 - GET: get the comment chain ending in the specified entry
- - /register
-	 - GET: get registration page
-	 - POST: register new user
- - /login
-	 - GET: get login page
-	 - POST: login user
- - /logout
-	 - GET: get logout page
-	 - POST: logout user
- - /profile
-	 - GET: get logged in user's profile page
-		 - if no logged in user, just store settings in localStorage
-	 - PUT: edit logged in user's profile
- - /user
-	 - GET: get a list of users
- - /user/:userID
-	 - GET: get user's public profile
- - /search
-	 - GET: get search page
-	 - GET with query string: search for entries matching search
- - /keywords
-	 - GET: get a list of defined keywords
 
 ---
