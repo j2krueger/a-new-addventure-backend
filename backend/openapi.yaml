@@ -473,8 +473,8 @@ paths:
             schema:
               $ref: '#/components/schemas/Login'
             example:
-              userName: "Freddy"
-              password: "s33krit!"
+              userName: Freddy
+              password: s33krit!
       responses:
         "200":
           description: "If the login is successful, return the username and email\
