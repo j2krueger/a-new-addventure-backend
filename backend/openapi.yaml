@@ -16,7 +16,7 @@ paths:
       summary: Get registration page.
       description:
         "Get the statically served registration page, with text boxes for\
-        \ username, email address, and password."
+        \ userName, email address, and password."
       operationId: get_registration_page
       responses:
         default:
@@ -27,8 +27,8 @@ paths:
         - User
       summary: Register a new user
       description:
-        "Register a new user by posting a new username, an email address,\
-        \ and a password. Check for unique username, send verification email, and\
+        "Register a new user by posting a new userName, an email address,\
+        \ and a password. Check for unique userName, send verification email, and\
         \ store password."
       operationId: register_user
       requestBody:
@@ -37,10 +37,16 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Register"
+            example:
+              {
+                "userName": "Freddy",
+                "email": "Freddy@example.com",
+                "password": "s33krit!",
+              }
       responses:
         "201":
           description:
-            "If the registration is successful, return the username and\
+            "If the registration is successful, return the userName and\
             \ email fields of the user object to indicate success."
           content:
             application/json:
@@ -49,17 +55,22 @@ paths:
                   value:
                     {
                       "user":
-                        { "username": "John", "email": "j_krueger@yahoo.com" },
+                        { "userName": "Freddy", "email": "Freddy@example.com" },
                     }
-        "401":
-          description:
-            "If the username/email don't exist, or the password is incorrect,\
-            \ return an error."
+        "400":
+          description: "If any of the fields are missing, return an error."
           content:
             application/json:
               examples:
                 duplicateUsername:
-                  value: { error: "Bad username/email or wrong password." }
+                  value: { "error": "Missing userName, email, or password." }
+        "409":
+          description: "Username or Email are already in use."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "error": "Username or email are already in use." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -70,7 +81,7 @@ paths:
         - User
       summary: Get statically served login page.
       description:
-        "Get the statically served login page, with text boxes for username\
+        "Get the statically served login page, with text boxes for userName\
         \ and password."
       operationId: get_login_page
       responses:
@@ -82,8 +93,9 @@ paths:
         - User
       summary: Login user
       description:
-        "Post the username and password, and if they match, log the user\
-        \ in."
+        "Post the name and password entered by the user, name may be either a userName or an email,\
+        \ userName checked first. If the name matches a user and the password is correct for that user,\
+        \ log them in."
       operationId: login_user
       requestBody:
         description: Submit a request to login
@@ -91,13 +103,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Login"
-            example:
-              userName: Freddy
-              password: s33krit!
+            example: { "name": "Freddy", "password": "s33krit!" }
       responses:
         "200":
           description:
-            "If the login is successful, return the username and email\
+            "If the login is successful, return the userName and email\
             \ fields of the user object to indicate success."
           content:
             application/json:
@@ -105,16 +115,24 @@ paths:
                 registered:
                   value:
                     {
-                      "user":
-                        { "username": "Freddy", "email": "freddy@example.com" },
+                      "userID": "1973",
+                      "userName": "Freddy",
+                      "email": "freddy@example.com",
                     }
-        "404":
+        "400":
+          description: "Missing field."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "error": "Missing name or password." }
+        "401":
           description: "Login failed."
           content:
             application/json:
               examples:
                 registered:
-                  value: { error: "Incorrect username or password." }
+                  value: { "error": "Incorrect name or password." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -139,7 +157,7 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: { message: "Logout successful." }
+                  value: { "message": "Logout successful." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -180,7 +198,7 @@ paths:
       summary: "Get a list of users, sorted alphabetically."
       description:
         "Get a list of users, sorted alphabetically. If there's a query\
-        \ string, only return the users whose usernames match that query string.\
+        \ string, only return the users whose userNames match that query string.\
         \ Each name should be linked to it's respective public profile."
       operationId: get_users
       responses:
@@ -192,19 +210,19 @@ paths:
                 registered:
                   value:
                     {
-                      users:
+                      "users":
                         [
-                          { userName: "Abba", userID: 1972 },
-                          { userName: "Freddy", userID: 1973 },
+                          { "userName": "Abba", "userID": "1972" },
+                          { "userName": "Freddy", "userID": "1973" },
                         ],
                     }
         "404":
-          description: ""
+          description: "No users matching the search string found."
           content:
             application/json:
               examples:
                 registered:
-                  value: "{}"
+                  value: {"error": "No users matching the search found."}
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -216,7 +234,7 @@ paths:
       summary: Get a user's public profile.
       description:
         "Get a webpage showing the specified user's public profile, including\
-        \ username, bio, email if user has decided to make that public, links to entries\
+        \ userName, bio, email if user has decided to make that public, links to entries\
         \ and comments, possibly other stuff we think of later."
       operationId: get_public_profile
       parameters:
@@ -236,34 +254,34 @@ paths:
                 registered:
                   value:
                     {
-                      userData:
+                      "userData":
                         {
-                          userName: "Freddy",
-                          email: "",
-                          bio: "I'm a movie monster!",
-                          entries:
+                          "userName": "Freddy",
+                          "email": "",
+                          "bio": "I'm a movie monster!",
+                          "entries":
                             [
                               {
-                                storyTitle: "Jerry's Journey",
-                                entryTitle: "A Fork in the Road",
-                                authorName: "Freddy",
-                                entryID:123,
+                                "storyTitle": "Jerry's Journey",
+                                "entryTitle": "A Fork in the Road",
+                                "authorName": "Freddy",
+                                "entryID": "123",
                               },
                             ],
-                          comments:
+                          "comments":
                             [
                               {
-                                entry:
+                                "entry":
                                   {
-                                    storyTitle: "Jerry's Journey",
-                                    entryTitle: "A Fork in the Road",
-                                    authorName: "Freddy",
-                                    entryID:123,
+                                    "storyTitle": "Jerry's Journey",
+                                    "entryTitle": "A Fork in the Road",
+                                    "authorName": "Freddy",
+                                    "entryID": "123",
                                   },
-                                comment:
+                                "comment":
                                   {
-                                    commentID: 456,
-                                    commentText: "I'm making comments!",
+                                    "commentID": "456",
+                                    "commentText": "I'm making comments!",
                                   },
                               },
                             ],
@@ -541,7 +559,7 @@ paths:
       summary: Get comments posted to an entry
       description:
         Get a list of the comments that have been posted to an entry. Each
-        comment entry will have the username of the user who posted it attatched.
+        comment entry will have the userName of the user who posted it attatched.
       operationId: get_comments
       parameters:
         - name: entryID
