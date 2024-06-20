@@ -2,7 +2,14 @@
 
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT||5001; // 443:https 80:http FIXME: read from .env
+const PORT = process.env.PORT || 5001;
+
+const cors = require('cors');
+
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+const passport = require('passport');
 
 // FIXME memory only database only until we get a real database set up
 const userDatabase = {
@@ -29,8 +36,18 @@ const userDatabase = {
     ]
 };
 
-function registerUser(user) {
-    const newUserEntry = user;
+// FIXME remove when real password database is implemented
+async function initUserDatabase() {
+    for (const user of userDatabase.users) {
+        user.passwordHash = await bcrypt.hash(user.password, saltRounds);
+        delete user.password;
+    }
+}
+initUserDatabase();
+
+async function registerUser(user) {
+    const newUserEntry = { userID: user.userID, userName: user.userName, email: user.email };
+    newUserEntry.passwordHash = await bcrypt.hash(user.password, saltRounds);
     newUserEntry.userID = userDatabase.nextUserID++;
     userDatabase.users.push(newUserEntry);
     return {
@@ -50,6 +67,9 @@ function findUserByEmail(email) {
 
 
 app.use(express.json());
+app.use(cors({
+    origin: "http://localhost"
+})); // FIXME work out cors
 
 app.post('/register', function (req, res, next) {
     const user = {
@@ -75,7 +95,7 @@ app.post('/register', function (req, res, next) {
     }
 });
 
-app.post('/login', function (req, res, next) {
+app.post('/login', async function (req, res, next) {
     const name = req.body?.name;
     const password = req.body?.password;
     if (!name) {
@@ -84,8 +104,7 @@ app.post('/login', function (req, res, next) {
         res.status(400).json({ error: "Missing password." });
     } else {
         const user = findUserByName(name) || findUserByEmail(name);
-        // FIXME need real password checking
-        if (!user || password != user.password) {
+        if (!user || !await bcrypt.compare(password, user.passwordHash)) {
             res.status(401).json({ error: "Incorrect name or password." });
         } else {
             // FIXME need real login code

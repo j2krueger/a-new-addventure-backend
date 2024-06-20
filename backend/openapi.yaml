@@ -10,18 +10,6 @@ servers:
 paths:
   /register:
     summary: GET/POST registration
-    get:
-      tags:
-        - User
-      summary: Get registration page.
-      description:
-        "Get the statically served registration page, with text boxes for\
-        \ userName, email address, and password."
-      operationId: get_registration_page
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
     post:
       tags:
         - User
@@ -76,18 +64,6 @@ paths:
       x-swagger-router-controller: User
   /login:
     summary: GET/POST login
-    get:
-      tags:
-        - User
-      summary: Get statically served login page.
-      description:
-        "Get the statically served login page, with text boxes for userName\
-        \ and password."
-      operationId: get_login_page
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
     post:
       tags:
         - User
@@ -222,7 +198,7 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: {"error": "No users matching the search found."}
+                  value: { "users": [] }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -320,23 +296,6 @@ paths:
         "Post the title, author, keywords, and text of an entry to start\
         \ a new story."
       operationId: post_story
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: Entry
-  /newStory:
-    summary: GET new story page
-    get:
-      tags:
-        - Entry
-        - Story
-        - StaticPage
-      summary: GET the page for entering a new story
-      description:
-        "Gets the static page presented to the user for entering a new\
-        \ story with text boxes for story title, entry title, keywords, and story\
-        \ text. Result POSTs to /entry."
-      operationId: get_new_story_page
       responses:
         default:
           description: Default error sample response
@@ -758,14 +717,15 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: { keywords: ["NSFW", "GORE", "SEX", "FF:Sailor Moon"] }
+                  value:
+                    { "keywords": ["NSFW", "GORE", "SEX", "FF:Sailor Moon"] }
         "404":
           description: "No matching keywords found."
           content:
             application/json:
               examples:
                 registered:
-                  value: { keywords: [] }
+                  value: { "keywords": [] }
         default:
           description: Default error sample response
       x-swagger-router-controller: Keyword
