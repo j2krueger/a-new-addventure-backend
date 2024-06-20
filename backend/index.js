@@ -2,7 +2,7 @@
 
 const express = require('express');
 const app = express();
-const PORT = 5001; // 443:https 80:http FIXME: read from .env
+const PORT = process.env.PORT||5001; // 443:https 80:http FIXME: read from .env
 
 // FIXME memory only database only until we get a real database set up
 const userDatabase = {
