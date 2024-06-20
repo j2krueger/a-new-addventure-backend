@@ -68,7 +68,7 @@ function findUserByEmail(email) {
 
 app.use(express.json());
 app.use(cors({
-    origin: "http://localhost"
+    origin: /https?:\/\/localhost/
 })); // FIXME work out cors
 
 app.post('/register', function (req, res, next) {
