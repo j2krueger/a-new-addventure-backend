@@ -1,19 +1,310 @@
 openapi: 3.1.0
 info:
   title: A New Addventure
-  description: "A collaborative fiction site that allows users to write stories with\
+  description:
+    "A collaborative fiction site that allows users to write stories with\
     \ multiple branches, and add branches to existing stories written by others."
   version: 1.0.0
 servers:
-- url: /
+  - url: /
 paths:
+  /register:
+    summary: GET/POST registration
+    get:
+      tags:
+        - User
+      summary: Get registration page.
+      description:
+        "Get the statically served registration page, with text boxes for\
+        \ userName, email address, and password."
+      operationId: get_registration_page
+      responses:
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+    post:
+      tags:
+        - User
+      summary: Register a new user
+      description:
+        "Register a new user by posting a new userName, an email address,\
+        \ and a password. Check for unique userName, send verification email, and\
+        \ store password."
+      operationId: register_user
+      requestBody:
+        description: Submit a request to register a user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Register"
+            example:
+              {
+                "userName": "Freddy",
+                "email": "Freddy@example.com",
+                "password": "s33krit!",
+              }
+      responses:
+        "201":
+          description:
+            "If the registration is successful, return the userName and\
+            \ email fields of the user object to indicate success."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "user":
+                        { "userName": "Freddy", "email": "Freddy@example.com" },
+                    }
+        "400":
+          description: "If any of the fields are missing, return an error."
+          content:
+            application/json:
+              examples:
+                duplicateUsername:
+                  value: { "error": "Missing userName, email, or password." }
+        "409":
+          description: "Username or Email are already in use."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "error": "Username or email are already in use." }
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+  /login:
+    summary: GET/POST login
+    get:
+      tags:
+        - User
+      summary: Get statically served login page.
+      description:
+        "Get the statically served login page, with text boxes for userName\
+        \ and password."
+      operationId: get_login_page
+      responses:
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+    post:
+      tags:
+        - User
+      summary: Login user
+      description:
+        "Post the name and password entered by the user, name may be either a userName or an email,\
+        \ userName checked first. If the name matches a user and the password is correct for that user,\
+        \ log them in."
+      operationId: login_user
+      requestBody:
+        description: Submit a request to login
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+            example: { "name": "Freddy", "password": "s33krit!" }
+      responses:
+        "200":
+          description:
+            "If the login is successful, return the userName and email\
+            \ fields of the user object to indicate success."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "userID": "1973",
+                      "userName": "Freddy",
+                      "email": "freddy@example.com",
+                    }
+        "400":
+          description: "Missing field."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "error": "Missing name or password." }
+        "401":
+          description: "Login failed."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "error": "Incorrect name or password." }
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+  /logout:
+    summary: POST logout
+    post:
+      tags:
+        - User
+      summary: Logout the logged in user.
+      description:
+        "Logout the logged in user. Posted by a button on the users profile\
+        \ page, or from the user menu."
+      operationId: logout_user
+      responses:
+        "200":
+          description:
+            "Logout should always be successful. If user was logged in\
+            \ before request, the cookie will indicate the user to log out. If user\
+            \ was not logged in before request, user will still not be logged in,\
+            \ so we'll call that a success condition too."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "message": "Logout successful." }
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+  /profile:
+    summary: GET/PUT logged in user's profile
+    get:
+      tags:
+        - User
+      summary: Get user's profile.
+      description:
+        "If a user is logged in, get that user's settings from the server,\
+        \ and show them on the page. If no user is logged in, check localStorage for\
+        \ basic settings (light/dark mode, blocked tags) otherwise use default basic\
+        \ settings. Can be used to change settings."
+      operationId: get_profile_page
+      responses:
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+    put:
+      tags:
+        - User
+      summary: Post changes to user's profile.
+      description:
+        "If a user is logged in, put the changed settings to the server,\
+        \ otherwise store them in localStorage."
+      operationId: put_profile
+      responses:
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+  /user:
+    summary: GET a list of users
+    get:
+      tags:
+        - User
+        - Search
+      summary: "Get a list of users, sorted alphabetically."
+      description:
+        "Get a list of users, sorted alphabetically. If there's a query\
+        \ string, only return the users whose userNames match that query string.\
+        \ Each name should be linked to it's respective public profile."
+      operationId: get_users
+      responses:
+        "200":
+          description: "List of users found."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "users":
+                        [
+                          { "userName": "Abba", "userID": "1972" },
+                          { "userName": "Freddy", "userID": "1973" },
+                        ],
+                    }
+        "404":
+          description: "No users matching the search string found."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: {"error": "No users matching the search found."}
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+  /user/{userID}:
+    summary: GET a user's public profile
+    get:
+      tags:
+        - User
+      summary: Get a user's public profile.
+      description:
+        "Get a webpage showing the specified user's public profile, including\
+        \ userName, bio, email if user has decided to make that public, links to entries\
+        \ and comments, possibly other stuff we think of later."
+      operationId: get_public_profile
+      parameters:
+        - name: userID
+          in: path
+          description: the ID of the user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: "Successfully retrieved user profile."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "userData":
+                        {
+                          "userName": "Freddy",
+                          "email": "",
+                          "bio": "I'm a movie monster!",
+                          "entries":
+                            [
+                              {
+                                "storyTitle": "Jerry's Journey",
+                                "entryTitle": "A Fork in the Road",
+                                "authorName": "Freddy",
+                                "entryID": "123",
+                              },
+                            ],
+                          "comments":
+                            [
+                              {
+                                "entry":
+                                  {
+                                    "storyTitle": "Jerry's Journey",
+                                    "entryTitle": "A Fork in the Road",
+                                    "authorName": "Freddy",
+                                    "entryID": "123",
+                                  },
+                                "comment":
+                                  {
+                                    "commentID": "456",
+                                    "commentText": "I'm making comments!",
+                                  },
+                              },
+                            ],
+                        },
+                    }
+        "404":
+          description: "User not found."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { error: "There is no user with that user ID." }
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
   /entry:
     summary: GET/POST entries
     get:
       tags:
-      - Entry
+        - Entry
       summary: GET a list of recent entries
-      description: "Gets a list of recent entries, showing story title, entry title,\
+      description:
+        "Gets a list of recent entries, showing story title, entry title,\
         \ author, and date for each one."
       operationId: get_entry_list
       responses:
@@ -22,10 +313,11 @@ paths:
       x-swagger-router-controller: Entry
     post:
       tags:
-      - Entry
-      - Story
+        - Entry
+        - Story
       summary: Post a new story
-      description: "Post the title, author, keywords, and text of an entry to start\
+      description:
+        "Post the title, author, keywords, and text of an entry to start\
         \ a new story."
       operationId: post_story
       responses:
@@ -36,11 +328,12 @@ paths:
     summary: GET new story page
     get:
       tags:
-      - Entry
-      - Story
-      - StaticPage
+        - Entry
+        - Story
+        - StaticPage
       summary: GET the page for entering a new story
-      description: "Gets the static page presented to the user for entering a new\
+      description:
+        "Gets the static page presented to the user for entering a new\
         \ story with text boxes for story title, entry title, keywords, and story\
         \ text. Result POSTs to /entry."
       operationId: get_new_story_page
@@ -52,77 +345,81 @@ paths:
     summary: GET/POST/PUT/DELETE a particular entry
     get:
       tags:
-      - Entry
+        - Entry
       summary: GET the page showing a particular entry
-      description: "Gets the entry title, author, keywords, date, text, and choice\
+      description:
+        "Gets the entry title, author, keywords, date, text, and choice\
         \ texts, formatted in HTML."
       operationId: get_entry_by_id
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
     put:
       tags:
-      - Entry
+        - Entry
       summary: Edit an entry
-      description: "Edit an entry's choice text, entry title, keywords, and entry\
+      description:
+        "Edit an entry's choice text, entry title, keywords, and entry\
         \ text. Can only be done by admins, mods, and the user who created the entry."
       operationId: edit_entry
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
     post:
       tags:
-      - Entry
+        - Entry
       summary: "Post a continuation of entry {entryID}"
-      description: "Post a new entry continuing entry {entryID} including choice text,\
+      description:
+        "Post a new entry continuing entry {entryID} including choice text,\
         \ entry title, keywords, and entry text."
       operationId: post_entry
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
     delete:
       tags:
-      - Entry
+        - Entry
       summary: Delete an entry
-      description: "Delete an entry entirely if there are no continuations, otherwise\
+      description:
+        "Delete an entry entirely if there are no continuations, otherwise\
         \ deletes choice text, entry title, deletable keywords, and entry text. Can\
         \ only be done by admins, mods, and the creating user."
       operationId: delete_entry
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
@@ -131,9 +428,10 @@ paths:
     summary: Static page for entering a new entry
     get:
       tags:
-      - Entry
+        - Entry
       summary: GET the page for entering a new entry
-      description: "Gets the page presented to the user for entering a continuation\
+      description:
+        "Gets the page presented to the user for entering a continuation\
         \ of an existing entry. Requested from, is inserted into, and posts to, /entry/{entryID}.\
         \ Has textboxes for choice text, entry title, keywords, and entry text."
       operationId: get_new_entry_page
@@ -145,19 +443,20 @@ paths:
     summary: POST a flag for review on the entry
     post:
       tags:
-      - Entry
+        - Entry
       summary: Flag an entry for review
-      description: "Post a flag for review, to be entered into a moderation queue.\
+      description:
+        "Post a flag for review, to be entered into a moderation queue.\
         \ Must include reason for flagging."
       operationId: flag_entry
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
@@ -166,84 +465,87 @@ paths:
     summary: GET/POST/DELETE keywords
     get:
       tags:
-      - Entry
-      - Keyword
+        - Entry
+        - Keyword
       summary: Get list of keywords on entry.
-      description: "Gets a list of the keywords applied to the entry. Special keywords\
+      description:
+        "Gets a list of the keywords applied to the entry. Special keywords\
         \ first, then non-special inherited keywords, then non-special non-inherited\
         \ keywords."
       operationId: get_keywords
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
-      - name: keyword
-        in: path
-        description: a keyword
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+        - name: keyword
+          in: path
+          description: a keyword
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
     post:
       tags:
-      - Entry
-      - Keyword
+        - Entry
+        - Keyword
       summary: Post new keywords to an entry
-      description: "Posts one or more keywords to be applied to an existing entry.\
+      description:
+        "Posts one or more keywords to be applied to an existing entry.\
         \ Admins, mods, and creating author get their new keywords automatically applied,\
         \ anyone else gets their keywords submitted to a mod queue."
       operationId: post_new_keywords
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
-      - name: keyword
-        in: path
-        description: a keyword
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+        - name: keyword
+          in: path
+          description: a keyword
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
     delete:
       tags:
-      - Entry
-      - Keyword
+        - Entry
+        - Keyword
       summary: Delete keywords from an entry.
-      description: "If given keywords are not inherited, admins, mods, and the entry\
+      description:
+        "If given keywords are not inherited, admins, mods, and the entry\
         \ creator get the keyword deleted immediately, anyone else gets keyword deletion\
         \ request submitted to mod queue."
       operationId: delete_keywords
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
-      - name: keyword
-        in: path
-        description: a keyword
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+        - name: keyword
+          in: path
+          description: a keyword
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
@@ -252,39 +554,40 @@ paths:
     summary: GET/POST comments on entry
     get:
       tags:
-      - Entry
-      - Comment
+        - Entry
+        - Comment
       summary: Get comments posted to an entry
-      description: Get a list of the comments that have been posted to an entry. Each
-        comment entry will have the username of the user who posted it attatched.
+      description:
+        Get a list of the comments that have been posted to an entry. Each
+        comment entry will have the userName of the user who posted it attatched.
       operationId: get_comments
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
     post:
       tags:
-      - Entry
-      - Comment
+        - Entry
+        - Comment
       summary: Post a new comment.
       description: Post a new comment to an entry. Any logged in user.
       operationId: post_comment
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
@@ -293,52 +596,52 @@ paths:
     summary: PUT/DELETE a comment
     put:
       tags:
-      - Entry
-      - Comment
+        - Entry
+        - Comment
       summary: Edit a comment.
       description: Edit a comment. Admin/mod/comment creator only.
       operationId: edit_comment
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
-      - name: commentID
-        in: path
-        description: the ID of the comment
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+        - name: commentID
+          in: path
+          description: the ID of the comment
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
     delete:
       tags:
-      - Entry
-      - Comment
+        - Entry
+        - Comment
       summary: Delete a comment.
       description: Delete a comment. Admin/mod/comment creator only.
       operationId: delete_comment
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
-      - name: commentID
-        in: path
-        description: the ID of the comment
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+        - name: commentID
+          in: path
+          description: the ID of the comment
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
@@ -347,27 +650,27 @@ paths:
     summary: POST a flag for review on a comment
     post:
       tags:
-      - Entry
-      - Comment
-      - Flag
+        - Entry
+        - Comment
+        - Flag
       summary: Post a flag for review on a comment
       description: "Post a flag for review on a comment, inserted into mod queue"
       operationId: flag_comment
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
-      - name: commentID
-        in: path
-        description: the ID of the comment
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+        - name: commentID
+          in: path
+          description: the ID of the comment
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
@@ -376,218 +679,64 @@ paths:
     summary: GET the entry chain ending at the specified entry
     get:
       tags:
-      - Chain
+        - Chain
       summary: Get the entry chain ending at the specified entry.
-      description: "Get the entry chain starting with the first entry of the story\
+      description:
+        "Get the entry chain starting with the first entry of the story\
         \ and ending at the specified entry. Show the Story title, then for each entry\
         \ show the entry title, the author, the keywords, the story text, and the\
         \ choice text for the next entry in the chain if applicable."
       operationId: get_chain
       parameters:
-      - name: entryID
-        in: path
-        description: the ID of the entry
-        required: true
-        style: simple
-        explode: false
-        schema: {}
+        - name: entryID
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         default:
           description: Default error sample response
       x-swagger-router-controller: Chain
-  /register:
-    summary: GET/POST registration
-    get:
-      tags:
-      - User
-      summary: Get registration page.
-      description: "Get the statically served registration page, with text boxes for\
-        \ username, email address, and password."
-      operationId: get_registration_page
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
-    post:
-      tags:
-      - User
-      summary: Register a new user
-      description: "Register a new user by posting a new username, an email address,\
-        \ and a password. Check for unique username, send verification email, and\
-        \ store password."
-      operationId: register_user
-      requestBody:
-        description: Submit a request to register a user
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Register'
-      responses:
-        "201":
-          description: "If the registration is successful, return the username and\
-            \ email fields of the user object to indicate success."
-          content:
-            application/json:
-              examples:
-                registered:
-                  value: |-
-                    {"user":{
-                    "username": "John",
-                    "email": "j_krueger@yahoo.com"
-                    }}
-        "401":
-          description: "If the username/email don't exist, or the password is incorrect,\
-            \ return an error."
-          content:
-            application/json:
-              examples:
-                duplicateUsername:
-                  value: "{\"error\": \"Bad username/email or wrong password.\"}"
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
-  /login:
-    summary: GET/POST login
-    get:
-      tags:
-      - User
-      summary: Get statically served login page.
-      description: "Get the statically served login page, with text boxes for username\
-        \ and password."
-      operationId: get_login_page
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
-    post:
-      tags:
-      - User
-      summary: Login user
-      description: "Post the username and password, and if they match, log the user\
-        \ in."
-      operationId: login_user
-      requestBody:
-        description: Submit a request to login
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Login'
-            example:
-              userName: Freddy
-              password: s33krit!
-      responses:
-        "200":
-          description: "If the login is successful, return the username and email\
-            \ fields of the user object to indicate success."
-          content:
-            application/json:
-              examples:
-                registered:
-                  value: |-
-                    {"user":{
-                    "username": "Freddy",
-                    "email": "freddy@example.com"
-                    }}
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
-  /logout:
-    summary: POST logout
-    post:
-      tags:
-      - User
-      summary: Logout the logged in user.
-      description: "Logout the logged in user. Posted by a button on the users profile\
-        \ page, or from the user menu."
-      operationId: logout_user
-      responses:
-        "200":
-          description: "Logout should always be successful. If user was logged in\
-            \ before request, the cookie will indicate the user to log out. If user\
-            \ was not logged in before request, user will still not be logged in,\
-            \ so we'll call that a success condition too."
-          content:
-            application/json:
-              examples:
-                registered:
-                  value: "{\"message\":{\"Logout successful.\"}}"
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
-  /profile:
-    summary: GET/PUT logged in user's profile
-    get:
-      tags:
-      - User
-      summary: Get user's profile.
-      description: "If a user is logged in, get that user's settings from the server,\
-        \ and show them on the page. If no user is logged in, check localStorage for\
-        \ basic settings (light/dark mode, blocked tags) otherwise use default basic\
-        \ settings. Can be used to change settings."
-      operationId: get_profile_page
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
-    put:
-      tags:
-      - User
-      summary: Post changes to user's profile.
-      description: "If a user is logged in, put the changed settings to the server,\
-        \ otherwise store them in localStorage."
-      operationId: put_profile
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
-  /user:
-    summary: GET a list of users
-    get:
-      tags:
-      - User
-      - Search
-      summary: "Get a list of users, sorted alphabetically."
-      description: "Get a list of users, sorted alphabetically. If there's a query\
-        \ string, only return the users whose usernames contain that query string.\
-        \ Each name should be linked to it's respective public profile."
-      operationId: get_users
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
-  /user/{userID}:
-    summary: GET a user's public profile
-    get:
-      tags:
-      - User
-      summary: Get a user's public profile.
-      description: "Get a webpage showing the specified user's public profile, including\
-        \ username, bio, email if user has decided to make that public, links to entries\
-        \ and comments, etc."
-      operationId: get_public_profile
-      parameters:
-      - name: userID
-        in: path
-        description: the ID of the user
-        required: true
-        style: simple
-        explode: false
-        schema: {}
-      responses:
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: User
   /search:
     summary: GET/GET+query string search for entries
     get:
       tags:
-      - Entry
-      - Search
+        - Entry
+        - Search
       summary: Get a list of entries selected and sorted by query string.
-      description: Get a list of entries selected and sorted by query string. Default
+      description:
+        Get a list of entries selected and sorted by query string. Default
         to all entries sorted by newest first.
       operationId: get_search_results
       responses:
+        "200":
+          description: "Successfully found a list of entries."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      entries:
+                        [
+                          {
+                            storyTitle: "Jerry's Journey",
+                            entryTitle: "A Fork in the Road",
+                            authorName: "Freddy",
+                            authorID: 1973,
+                            entryID:123,
+                          },
+                        ],
+                    }
+        "404":
+          description: "No matching entries found."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { entries: [] }
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
@@ -595,13 +744,28 @@ paths:
     summary: GET a list of defined keywords
     get:
       tags:
-      - Keyword
-      - Search
+        - Keyword
+        - Search
       summary: Get a list of defined keywords
-      description: "Get a list of all used keywords, sorted alphabetically or by use\
+      description:
+        "Get a list of all used keywords, sorted alphabetically or by use\
         \ count. If a query string is used, return only matching keywords."
       operationId: get_keyword_list
       responses:
+        "200":
+          description: "Successfully found a list of keywords."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { keywords: ["NSFW", "GORE", "SEX", "FF:Sailor Moon"] }
+        "404":
+          description: "No matching keywords found."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { keywords: [] }
         default:
           description: Default error sample response
       x-swagger-router-controller: Keyword

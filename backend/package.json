@@ -1,0 +1,23 @@
+{
+  "name": "a-new-addventure-backend",
+  "version": "1.0.0",
+  "description": "A collaborative fiction website.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "../.git"
+  },
+  "keywords": [
+    "fiction",
+    "website",
+    "backend"
+  ],
+  "author": "John Krueger",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
