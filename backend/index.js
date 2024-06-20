@@ -50,6 +50,7 @@ async function registerUser(user) {
     newUserEntry.passwordHash = await bcrypt.hash(user.password, saltRounds);
     newUserEntry.userID = userDatabase.nextUserID++;
     userDatabase.users.push(newUserEntry);
+    console.log('\n   Debug: ', newUserEntry);
     return {
         userID: newUserEntry.userID,
         userName: newUserEntry.userName,
@@ -68,10 +69,11 @@ function findUserByEmail(email) {
 
 app.use(express.json());
 app.use(cors({
-    origin: /https?:\/\/localhost/
+    origin: "https://newadventures100.netlify.app",
+    credentials: true
 })); // FIXME work out cors
 
-app.post('/register', function (req, res, next) {
+app.post('/register', async function (req, res, next) {
     const user = {
         userName: req.body?.userName,
         email: req.body?.email,
@@ -90,7 +92,8 @@ app.post('/register', function (req, res, next) {
     } else if (findUserByEmail(user.email)) {
         res.status(409).json({ error: "Email already in use." });
     } else {
-        const newUser = registerUser(user);
+        const newUser = await registerUser(user);
+        console.log('\n   Debug: ', newUser);
         res.status(201).json(newUser);
     }
 });
@@ -116,6 +119,11 @@ app.post('/login', async function (req, res, next) {
             res.status(200).json(resultUser);
         }
     }
+});
+
+app.get('/user', function (req, res, next) {
+    const userList = userDatabase.users.map(user => {return {userID: user.userID, userName: user.userName}});
+    res.status(200).json(userList);
 });
 
 app.listen(PORT, () => {
