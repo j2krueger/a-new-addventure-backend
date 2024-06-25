@@ -1,5 +1,8 @@
 "use strict";
 
+const process = require('process');
+require("dotenv").config();
+
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -11,59 +14,41 @@ const saltRounds = 10;
 
 const passport = require('passport');
 
-// FIXME memory only database only until we get a real database set up
-const userDatabase = {
-    nextUserID: 1974,
-    users: [
-        {
-            userID: 0,
-            userName: "admin",
-            email: "admin@example.com",
-            password: "admin"
-        },
-        {
-            userID: 1973,
-            userName: "Freddy",
-            email: "Freddy@example.com",
-            password: "s33krit!"
-        },
-        {
-            userID: 1972,
-            userName: "Abba",
-            email: "Bjorn@example.com",
-            password: "Waterloo"
-        }
-    ]
-};
+const session = require('express-session');
+const sessionSecret = process.env.SESSIONSECRET;
 
-// FIXME remove when real password database is implemented
-async function initUserDatabase() {
-    for (const user of userDatabase.users) {
-        user.passwordHash = await bcrypt.hash(user.password, saltRounds);
-        delete user.password;
-    }
-}
-initUserDatabase();
+const { MongoClient } = require("mongodb");
+const databaseURI = process.env.DATABASEURI;
+const dbClient = new MongoClient(databaseURI);
+const dbAddventure = dbClient.db("Addventure");
+const usersCollection = dbAddventure.collection("users");
+
+
+app.use(session({
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+}));
 
 async function registerUser(user) {
-    const newUserEntry = { userID: user.userID, userName: user.userName, email: user.email };
+    const newUserEntry = { userName: user.userName, email: user.email };
     newUserEntry.passwordHash = await bcrypt.hash(user.password, saltRounds);
-    newUserEntry.userID = userDatabase.nextUserID++;
-    userDatabase.users.push(newUserEntry);
-    console.log('\n   Debug: ', newUserEntry);
+    // userDatabase.users.push(newUserEntry);
+    const result = await usersCollection.insertOne(newUserEntry);
     return {
-        userID: newUserEntry.userID,
+        userID: result.insertedId,
         userName: newUserEntry.userName,
         email: newUserEntry.email
     };
 }
 
-function findUserByName(name) {
-    return userDatabase.users.find(e => e.userName == name);
+async function findUserByName(name) {
+    const result = await usersCollection.findOne({ userName: name });
+    return result;
 }
 
-function findUserByEmail(email) {
-    return userDatabase.users.find(e => e.email == email);
+async function findUserByEmail(email) {
+    return await usersCollection.findOne({ email: email });
 }
 
 
@@ -79,21 +64,18 @@ app.post('/register', async function (req, res, next) {
         email: req.body?.email,
         password: req.body?.password
     };
-    console.log(user);
-    console.log(userDatabase);
     if (!user.userName) {
-        res.status(400).json({ error: "Missing username." });
+        res.status(400).json({ error: "Missing userName." });
     } else if (!user.email) {
         res.status(400).json({ error: "Missing email." });
     } else if (!user.password) {
         res.status(400).json({ error: "Missing password." });
-    } else if (findUserByName(user.userName)) {
+    } else if (await findUserByName(user.userName)) {
         res.status(409).json({ error: "Username already in use." });
-    } else if (findUserByEmail(user.email)) {
+    } else if (await findUserByEmail(user.email)) {
         res.status(409).json({ error: "Email already in use." });
     } else {
         const newUser = await registerUser(user);
-        console.log('\n   Debug: ', newUser);
         res.status(201).json(newUser);
     }
 });
@@ -106,7 +88,7 @@ app.post('/login', async function (req, res, next) {
     } else if (!password) {
         res.status(400).json({ error: "Missing password." });
     } else {
-        const user = findUserByName(name) || findUserByEmail(name);
+        const user = await findUserByName(name) || await findUserByEmail(name);
         if (!user || !await bcrypt.compare(password, user.passwordHash)) {
             res.status(401).json({ error: "Incorrect name or password." });
         } else {
@@ -121,8 +103,10 @@ app.post('/login', async function (req, res, next) {
     }
 });
 
-app.get('/user', function (req, res, next) {
-    const userList = userDatabase.users.map(user => {return {userID: user.userID, userName: user.userName}});
+app.get('/user', async function (req, res, next) {
+    // const userList = userDatabase.users.map(user => { return { userID: user.userID, userName: user.userName } });
+    const cursor = await usersCollection.find({}, { sort: { userName: 1 }, projection: { userName: 1 } });
+    const userList = (await cursor.toArray()).map(user => { return { userID: user._id, userName: user.userName }; });
     res.status(200).json(userList);
 });
 
