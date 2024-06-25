@@ -23,12 +23,8 @@ const dbClient = new MongoClient(databaseURI);
 const dbAddventure = dbClient.db("Addventure");
 const usersCollection = dbAddventure.collection("users");
 
+const morgan = require('morgan');
 
-app.use(session({
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-}));
 
 async function registerUser(user) {
     const newUserEntry = { userName: user.userName, email: user.email };
@@ -53,12 +49,30 @@ async function findUserByEmail(email) {
 
 
 app.use(express.json());
-app.use(cors({
-    origin: "https://newadventures100.netlify.app",
-    credentials: true
-})); // FIXME work out cors
+
+app.use(morgan(function (tokens, req, res) {
+    return [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms',
+        "req.body:", JSON.stringify(req.body)
+    ].join(' ')
+}));
+
+app.use(session({
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+}));
 
 app.post('/register', async function (req, res, next) {
+    app.use(cors({
+        origin: "https://newadventures100.netlify.app",
+        credentials: true
+    })); // FIXME work out cors
+
     const user = {
         userName: req.body?.userName,
         email: req.body?.email,
