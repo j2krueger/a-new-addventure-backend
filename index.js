@@ -38,7 +38,7 @@ const morgan = require('morgan');
 //     credentials: true
 // })); // FIXME work out cors
 app.use(cors({
-    origin: "https://newadventures100.netlify.app/" || "http://localhost:5173/",
+    origin: "https://newadventures100.netlify.app" || "http://localhost:5173",
     credentials: true
 }));
 
@@ -177,14 +177,14 @@ app.get('/user', async function (req, res, next) {
     res.status(200).json(userList);
 });
 
-app.get('/profile', async function (req, res, next) {
-    const userID = req.session?.user?.userID;
-    if(!userID) {
-        res.status(401).json({error: "No user logged in."});
-    } else {
-        const profile = (await usersCollection.findOne({_id: userID})).profile;
-    }
-});
+// app.get('/profile', async function (req, res, next) {
+//     const userID = req.session?.user?.userID;
+//     if(!userID) {
+//         res.status(401).json({error: "No user logged in."});
+//     } else {
+//         const profile = (await usersCollection.findOne({_id: userID})).profile;
+//     }
+// });
 
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
