@@ -35,6 +35,11 @@ const mongoStore = MongoStore.create({
 
 const morgan = require('morgan');
 
+app.use(cors({
+    origin: "https://newadventures100.netlify.app",
+    credentials: true
+})); // FIXME work out cors
+
 
 async function registerUser(user) {
     const newUserEntry = { userName: user.userName, email: user.email };
@@ -81,11 +86,6 @@ app.use(session({
         maxAge: oneYearInMilliseconds
     }
 }));
-
-app.use(cors({
-    origin: "https://newadventures100.netlify.app",
-    credentials: true
-})); // FIXME work out cors
 
 app.post('/register', async function (req, res, next) {
 
