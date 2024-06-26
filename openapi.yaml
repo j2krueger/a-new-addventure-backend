@@ -150,6 +150,35 @@ paths:
         \ settings. Can be used to change settings."
       operationId: get_profile_page
       responses:
+        "200":
+          description: "Returns the profile of the logged in user"
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "userName": "Hank R. Chief",
+                      "email": "Hank@example.com",
+                      "public": {
+                        "bio": "I haven't decided what to put in my bio yet."
+                      },
+                      "publishEmail": false,
+                      "blockedKeywords": [],
+                      "blockedAuthors": [],
+                      "followedAuthors": [],
+                      "followedStories": [],
+                      "likes": [],
+                      "dislikes": [],
+                      "darkMode": false
+                    }
+        "401":
+          description: "If no user is logged in, return an error"
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "error": "No user logged in." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User

@@ -18,7 +18,7 @@ const sessionSecret = process.env.SESSIONSECRET;
 const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JWT_SECRET;
 
-const { MongoClient } = require("mongodb");
+const { MongoClient, ReturnDocument, ObjectId } = require("mongodb");
 const databaseURI = process.env.DATABASEURI;
 const mongoClient = new MongoClient(databaseURI);
 const addventureDatabase = mongoClient.db("Addventure");
@@ -33,24 +33,40 @@ const mongoStore = MongoStore.create({
 
 const morgan = require('morgan');
 
-// app.use(cors({
-//     origin: "https://newadventures100.netlify.app",
-//     credentials: true
-// })); // FIXME work out cors
+const defaultProfile = {
+    public: {
+        bio: "I haven't decided what to put in my bio yet."
+    },
+    publishEmail: false,
+    blockedKeywords: [],
+    blockedAuthors: [],
+    followedAuthors: [],
+    followedStories: [],
+    likes: [],
+    dislikes: [],
+    darkMode: false,
+}
+
+
 app.use(cors({
     origin: ["https://newadventures100.netlify.app", "http://localhost:5173"],
     credentials: true
-}));
+})); // FIXME work out cors, remove localhost once testing is done
 
 async function registerUser(user) {
-    const newUserEntry = { userName: user.userName, email: user.email };
+    const newUserEntry = {
+        userName: user.userName,
+        email: user.email,
+        admin: false,
+        moderator: false,
+        profile: defaultProfile,
+    };
     newUserEntry.passwordHash = await bcrypt.hash(user.password, saltRounds);
-    // userDatabase.users.push(newUserEntry);
     const result = await usersCollection.insertOne(newUserEntry);
     return {
         userID: result.insertedId,
         userName: newUserEntry.userName,
-        email: newUserEntry.email
+        email: newUserEntry.email,
     };
 }
 
@@ -126,7 +142,7 @@ app.post('/login', async function (req, res, next) {
             req.session.regenerate(function (err) {
                 if (err) next(err);
                 const resultUser = {
-                    userID: user.userID,
+                    userID: user._id,
                     userName: user.userName,
                     email: user.email
                 };
@@ -170,20 +186,39 @@ app.get('/sessioncheck', function (req, res, next) {
 });
 
 app.get('/user', async function (req, res, next) {
-    // const userList = userDatabase.users.map(user => { return { userID: user.userID, userName: user.userName } });
     const cursor = await usersCollection.find({}, { sort: { userName: 1 }, projection: { userName: 1 } });
     const userList = (await cursor.toArray()).map(user => { return { userID: user._id, userName: user.userName }; });
     res.status(200).json(userList);
 });
 
-// app.get('/profile', async function (req, res, next) {
-//     const userID = req.session?.user?.userID;
-//     if(!userID) {
-//         res.status(401).json({error: "No user logged in."});
-//     } else {
-//         const profile = (await usersCollection.findOne({_id: userID})).profile;
-//     }
-// });
+app.get('/profile', async function (req, res, next) {
+    const userID = req.session?.user?.userID;
+    if (!userID) {
+        res.status(401).json({ error: "No user logged in." });
+    } else {
+        const profile = (await usersCollection.findOne({ _id: new ObjectId(userID) })).profile;
+        if (profile) {
+            const returnedProfile = { userName: req.session.user.userName, email: req.session.user.email, ...profile }
+            res.status(200).json(returnedProfile);
+        } else {
+            const newProfile = {
+                userName: req.session.user.userName,
+                email: req.session.user.email,
+                ...(await usersCollection.findOneAndUpdate({ _id: new ObjectId(userID) }, {
+                    $set: { profile: defaultProfile, }
+                }, { returnDocument: 'after' }))
+            };
+            newProfile.userName = req.session.user.userName;
+            newProfile.email = req.session.user.email;
+            res.status(200).json(newProfile);
+        }
+    }
+});
+
+app.head('/', function (req, res, next) {
+    console.log(req.ip);
+    res.status(200).send();
+});
 
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
