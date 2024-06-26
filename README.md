@@ -155,16 +155,26 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 
 
 ### user schema:
-- id: int
-- email: string
-- name: string
-- admin: boolean
-- moderator: boolean
-- settings: ?
-- consecutive_login_failures: int; reset to 0 on successful login
-- last_login_fail: timestamp; if n login fails, wait n seconds before allowing another login attempt, if it's been less than n seconds since the last login attempt, don't even check against the stored hash, just increment failure count and update timestamp (replace with next_allowed_login_attempt?)
-- keyword_blocking
-- user_blocking?
+_id: int
+userName: string
+email: string
+admin: boolean
+moderator: boolean
+profile: {
+	public: {
+		bio: "I like trains."
+	},
+	publishEmail: false,
+	blockedKeywords: [],
+	blockedAuthors: [],
+	followedAuthors: [],
+	followedStories: [],
+	likes: [],
+	dislikes: [],
+	darkMode: boolean,
+}
+//- consecutive_login_failures: int; reset to 0 on successful login
+//- last_login_fail: timestamp; if n login fails, wait n seconds before allowing another login attempt, if it's been less than n seconds since the last login attempt, don't even check against the stored hash, just increment failure count and update timestamp (replace with next_allowed_login_attempt?)
 
 ### user_ratings schema:
  - user_id: int

@@ -12,8 +12,6 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-const passport = require('passport');
-
 const session = require('express-session');
 const sessionSecret = process.env.SESSIONSECRET;
 
@@ -35,11 +33,14 @@ const mongoStore = MongoStore.create({
 
 const morgan = require('morgan');
 
+// app.use(cors({
+//     origin: "https://newadventures100.netlify.app",
+//     credentials: true
+// })); // FIXME work out cors
 app.use(cors({
-    origin: "https://newadventures100.netlify.app",
+    origin: "https://newadventures100.netlify.app/" || "http://localhost:5173/",
     credentials: true
-})); // FIXME work out cors
-
+}));
 
 async function registerUser(user) {
     const newUserEntry = { userName: user.userName, email: user.email };
@@ -157,10 +158,10 @@ app.post('/login', async function (req, res, next) {
 app.post('/logout', function (req, res, next) {
     req.session.user = null;
     req.session.save(function (err) {
-        if (err) next(err);
+        if (err) return next(err);
         req.session.regenerate(function (err) {
-            if (err) next(err);
-            res.status(200).json({ message: "Logout successful." })
+            if (err) return next(err);
+            res.status(200).json({ message: "Logout successful." });
         })
     })
 });
@@ -174,6 +175,15 @@ app.get('/user', async function (req, res, next) {
     const cursor = await usersCollection.find({}, { sort: { userName: 1 }, projection: { userName: 1 } });
     const userList = (await cursor.toArray()).map(user => { return { userID: user._id, userName: user.userName }; });
     res.status(200).json(userList);
+});
+
+app.get('/profile', async function (req, res, next) {
+    const userID = req.session?.user?.userID;
+    if(!userID) {
+        res.status(401).json({error: "No user logged in."});
+    } else {
+        const profile = (await usersCollection.findOne({_id: userID})).profile;
+    }
 });
 
 app.listen(PORT, () => {
