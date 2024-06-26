@@ -17,11 +17,21 @@ const passport = require('passport');
 const session = require('express-session');
 const sessionSecret = process.env.SESSIONSECRET;
 
+const jwt = require('jsonwebtoken');
+const jwtSecret = process.env.JWT_SECRET;
+
 const { MongoClient } = require("mongodb");
 const databaseURI = process.env.DATABASEURI;
-const dbClient = new MongoClient(databaseURI);
-const dbAddventure = dbClient.db("Addventure");
-const usersCollection = dbAddventure.collection("users");
+const mongoClient = new MongoClient(databaseURI);
+const addventureDatabase = mongoClient.db("Addventure");
+const usersCollection = addventureDatabase.collection("users");
+const MongoStore = require('connect-mongo');
+const oneYearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
+const mongoStore = MongoStore.create({
+    client: mongoClient,
+    dbName: "Addventure",
+    ttl: oneYearInMilliseconds,
+});
 
 const morgan = require('morgan');
 
@@ -65,13 +75,19 @@ app.use(session({
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
+    store: mongoStore,
+    cookie: {
+        httpOnly: true,
+        maxAge: oneYearInMilliseconds
+    }
 }));
 
+app.use(cors({
+    origin: "https://newadventures100.netlify.app",
+    credentials: true
+})); // FIXME work out cors
+
 app.post('/register', async function (req, res, next) {
-    app.use(cors({
-        origin: "https://newadventures100.netlify.app",
-        credentials: true
-    })); // FIXME work out cors
 
     const user = {
         userName: req.body?.userName,
@@ -106,15 +122,48 @@ app.post('/login', async function (req, res, next) {
         if (!user || !await bcrypt.compare(password, user.passwordHash)) {
             res.status(401).json({ error: "Incorrect name or password." });
         } else {
-            // FIXME need real login code
-            const resultUser = {
-                userID: user.userID,
-                userName: user.userName,
-                email: user.email
-            };
-            res.status(200).json(resultUser);
+            req.session.regenerate(function (err) {
+                if (err) next(err);
+                const resultUser = {
+                    userID: user.userID,
+                    userName: user.userName,
+                    email: user.email
+                };
+                req.session.user = resultUser;
+                req.session.save(function (err) {
+                    if (err) next(err);
+                    const token = jwt.sign(
+                        {
+                            email: user.email,
+                            id: user._id,
+                            firstname: user.firstName,
+                        },
+                        jwtSecret,
+                        {}
+                    );
+                    res.cookie("token", token, {
+                        maxAge: oneYearInMilliseconds,
+                    });
+                    res.status(200).json(resultUser);
+                });
+            })
         }
     }
+});
+
+app.post('/logout', function (req, res, next) {
+    req.session.user = null;
+    req.session.save(function (err) {
+        if (err) next(err);
+        req.session.regenerate(function (err) {
+            if (err) next(err);
+            res.status(200).json({ message: "Logout successful." })
+        })
+    })
+});
+
+app.get('/sessioncheck', function (req, res, next) {
+    res.status(200).json(req.session);
 });
 
 app.get('/user', async function (req, res, next) {

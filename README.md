@@ -124,14 +124,12 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 - "use strict";
 - node/npm
 - git/github
-- mocha/chai
-- React
 - MongoDB
-- sequelize
 - express
-- sessions
 - bcrypt
+- sessions
 - passport(password, oauth)
+- mocha/chai
 - helmet
 - eslint
 
