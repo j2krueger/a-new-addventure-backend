@@ -38,7 +38,7 @@ const morgan = require('morgan');
 //     credentials: true
 // })); // FIXME work out cors
 app.use(cors({
-    origin: "https://newadventures100.netlify.app" || "http://localhost:5173",
+    origin: ["https://newadventures100.netlify.app", "http://localhost:5173"],
     credentials: true
 }));
 
