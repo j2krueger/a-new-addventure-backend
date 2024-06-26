@@ -83,9 +83,8 @@ app.use(session({
     store: mongoStore,
     cookie: {
         httpOnly: true,
-        // maxAge: oneYearInMilliseconds,
+        maxAge: oneYearInMilliseconds,
         secure: true,
-        maxAge: 3600000,
     }
 }));
 
@@ -145,6 +144,8 @@ app.post('/login', async function (req, res, next) {
                     );
                     res.cookie("token", token, {
                         maxAge: oneYearInMilliseconds,
+                        httpOnly: true,
+                        secure: true,
                     });
                     res.status(200).json(resultUser);
                 });
