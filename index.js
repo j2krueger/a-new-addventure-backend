@@ -83,7 +83,9 @@ app.use(session({
     store: mongoStore,
     cookie: {
         httpOnly: true,
-        maxAge: oneYearInMilliseconds
+        // maxAge: oneYearInMilliseconds,
+        secure: true,
+        maxAge: 3600000,
     }
 }));
 
