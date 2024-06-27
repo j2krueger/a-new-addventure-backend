@@ -103,6 +103,7 @@ app.use(session({
     cookie: {
         httpOnly: true,
         maxAge: oneYearInMilliseconds,
+        sameSite: 'none',
     }
 }));
 
@@ -164,6 +165,7 @@ app.post('/login', async function (req, res, next) {
                         maxAge: oneYearInMilliseconds,
                         httpOnly: true,
                         secure: true,
+                        sameSite: 'none',
                     });
                     res.status(200).json(resultUser);
                 });
