@@ -95,6 +95,7 @@ app.use(morgan(function (tokens, req, res) {
     ].join(' ')
 }));
 
+app.set('trust proxy', 1);
 app.use(session({
     secret: sessionSecret,
     resave: false,
@@ -104,6 +105,7 @@ app.use(session({
         httpOnly: true,
         maxAge: oneYearInMilliseconds,
         sameSite: 'none',
+        secure: true,
     }
 }));
 
