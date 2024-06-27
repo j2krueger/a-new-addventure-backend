@@ -237,6 +237,7 @@ app.get('/profile', async function (req, res) {
             const newProfile = {
                 userName: req.session.user.userName,
                 email: req.session.user.email,
+                userID: req.session.user.userID,
                 ...(await usersCollection.findOneAndUpdate({ _id: new ObjectId(userID) }, {
                     $set: { profile: defaultProfile, }
                 }, { returnDocument: 'after' }))
