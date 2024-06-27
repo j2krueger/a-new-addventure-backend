@@ -298,7 +298,7 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: { error: "There is no user with that user ID." }
+                  value: { "error": "There is no user with that user ID." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User

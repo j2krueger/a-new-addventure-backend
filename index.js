@@ -18,7 +18,7 @@ const sessionSecret = process.env.SESSIONSECRET;
 const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JWT_SECRET;
 
-const { MongoClient, ReturnDocument, ObjectId } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const databaseURI = process.env.DATABASEURI;
 const mongoClient = new MongoClient(databaseURI);
 const addventureDatabase = mongoClient.db("Addventure");
@@ -35,7 +35,9 @@ const morgan = require('morgan');
 
 const defaultProfile = {
     public: {
-        bio: "I haven't decided what to put in my bio yet."
+        bio: "I haven't decided what to put in my bio yet.",
+        entries: [],
+        comments: [],
     },
     publishEmail: false,
     blockedKeywords: [],
@@ -104,7 +106,7 @@ app.use(session({
     }
 }));
 
-app.post('/register', async function (req, res, next) {
+app.post('/register', async function (req, res) {
 
     const user = {
         userName: req.body?.userName,
@@ -181,17 +183,44 @@ app.post('/logout', function (req, res, next) {
     })
 });
 
-app.get('/sessioncheck', function (req, res, next) {
+app.get('/sessioncheck', function (req, res) {
     res.status(200).json(req.session);
 });
 
-app.get('/user', async function (req, res, next) {
+app.get('/user', async function (req, res) {
     const cursor = await usersCollection.find({}, { sort: { userName: 1 }, projection: { userName: 1 } });
     const userList = (await cursor.toArray()).map(user => { return { userID: user._id, userName: user.userName }; });
     res.status(200).json(userList);
 });
 
-app.get('/profile', async function (req, res, next) {
+app.param('userID', async function (req, res, next, value) {
+    const userID = value;
+    try {
+        const result = await usersCollection.findOne({ _id: new ObjectId(userID) });
+        if (result) {
+            req.verifiedUser = result;
+        }
+        next();
+    } catch (err) {
+        return next(err)
+    }
+});
+
+app.get('/user/:userID', function (req, res) {
+    if (req.verifiedUser) {
+        const user = req.verifiedUser;
+        const result = {
+            userName: user.userName,
+            email: user.profile.publishEmail ? user.email : "",
+            ...user.profile.public,
+        };
+        res.status(200).json(result);
+    } else {
+        res.status(404).json({ error: "There is no user with that user ID." })
+    };
+});
+
+app.get('/profile', async function (req, res) {
     const userID = req.session?.user?.userID;
     if (!userID) {
         res.status(401).json({ error: "No user logged in." });
@@ -215,7 +244,7 @@ app.get('/profile', async function (req, res, next) {
     }
 });
 
-app.head('/', function (req, res, next) {
+app.head('/', function (req, res) {
     console.log(req.ip);
     res.status(200).send();
 });
