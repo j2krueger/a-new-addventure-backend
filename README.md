@@ -134,8 +134,69 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 - eslint
 
 
+
 ---
 ## Database schemas:
+
+Table users {
+  userId integer [primary key]
+  userName integer
+  email integer
+  password varchar
+  bio varchar
+}
+REF: users.username < entry.authorName
+
+Table entry {
+  entryId integer [primary key]
+  storyId integer
+  authorName varchar 
+  entryTitle varchar
+  storyTitle varchar
+  bodyText varchar
+  previousEntry integer
+  createdDate timestamp
+  flagId integer
+  likes integer
+}
+
+REF: entry.storyId > story.storyId
+REF: entry.storyTitle > story.storyTitle
+REF: entry.flagId > flagEntry.flagId
+REF: entry.entryId > flagEntry.entryId
+
+Table userRating {
+  userId integer
+  entryId integer
+  rating integer 
+    
+}
+
+REF: users.userId < userRating.userId
+REF: entry.entryId < userRating.entryId
+
+Table flagEntry {
+  flagId integer
+  entryId integer
+  reason varchar
+}
+
+Table story {
+  storyId integer [primary key]
+  storyTitle varchar
+  originEntry integer
+}
+
+Table userBlock {
+  userBlockId integer
+  userId interger
+  blockedUserId integer
+}
+REF: users.userId < userBlock.userId
+REF: users.userId < userBlock.blockedUserId
+
+---
+## Old Database schemas (hang on to it until we're sure we don't need it):
 ### story schema
 - id: int;
 - title: text
@@ -209,5 +270,3 @@ profile: {
  - keyword_id: int
  - reason: text
 
-
----
