@@ -34,16 +34,17 @@ paths:
       responses:
         "201":
           description:
-            "If the registration is successful, return the userName and\
-            \ email fields of the user object to indicate success."
+            "If the registration is successful, return the users private profile information to indicate success."
           content:
             application/json:
               examples:
                 registered:
-                  value:
-                    {
-                      "user":
-                        { "userName": "Freddy", "email": "Freddy@example.com" },
+                  value: {
+                      "userID": "66845f61c806ebe5276df8db",
+                      "userName": "Freddy",
+                      "email": "Freddy@example.com",
+                      "bio": "I haven't decided what to put in my bio yet.",
+                      "publishEmail": false
                     }
         "400":
           description: "If any of the fields are missing, return an error."
@@ -83,17 +84,17 @@ paths:
       responses:
         "200":
           description:
-            "If the login is successful, return the userName and email\
-            \ fields of the user object to indicate success."
+            "If the login is successful, return the users private profile information to indicate success."
           content:
             application/json:
               examples:
                 registered:
-                  value:
-                    {
-                      "userID": "1973",
-                      "userName": "Freddy",
-                      "email": "freddy@example.com",
+                  value: {
+                      "userID": "667afb5feb94737bf4556b7e",
+                      "userName": "Hank R. Chief",
+                      "email": "Hank@example.com",
+                      "bio": "I haven't decided what to put in my bio yet.",
+                      "publishEmail": false
                     }
         "400":
           description: "Missing field."
@@ -151,26 +152,17 @@ paths:
       operationId: get_profile_page
       responses:
         "200":
-          description: "Returns the profile of the logged in user"
+          description: "Returns the private profile information of the logged in user."
           content:
             application/json:
               examples:
                 registered:
-                  value:
-                    {
+                  value: {
+                      "userID": "667afb5feb94737bf4556b7e",
                       "userName": "Hank R. Chief",
                       "email": "Hank@example.com",
-                      "public": {
-                        "bio": "I haven't decided what to put in my bio yet."
-                      },
-                      "publishEmail": false,
-                      "blockedKeywords": [],
-                      "blockedAuthors": [],
-                      "followedAuthors": [],
-                      "followedStories": [],
-                      "likes": [],
-                      "dislikes": [],
-                      "darkMode": false
+                      "bio": "I haven't decided what to put in my bio yet.",
+                      "publishEmail": false
                     }
         "401":
           description: "If no user is logged in, return an error"
@@ -213,21 +205,27 @@ paths:
             application/json:
               examples:
                 registered:
-                  value:
-                    {
-                      "users":
-                        [
-                          { "userName": "Abba", "userID": "1972" },
-                          { "userName": "Freddy", "userID": "1973" },
-                        ],
-                    }
+                  value: [
+                      {
+                        "userID": "667afb5feb94737bf4556b7e",
+                        "userName": "Hank R. Chief"
+                      },
+                      {
+                        "userID": "667b294248b8805d71a96a03",
+                        "userName": "apmanager"
+                      },
+                      {
+                        "userID": "6683586c0027ed9802194900",
+                        "userName": "Freddy"
+                      }
+                    ]
         "404":
           description: "No users matching the search string found."
           content:
             application/json:
               examples:
                 registered:
-                  value: { "users": [] }
+                  value: [ ]
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -257,40 +255,11 @@ paths:
             application/json:
               examples:
                 registered:
-                  value:
-                    {
-                      "userData":
-                        {
-                          "userName": "Freddy",
-                          "email": "",
-                          "bio": "I'm a movie monster!",
-                          "entries":
-                            [
-                              {
-                                "storyTitle": "Jerry's Journey",
-                                "entryTitle": "A Fork in the Road",
-                                "authorName": "Freddy",
-                                "entryID": "123",
-                              },
-                            ],
-                          "comments":
-                            [
-                              {
-                                "entry":
-                                  {
-                                    "storyTitle": "Jerry's Journey",
-                                    "entryTitle": "A Fork in the Road",
-                                    "authorName": "Freddy",
-                                    "entryID": "123",
-                                  },
-                                "comment":
-                                  {
-                                    "commentID": "456",
-                                    "commentText": "I'm making comments!",
-                                  },
-                              },
-                            ],
-                        },
+                  value: {
+                      "userID": "667afb5feb94737bf4556b7e",
+                      "userName": "Hank R. Chief",
+                      "email": "",
+                      "bio": "I haven't decided what to put in my bio yet."
                     }
         "404":
           description: "User not found."
