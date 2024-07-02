@@ -111,8 +111,11 @@ function getUserInfoByID(req, res) {
 }
 
 async function getProfile(req, res) {
-    console.log('\n   Debug: ', 'Authenticated');
     res.status(200).json(req.authenticatedUser.privateProfile());
+}
+
+async function putProfile(req, res){
+
 }
 
 module.exports = {
@@ -123,4 +126,5 @@ module.exports = {
     paramUserID,
     getUserInfoByID,
     getProfile,
+    // putProfile,
 };

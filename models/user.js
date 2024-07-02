@@ -49,6 +49,10 @@ userSchema.methods.basicInfo = function basicInfo() {
   return { userID: this._id, userName: this.userName };
 }
 
+/* userSchema.methods.applySettings = function applySettings(settings){
+
+}
+ */
 const User = mongoose.model("User", userSchema)
 
 module.exports = User
