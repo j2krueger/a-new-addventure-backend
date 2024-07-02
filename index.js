@@ -15,6 +15,9 @@ const mongoStore = MongoStore.create({
     ttl: constants.loginExpirationTime,
 });
 
+if(constants.testing){
+    console.log('\n   constants: ', constants);
+}
 
 const mongoose = require("mongoose");
 // const cookieParser = require("cookie-parser");

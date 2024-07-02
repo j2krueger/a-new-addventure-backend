@@ -33,4 +33,5 @@ module.exports = {
     corsAllowURLs: process.env.SERVER_URL.split(' '),
     dbName: process.env.DBNAME,
     localDeploy: process.env.LOCALDEPLOY,
+    testing: process.env.TESTING,
 }

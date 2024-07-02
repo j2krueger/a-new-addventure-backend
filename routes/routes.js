@@ -21,7 +21,7 @@ router.get('/user', userControllers.getUser);
 router.param('userID', userControllers.paramUserID);
 router.get('/user/:userID', userControllers.getUserInfoByID);
 router.get('/profile', userAuth, userControllers.getProfile);
-// router.put('/profile', userAuth, userControllers.putProfile)
+router.put('/profile', userAuth, userControllers.putProfile)
 
 if(constants.localDeploy){
     router.get('/sessioncheck', function (req, res) {

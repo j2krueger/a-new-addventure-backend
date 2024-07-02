@@ -55,7 +55,7 @@ const defaultProfile = {
 app.use(cors({
     origin: ["https://newadventures100.netlify.app", "http://localhost:5173"],
     credentials: true
-})); // FIXME work out cors, remove localhost once testing is done
+})); 
 
 async function registerUser(user) {
     const newUserEntry = {

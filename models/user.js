@@ -34,11 +34,15 @@ const userSchema = new Schema({
   publishEmail: {
     type: Boolean,
     default: false,
-  }
+  },
+  darkMode: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 userSchema.methods.privateProfile = function privateProfile() {
-  return { userID: this._id, userName: this.userName, email: this.email, bio: this.bio, publishEmail: this.publishEmail };
+  return { userID: this._id, userName: this.userName, email: this.email, bio: this.bio, publishEmail: this.publishEmail, darkMode: this.darkMode };
 }
 
 userSchema.methods.publicInfo = function publicInfo() {
@@ -49,10 +53,25 @@ userSchema.methods.basicInfo = function basicInfo() {
   return { userID: this._id, userName: this.userName };
 }
 
-/* userSchema.methods.applySettings = function applySettings(settings){
 
+const userSetable = {
+  bio: "string",
+  publishEmail: "boolean",
+  darkMode: "boolean",
 }
- */
+
+userSchema.methods.applySettings = async function applySettings(settings) {
+  for (const key in settings) {
+    if (!(key in userSetable && typeof settings[key] == userSetable[key])) {
+      throw new Error("Invalid request.");
+    }
+  }
+  for (const key in settings) {
+    this[key] = settings[key];
+  }
+  return (await this.save());
+}
+
 const User = mongoose.model("User", userSchema)
 
 module.exports = User

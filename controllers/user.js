@@ -114,8 +114,19 @@ async function getProfile(req, res) {
     res.status(200).json(req.authenticatedUser.privateProfile());
 }
 
-async function putProfile(req, res){
-
+async function putProfile(req, res, next){
+    try {
+        const result = await req.authenticatedUser.applySettings(req.body);
+        req.session.user = result;
+        res.status(200).json(result.privateProfile());
+    } catch (err) {
+        if(err.message == "Invalid request."){
+            res.status(400).json({error: err.message});
+        }else{
+            res.status(500).json(err);
+        }
+        next(err);
+    }
 }
 
 module.exports = {
@@ -126,5 +137,5 @@ module.exports = {
     paramUserID,
     getUserInfoByID,
     getProfile,
-    // putProfile,
+    putProfile,
 };
