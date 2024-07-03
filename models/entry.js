@@ -15,7 +15,7 @@ const entrySchema = new Schema({
     },
     entryTitle: {
       type: String,
-      required: ['Entry Title is needed'],
+    //   required: ['Entry Title is needed'],
     },
     storyTitle: {
       type: String,
@@ -27,11 +27,11 @@ const entrySchema = new Schema({
       },
     previousEntry: {
         type: ObjectId,
-        required: ['Previous Entry is needed'],
+        // required: ['Previous Entry is needed'],
       },
     createDate: {
         type: Date,
-        required: ['Author is needed'],
+        // required: ['Author is needed'],
       },
     flagId: {
       type: ObjectId,

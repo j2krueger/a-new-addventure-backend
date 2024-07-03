@@ -91,20 +91,20 @@ async function getUser(req, res) {
 
 async function paramUserID(req, res, next, value) {
     const userID = value;
+}
+
+async function getUserInfoByID(req, res) {
+    let foundUser = null;
     try {
-        const result = await User.findById(userID);
+        const result = await User.findById(req.params.id);
         if (result) {
-            req.foundUserByID = result;
+            foundUser = result;
         }
-        next();
     } catch (err) {
         return next(err)
     }
-}
-
-function getUserInfoByID(req, res) {
-    if (req.foundUserByID) {
-        res.status(200).json(req.foundUserByID.publicInfo());
+    if (foundUser) {
+        res.status(200).json(foundUser.publicInfo());
     } else {
         res.status(404).json({ error: "There is no user with that user ID." })
     };

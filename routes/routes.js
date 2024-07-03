@@ -19,14 +19,13 @@ router.post('/register', userControllers.registerUser);
 router.post('/login', userControllers.loginUser);
 router.post('/logout', userControllers.logoutUser);
 router.get('/user', userControllers.getUser);
-router.param('userID', userControllers.paramUserID);
-router.get('/user/:userID', userControllers.getUserInfoByID);
+router.get('/user/:id', userControllers.getUserInfoByID);
 router.get('/profile', userAuth, userControllers.getProfile);
 router.put('/profile', userAuth, userControllers.putProfile)
 
-router.param('entryID', entryControllers.paramEntryID);
-router.get('/entry/:entryID', entryControllers.getEntry);
-router.post('/entry', entryControllers.createStory)
+router.param('id', entryControllers.paramId);
+router.get('/entry/:id', entryControllers.getEntry);
+router.post('/entry', userAuth, entryControllers.createStory);
 
 if (constants.localDeploy && constants.testing) { // use on loca
     router.get('/sessioncheck', function (req, res) {
