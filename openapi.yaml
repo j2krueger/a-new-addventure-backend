@@ -179,9 +179,15 @@ paths:
         - User
       summary: Post changes to user's profile.
       description:
-        "If a user is logged in, put the changed settings to the server,\
-        \ otherwise store them in localStorage."
+        "If a user is logged in, put the changed settings to the server."
       operationId: put_profile
+      requestBody:
+        description: Submit a request to change some settings."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Settings"
+            example: { "publishEmail": true, "bio": "This is a new bio." }
       responses:
         default:
           description: Default error sample response
@@ -730,16 +736,31 @@ paths:
 components:
   schemas:
     Register:
+      required:
+        - userName
+        - email
+        - password
       properties:
-        userName: {}
-        email: {}
-        password: {}
-      xml:
-        name: Register
+        userName: 
+          type: string
+        email: 
+          type: string
+        password:
+          type: string
     Login:
+      required:
+        - name
+        - password
       properties:
-        userName: {}
-        email: {}
-        password: {}
-      xml:
-        name: Login
+        name:
+          type: string
+        password:
+          type: string
+    Settings:
+      properties:
+        bio:
+          type: boolean
+        publishEmail:
+          type: boolean
+        darkMode:
+          type: boolean
