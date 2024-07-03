@@ -11,6 +11,7 @@ const oneDayInMilliseconds = 24 * oneHourInMilliseconds;
 const oneWeekInMilliseconds = 7 * oneDayInMilliseconds;
 const oneMonthInMilliseconds = 30 * oneDayInMilliseconds;
 const oneYearInMilliseconds = 365 * oneDayInMilliseconds;
+const entriesPerPage = 100;
 
 module.exports = {
     // Useful lengths of time
@@ -24,6 +25,7 @@ module.exports = {
 
     // Standardise these across the application
     loginExpirationTime: oneWeekInMilliseconds,
+    entriesPerPage,
 
     // configuration values loaded from .env
     databaseURI: process.env.DATABASEURI,

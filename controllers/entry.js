@@ -1,6 +1,6 @@
 "use strict";
 
-// const constants = require('../helpers/constants');
+const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
 const { randomBytes, } = require('node:crypto');
 
@@ -32,7 +32,7 @@ const getEntry = async (req, res) => {
 
 const createStory = async (req, res) => {
   try {
-    const { storyTitle, body, authorName } =
+    const { storyTitle, body, } =
       req.body;
 
     const createdStoryId = randomBytes(12).toString("hex");
@@ -43,7 +43,7 @@ const createStory = async (req, res) => {
       storyTitle,
       bodyText: body,
       previousEntry: null,
-      authorName
+      authorName: req.authenticatedUser.userName,
     });
     return res.json(entry);
   } catch (error) {
@@ -51,8 +51,9 @@ const createStory = async (req, res) => {
   }
 };
 
-async function getEntryList(req, res){
-  const result = await Entry.find().limit(100);
+async function getEntryList(req, res) {
+  const pageNumber = req.query?.page ?? 1; // FIXME better validation of query
+  const result = await Entry.find().skip((pageNumber - 1) * constants.entriesPerPage).limit(constants.entriesPerPage);
   res.status(200).json(result);
 }
 
