@@ -51,8 +51,14 @@ const createStory = async (req, res) => {
   }
 };
 
+async function getEntryList(req, res){
+  const result = await Entry.find().limit(100);
+  res.status(200).json(result);
+}
+
 module.exports = {
   paramId,
   getEntry,
   createStory,
+  getEntryList,
 }

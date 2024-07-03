@@ -89,11 +89,11 @@ async function getUser(req, res) {
     res.status(200).json(result);
 }
 
-async function paramUserID(req, res, next, value) {
-    const userID = value;
-}
+// async function paramUserID(req, res, next, value) {
+//     const userID = value;
+// }
 
-async function getUserInfoByID(req, res) {
+async function getUserInfoByID(req, res, next) {
     let foundUser = null;
     try {
         const result = await User.findById(req.params.id);
@@ -134,7 +134,7 @@ module.exports = {
     loginUser,
     logoutUser,
     getUser,
-    paramUserID,
+    // paramUserID,
     getUserInfoByID,
     getProfile,
     putProfile,
