@@ -6,6 +6,7 @@ const express = require('express');
 const router = express.Router();
 const cors = require('cors');
 const userControllers = require('../controllers/user');
+const entryControllers = require('../controllers/entry');
 
 
 router.use(cors({
@@ -23,7 +24,11 @@ router.get('/user/:userID', userControllers.getUserInfoByID);
 router.get('/profile', userAuth, userControllers.getProfile);
 router.put('/profile', userAuth, userControllers.putProfile)
 
-if(constants.localDeploy){
+router.param('entryID', entryControllers.paramEntryID);
+router.get('/entry/:entryID', entryControllers.getEntry);
+router.post('/entry', entryControllers.createStory)
+
+if (constants.localDeploy && constants.testing) { // use on loca
     router.get('/sessioncheck', function (req, res) {
         res.status(200).json(req.session);
     });
