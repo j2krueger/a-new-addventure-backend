@@ -15,7 +15,7 @@ const entrySchema = new Schema({
     },
     entryTitle: {
         type: String,
-        //   required: ['Entry Title is needed'],
+        required: ['Entry Title is needed'],
     },
     storyTitle: {
         type: String,
@@ -25,9 +25,13 @@ const entrySchema = new Schema({
         type: String,
         required: ['The body is needed'],
     },
+    choiceText: {
+        type: String,
+        // required: ['The choice text is needed'],
+    },
     previousEntry: {
         type: ObjectId,
-        // required: ['Previous Entry is needed'],
+        default: null,
     },
     createDate: {
         type: Date,
@@ -43,6 +47,16 @@ const entrySchema = new Schema({
     }
 });
 
+entrySchema.methods.saveNewStory = async function saveNewStory(){
+    this.storyId = this._id;
+    await this.save();
+}
+
+entrySchema.methods.saveContinuationEntry = async function saveContinuationEntry(prevEntry){
+    this.storyId = prevEntry.storyId;
+    this.storyTitle = prevEntry.storyTitle;
+    await this.save();
+}
 const Entry = mongoose.model("Entry", entrySchema)
 
 module.exports = Entry

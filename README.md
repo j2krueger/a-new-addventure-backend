@@ -128,10 +128,11 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 - express
 - bcrypt
 - sessions
+- eslint
+- validator.js
 - passport(password, oauth)
 - mocha/chai
 - helmet
-- eslint
 
 
 

@@ -26,6 +26,7 @@ router.put('/profile', userAuth, userControllers.putProfile)
 router.param('id', entryControllers.paramId);
 router.get('/entry/:id', entryControllers.getEntry);
 router.post('/entry', userAuth, entryControllers.createStory);
+router.post('/entry/:id', userAuth, entryControllers.continueStory);
 router.get('/entry', entryControllers.getEntryList);
 
 if (constants.localDeploy && constants.testing) { // use on loca

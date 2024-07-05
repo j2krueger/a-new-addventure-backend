@@ -4,7 +4,10 @@
   "description": "A collaborative fiction website.",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "lint": "./node_modules/.bin/eslint *.js controllers/*.js helpers/*.js models/*.js routes/*.js",
+    "finddebug": "grep Debug -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js",
+    "findfixme": "grep FIXME -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js"
   },
   "repository": {
     "type": "git",
@@ -28,7 +31,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.0",
     "mongoose": "^8.4.4",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "validator": "^13.12.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",

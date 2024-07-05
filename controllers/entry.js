@@ -2,7 +2,6 @@
 
 const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
-const { randomBytes, } = require('node:crypto');
 
 async function paramId(req, res, next, value) {
   const entryID = value;
@@ -30,30 +29,66 @@ const getEntry = async (req, res) => {
   }
 };
 
-const createStory = async (req, res) => {
+async function createStory(req, res) {
+  const { storyTitle, bodyText, entryTitle, } = req.body;
+
+  if (typeof storyTitle != 'string') {
+    return res.status(400).json({ error: "Missing story title." });
+  } else if (typeof bodyText != 'string') {
+    return res.status(400).json({ error: "Missing story text." });
+  } else if (typeof entryTitle != 'string') {
+    return res.status(400).json({ error: "Missing entry title." });
+  }
+
   try {
-    const { storyTitle, body, } =
-      req.body;
-
-    const createdStoryId = randomBytes(12).toString("hex");
-
-    const entry = await Entry.create({
-      storyId: createdStoryId,
-      entryTitle: null,
+    const entry = new Entry({
+      entryTitle,
       storyTitle,
-      bodyText: body,
+      bodyText,
       previousEntry: null,
       authorName: req.authenticatedUser.userName,
     });
-    return res.json(entry);
+    await entry.saveNewStory();
+
+    return res.status(201).json(entry);
   } catch (error) {
-    console.log(error);
+    return res.status(500).json(error);
   }
 };
 
+async function continueStory(req, res) {
+  const { bodyText, entryTitle, choiceText } = req.body;
+  if (typeof choiceText != 'string') {
+    return res.status(400).json({ error: "Missing choice text." });
+  } else if (typeof bodyText != 'string') {
+    return res.status(400).json({ error: "Missing story text." });
+  } else if (typeof entryTitle != 'string') {
+    return res.status(400).json({ error: "Missing entry title." });
+  }
+
+  try {
+    const entry = new Entry({
+      bodyText,
+      entryTitle,
+      choiceText,
+      authorName: req.authenticatedUser.userName,
+      previousEntry: req.foundEntryByID._id,
+    })
+    await entry.saveContinuationEntry(req.foundEntryByID);
+
+    return res.status(201).json(entry);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+}
+
 async function getEntryList(req, res) {
-  const pageNumber = req.query?.page ?? 1; // FIXME better validation of query
-  const result = await Entry.find().skip((pageNumber - 1) * constants.entriesPerPage).limit(constants.entriesPerPage);
+  const pageNumber = Number.isSafeInteger(req.query?.page) && req.query.page > 0 ? req.query.page : 1;
+  const result = await Entry.find({}, null, {
+    sort: { createDate: -1 },
+    skip: (pageNumber - 1) * constants.entriesPerPage,
+    limit: constants.entriesPerPage,
+  })
   res.status(200).json(result);
 }
 
@@ -61,5 +96,6 @@ module.exports = {
   paramId,
   getEntry,
   createStory,
+  continueStory,
   getEntryList,
 }

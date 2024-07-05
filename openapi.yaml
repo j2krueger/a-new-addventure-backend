@@ -33,18 +33,18 @@ paths:
               }
       responses:
         "201":
-          description:
-            "If the registration is successful, return the users private profile information to indicate success."
+          description: "If the registration is successful, return the users private profile information to indicate success."
           content:
             application/json:
               examples:
                 registered:
-                  value: {
+                  value:
+                    {
                       "userID": "66845f61c806ebe5276df8db",
                       "userName": "Freddy",
                       "email": "Freddy@example.com",
                       "bio": "I haven't decided what to put in my bio yet.",
-                      "publishEmail": false
+                      "publishEmail": false,
                     }
         "400":
           description: "If any of the fields are missing, return an error."
@@ -83,18 +83,18 @@ paths:
             example: { "name": "Freddy", "password": "s33krit!" }
       responses:
         "200":
-          description:
-            "If the login is successful, return the users private profile information to indicate success."
+          description: "If the login is successful, return the users private profile information to indicate success."
           content:
             application/json:
               examples:
                 registered:
-                  value: {
+                  value:
+                    {
                       "userID": "667afb5feb94737bf4556b7e",
                       "userName": "Hank R. Chief",
                       "email": "Hank@example.com",
                       "bio": "I haven't decided what to put in my bio yet.",
-                      "publishEmail": false
+                      "publishEmail": false,
                     }
         "400":
           description: "Missing field."
@@ -157,12 +157,13 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: {
+                  value:
+                    {
                       "userID": "667afb5feb94737bf4556b7e",
                       "userName": "Hank R. Chief",
                       "email": "Hank@example.com",
                       "bio": "I haven't decided what to put in my bio yet.",
-                      "publishEmail": false
+                      "publishEmail": false,
                     }
         "401":
           description: "If no user is logged in, return an error"
@@ -178,11 +179,10 @@ paths:
       tags:
         - User
       summary: Post changes to user's profile.
-      description:
-        "If a user is logged in, put the changed settings to the server."
+      description: "If a user is logged in, put the changed settings to the server."
       operationId: put_profile
       requestBody:
-        description: Submit a request to change some settings."
+        description: "Submit a request to change some settings."
         content:
           application/json:
             schema:
@@ -211,19 +211,20 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: [
+                  value:
+                    [
                       {
                         "userID": "667afb5feb94737bf4556b7e",
-                        "userName": "Hank R. Chief"
+                        "userName": "Hank R. Chief",
                       },
                       {
                         "userID": "667b294248b8805d71a96a03",
-                        "userName": "apmanager"
+                        "userName": "apmanager",
                       },
                       {
                         "userID": "6683586c0027ed9802194900",
-                        "userName": "Freddy"
-                      }
+                        "userName": "Freddy",
+                      },
                     ]
         "404":
           description: "No users matching the search string found."
@@ -231,7 +232,7 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: [ ]
+                  value: []
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -261,11 +262,12 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: {
+                  value:
+                    {
                       "userID": "667afb5feb94737bf4556b7e",
                       "userName": "Hank R. Chief",
                       "email": "",
-                      "bio": "I haven't decided what to put in my bio yet."
+                      "bio": "I haven't decided what to put in my bio yet.",
                     }
         "404":
           description: "User not found."
@@ -280,14 +282,56 @@ paths:
   /entry:
     summary: GET/POST entries
     get:
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: "The page number of results the user is requesting. Absence is equivalent to 'page=1'"
       tags:
         - Entry
       summary: GET a list of recent entries
-      description:
-        "Gets a list of recent entries, showing story title, entry title,\
-        \ author, and date for each one."
+      description: "Gets a list of [constants.entriesPerPage] recent entries, newest first. Get more by setting query string to 'page=2', etc."
       operationId: get_entry_list
       responses:
+        "200":
+          description: "Successfully found entries."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      [
+                        {
+                          "_id": "668820191cb99dfdc244c23c",
+                          "authorName": "Freddy",
+                          "entryTitle": "Chapter the first",
+                          "bodyText": "Mononoke Hime",
+                          "choiceText": "Suddenly...",
+                          "previousEntry": "6688142fb004b799a5a29d03",
+                          "flagId": null,
+                          "likes": 0,
+                          "createDate": "2024-07-05T16:32:25.490Z",
+                          "storyId": "6688142fb004b799a5a29d03",
+                          "storyTitle": "Random Title",
+                          "__v": 0,
+                        },
+                        {
+                          "_id": "6688142fb004b799a5a29d03",
+                          "authorName": "Freddy",
+                          "entryTitle": "Chapter the zeroeth",
+                          "storyTitle": "Random Title",
+                          "bodyText": "Genji no monogatari",
+                          "previousEntry": null,
+                          "flagId": null,
+                          "likes": 0,
+                          "createDate": "2024-07-05T15:41:35.510Z",
+                          "storyId": "6688142fb004b799a5a29d03",
+                          "__v": 0,
+                        },
+                      ],
+                    }
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
@@ -296,11 +340,48 @@ paths:
         - Entry
         - Story
       summary: Post a new story
-      description:
-        "Post the title, author, keywords, and text of an entry to start\
-        \ a new story."
+      description: "Post the story title, entry title, and text of an entry to start a new story."
       operationId: post_story
+      requestBody:
+        description: "Post a new story."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewStory"
+            example:
+              {
+                "storyTitle": "Random Title",
+                "entryTitle": "Chapter the zeroeth",
+                "bodyText": "Genji no monogatari",
+              }
       responses:
+        "201":
+          description: "Successfully created entry."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "authorName": "Freddy",
+                      "entryTitle": "Chapter the zeroeth",
+                      "storyTitle": "Random Title",
+                      "bodyText": "Genji no monogatari",
+                      "previousEntry": null,
+                      "flagId": null,
+                      "likes": 0,
+                      "_id": "6688142fb004b799a5a29d03",
+                      "createDate": "2024-07-05T15:41:35.510Z",
+                      "storyId": "6688142fb004b799a5a29d03",
+                      "__v": 0,
+                    }
+        "400":
+          description: "Bad request."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "error": "Missing story title." }
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
@@ -309,10 +390,8 @@ paths:
     get:
       tags:
         - Entry
-      summary: GET the page showing a particular entry
-      description:
-        "Gets the entry title, author, keywords, date, text, and choice\
-        \ texts, formatted in HTML."
+      summary: GET a particular entry by ID
+      description: "Gets the entry title, author, keywords, date, text, and choice texts."
       operationId: get_entry_by_id
       parameters:
         - name: entryID
@@ -350,19 +429,57 @@ paths:
       tags:
         - Entry
       summary: "Post a continuation of entry {entryID}"
-      description:
-        "Post a new entry continuing entry {entryID} including choice text,\
-        \ entry title, keywords, and entry text."
+      description: "Post a new entry continuing entry {entryID} including choice text, entry title, and entry text."
       operationId: post_entry
       parameters:
         - name: entryID
           in: path
-          description: the ID of the entry
+          description: The ID of the entry being continued.
           required: true
           style: simple
           explode: false
           schema: {}
+      requestBody:
+        description: "Post a new entry continuing entry {entryID} including choice text, entry title, and entry text."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContinueStory"
+            example:
+              {
+                "entryTitle": "Chapter the first",
+                "bodyText": "Mononoke Hime",
+                "choiceText": "Suddenly...",
+              }
       responses:
+        "201":
+          description: "Successfully created entry"
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "authorName": "Freddy",
+                      "entryTitle": "Chapter the first",
+                      "bodyText": "Mononoke Hime",
+                      "choiceText": "Suddenly...",
+                      "previousEntry": "6688142fb004b799a5a29d03",
+                      "flagId": null,
+                      "likes": 0,
+                      "_id": "668820191cb99dfdc244c23c",
+                      "createDate": "2024-07-05T16:32:25.490Z",
+                      "storyId": "6688142fb004b799a5a29d03",
+                      "storyTitle": "Random Title",
+                      "__v": 0,
+                    }
+        "400":
+          description: "Bad request."
+          content:
+            application/json:
+              examples:
+                registered:
+                  value: { "error": "Missing choice text." }
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
@@ -741,9 +858,9 @@ components:
         - email
         - password
       properties:
-        userName: 
+        userName:
           type: string
-        email: 
+        email:
           type: string
         password:
           type: string
@@ -764,3 +881,27 @@ components:
           type: boolean
         darkMode:
           type: boolean
+    NewStory:
+      required:
+        - storyTitle
+        - entryTitle
+        - bodyText
+      properties:
+        storyTitle:
+          type: string
+        entryTitle:
+          type: string
+        bodyText:
+          type: string
+    ContinueStory:
+      required:
+        - choiceText
+        - entryTitle
+        - bodyText
+      properties:
+        choiceText:
+          type: string
+        entryTitle:
+          type: string
+        bodyText:
+          type: string
