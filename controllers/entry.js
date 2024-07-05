@@ -3,6 +3,8 @@
 const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
 
+console.log(`Update check: 2024-07-05T16:44`);
+
 async function paramId(req, res, next, value) {
   const entryID = value;
   try {
