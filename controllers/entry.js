@@ -23,7 +23,7 @@ const getEntry = async (req, res) => {
     const entryId = req.params.id;
     const entry = await Entry.findById(entryId);
     const result = await entry.fullInfoWithContinuations();
-    
+
     // Send the user data back to the client
     res.status(200).json(result);
   } catch (error) {
@@ -60,10 +60,8 @@ async function createStory(req, res) {
 };
 
 async function continueStory(req, res) {
-  const { bodyText, entryTitle, choiceText } = req.body;
-  if (typeof choiceText != 'string') {
-    return res.status(400).json({ error: "Missing choice text." });
-  } else if (typeof bodyText != 'string') {
+  const { bodyText, entryTitle, } = req.body;
+  if (typeof bodyText != 'string') {
     return res.status(400).json({ error: "Missing story text." });
   } else if (typeof entryTitle != 'string') {
     return res.status(400).json({ error: "Missing entry title." });
@@ -73,7 +71,6 @@ async function continueStory(req, res) {
     const entry = new Entry({
       bodyText,
       entryTitle,
-      choiceText,
       authorName: req.authenticatedUser.userName,
       previousEntry: req.foundEntryByID._id,
     })
