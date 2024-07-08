@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose')
 const { Schema } = mongoose
+const Entry = require('./entry');
 
 const userSchema = new Schema({
   userName: {
@@ -41,12 +42,26 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.methods.privateProfile = function privateProfile() {
-  return { userID: this._id, userName: this.userName, email: this.email, bio: this.bio, publishEmail: this.publishEmail, darkMode: this.darkMode };
+userSchema.methods.privateProfile = async function privateProfile() {
+  return {
+    userID: this._id,
+    userName: this.userName,
+    email: this.email,
+    bio: this.bio,
+    publishEmail: this.publishEmail,
+    darkMode: this.darkMode,
+    publishedEntries: (await Entry.find({ authorName: this.userName })).map(entry => entry.summary()),
+  };
 }
 
-userSchema.methods.publicInfo = function publicInfo() {
-  return { userID: this._id, userName: this.userName, email: this.publishEmail ? this.email : "", bio: this.bio };
+userSchema.methods.publicInfo = async function publicInfo() {
+  return {
+    userID: this._id,
+    userName: this.userName,
+    email: this.publishEmail ? this.email : "",
+    bio: this.bio,
+    publishedEntries: (await Entry.find({ authorName: this.userName })).map(entry => entry.summary()),
+  };
 }
 
 userSchema.methods.basicInfo = function basicInfo() {

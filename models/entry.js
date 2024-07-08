@@ -25,10 +25,6 @@ const entrySchema = new Schema({
         type: String,
         required: ['The body is needed'],
     },
-    choiceText: {
-        type: String,
-        // required: ['The choice text is needed'],
-    },
     previousEntry: {
         type: ObjectId,
         default: null,
@@ -47,16 +43,56 @@ const entrySchema = new Schema({
     }
 });
 
-entrySchema.methods.saveNewStory = async function saveNewStory(){
+entrySchema.methods.saveNewStory = async function saveNewStory() {
     this.storyId = this._id;
     await this.save();
 }
 
-entrySchema.methods.saveContinuationEntry = async function saveContinuationEntry(prevEntry){
+entrySchema.methods.saveContinuationEntry = async function saveContinuationEntry(prevEntry) {
     this.storyId = prevEntry.storyId;
     this.storyTitle = prevEntry.storyTitle;
     await this.save();
 }
+
+entrySchema.methods.summary = function summary() {
+    return { entryID: this._id, storyTitle: this.storyTitle, entryTitle: this.entryTitle };
+}
+
+entrySchema.methods.fullInfo = function fullInfo(){
+    return {
+        entryID: this._id,
+        authorName: this.authorName,
+        entryTitle: this.entryTitle,
+        storyTitle: this.storyTitle,
+        bodyText: this.bodyText,
+        previousEntry: this.previousEntry,
+        flagId: this.flagId,
+        likes: this.likes,
+        createDate: this.createDate,
+        storyId: this.storyId,
+    };
+}
+
+entrySchema.methods.getContinuations = async function getContinuations() {
+    return (await Entry.find({ previousEntry: this._id })).map(entry => entry.summary());
+}
+
+entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithContinuations(){
+    return {
+        entryID: this._id,
+        authorName: this.authorName,
+        entryTitle: this.entryTitle,
+        storyTitle: this.storyTitle,
+        bodyText: this.bodyText,
+        previousEntry: this.previousEntry,
+        flagId: this.flagId,
+        likes: this.likes,
+        createDate: this.createDate,
+        storyId: this.storyId,
+        continuationEntries: await this.getContinuations(),
+    };
+}
+
 const Entry = mongoose.model("Entry", entrySchema)
 
 module.exports = Entry

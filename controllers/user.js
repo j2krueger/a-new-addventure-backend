@@ -33,7 +33,7 @@ async function registerUser(req, res) {
         } catch (err) {
             return res.status(500).json(err);
         }
-        res.status(201).json(newUser.privateProfile());
+        res.status(201).json(await newUser.privateProfile());
     }
 }
 
@@ -52,7 +52,7 @@ async function loginUser(req, res, next) {
             req.session.regenerate(function (err) {
                 if (err) next(err);
                 req.session.user = user;
-                req.session.save(function (err) {
+                req.session.save(async function (err) {
                     if (err) next(err);
                     const token = jwt.sign(
                         {
@@ -69,7 +69,7 @@ async function loginUser(req, res, next) {
                         secure: true,
                         sameSite: 'none',
                     });
-                    res.status(200).json(user.privateProfile());
+                    res.status(200).json(await user.privateProfile());
                 });
             })
         }
@@ -94,31 +94,26 @@ async function getUser(req, res) {
 // }
 
 async function getUserInfoByID(req, res, next) {
-    let foundUser = null;
     try {
         const result = await User.findById(req.params.id);
-        if (result) {
-            foundUser = result;
+        if (!result){
+            return res.status(404).json({ error: "There is no user with that user ID." });
         }
+        res.status(200).json(await result.publicInfo());
     } catch (err) {
         return next(err)
     }
-    if (foundUser) {
-        res.status(200).json(foundUser.publicInfo());
-    } else {
-        res.status(404).json({ error: "There is no user with that user ID." })
-    };
 }
 
 async function getProfile(req, res) {
-    res.status(200).json(req.authenticatedUser.privateProfile());
+    res.status(200).json(await req.authenticatedUser.privateProfile());
 }
 
 async function putProfile(req, res, next){
     try {
         const result = await req.authenticatedUser.applySettings(req.body);
         req.session.user = result;
-        res.status(200).json(result.privateProfile());
+        res.status(200).json(await result.privateProfile());
     } catch (err) {
         if(err.message == "Invalid request."){
             res.status(400).json({error: err.message});

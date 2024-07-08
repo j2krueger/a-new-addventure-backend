@@ -22,9 +22,10 @@ const getEntry = async (req, res) => {
   try {
     const entryId = req.params.id;
     const entry = await Entry.findById(entryId);
-
+    const result = await entry.fullInfoWithContinuations();
+    
     // Send the user data back to the client
-    res.json(entry);
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching entry:", error);
     res.status(500).json({ error: "Internal Server Error" });

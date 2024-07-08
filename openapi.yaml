@@ -159,11 +159,40 @@ paths:
                 registered:
                   value:
                     {
-                      "userID": "667afb5feb94737bf4556b7e",
-                      "userName": "Hank R. Chief",
-                      "email": "Hank@example.com",
-                      "bio": "I haven't decided what to put in my bio yet.",
-                      "publishEmail": false,
+                      "userID": "668490250029a28118a8d1be",
+                      "userName": "Freddy",
+                      "email": "Freddy@example.com",
+                      "bio": "I HAVE decided what to put in my bio yet.",
+                      "publishEmail": true,
+                      "darkMode": false,
+                      "publishedEntries":
+                        [
+                          {
+                            "entryID": "6685cf32fb208efa4de7dfab",
+                            "storyTitle": "Story Title",
+                            "entryTitle": null,
+                          },
+                          {
+                            "entryID": "6685d031715453a8be27589b",
+                            "storyTitle": "Super Good Title",
+                            "entryTitle": null,
+                          },
+                          {
+                            "entryID": "6688142fb004b799a5a29d03",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the zeroeth",
+                          },
+                          {
+                            "entryID": "668820191cb99dfdc244c23c",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the first",
+                          },
+                          {
+                            "entryID": "668857a03f120ae7785257d4",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the zeroeth",
+                          },
+                        ],
                     }
         "401":
           description: "If no user is logged in, return an error"
@@ -264,10 +293,38 @@ paths:
                 registered:
                   value:
                     {
-                      "userID": "667afb5feb94737bf4556b7e",
-                      "userName": "Hank R. Chief",
-                      "email": "",
-                      "bio": "I haven't decided what to put in my bio yet.",
+                      "userID": "668490250029a28118a8d1be",
+                      "userName": "Freddy",
+                      "email": "Freddy@example.com",
+                      "bio": "I HAVE decided what to put in my bio yet.",
+                      "publishedEntries":
+                        [
+                          {
+                            "entryID": "6685cf32fb208efa4de7dfab",
+                            "storyTitle": "Story Title",
+                            "entryTitle": null,
+                          },
+                          {
+                            "entryID": "6685d031715453a8be27589b",
+                            "storyTitle": "Super Good Title",
+                            "entryTitle": null,
+                          },
+                          {
+                            "entryID": "6688142fb004b799a5a29d03",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the zeroeth",
+                          },
+                          {
+                            "entryID": "668820191cb99dfdc244c23c",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the first",
+                          },
+                          {
+                            "entryID": "668857a03f120ae7785257d4",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the zeroeth",
+                          },
+                        ],
                     }
         "404":
           description: "User not found."
@@ -301,37 +358,35 @@ paths:
               examples:
                 registered:
                   value:
-                    {
-                      [
-                        {
-                          "_id": "668820191cb99dfdc244c23c",
-                          "authorName": "Freddy",
-                          "entryTitle": "Chapter the first",
-                          "bodyText": "Mononoke Hime",
-                          "choiceText": "Suddenly...",
-                          "previousEntry": "6688142fb004b799a5a29d03",
-                          "flagId": null,
-                          "likes": 0,
-                          "createDate": "2024-07-05T16:32:25.490Z",
-                          "storyId": "6688142fb004b799a5a29d03",
-                          "storyTitle": "Random Title",
-                          "__v": 0,
-                        },
-                        {
-                          "_id": "6688142fb004b799a5a29d03",
-                          "authorName": "Freddy",
-                          "entryTitle": "Chapter the zeroeth",
-                          "storyTitle": "Random Title",
-                          "bodyText": "Genji no monogatari",
-                          "previousEntry": null,
-                          "flagId": null,
-                          "likes": 0,
-                          "createDate": "2024-07-05T15:41:35.510Z",
-                          "storyId": "6688142fb004b799a5a29d03",
-                          "__v": 0,
-                        },
-                      ],
-                    }
+                    [
+                      {
+                        "_id": "668820191cb99dfdc244c23c",
+                        "authorName": "Freddy",
+                        "entryTitle": "Chapter the first",
+                        "bodyText": "Mononoke Hime",
+                        "choiceText": "Suddenly...",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "flagId": null,
+                        "likes": 0,
+                        "createDate": "2024-07-05T16:32:25.490Z",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "storyTitle": "Random Title",
+                        "__v": 0,
+                      },
+                      {
+                        "_id": "6688142fb004b799a5a29d03",
+                        "authorName": "Freddy",
+                        "entryTitle": "Chapter the zeroeth",
+                        "storyTitle": "Random Title",
+                        "bodyText": "Genji no monogatari",
+                        "previousEntry": null,
+                        "flagId": null,
+                        "likes": 0,
+                        "createDate": "2024-07-05T15:41:35.510Z",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "__v": 0,
+                      },
+                    ]
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
@@ -391,7 +446,7 @@ paths:
       tags:
         - Entry
       summary: GET a particular entry by ID
-      description: "Gets the entry title, author, keywords, date, text, and choice texts."
+      description: "Gets entry data, and an array named continuationEntries containing entryIDs and entry titles from continuation entries."
       operationId: get_entry_by_id
       parameters:
         - name: entryID
@@ -402,6 +457,33 @@ paths:
           explode: false
           schema: {}
       responses:
+        "200":
+          description: "Entry found"
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "entryID": "6688142fb004b799a5a29d03",
+                      "authorName": "Freddy",
+                      "entryTitle": "Chapter the zeroeth",
+                      "storyTitle": "Random Title",
+                      "bodyText": "Genji no monogatari",
+                      "previousEntry": null,
+                      "flagId": null,
+                      "likes": 0,
+                      "createDate": "2024-07-05T15:41:35.510Z",
+                      "storyId": "6688142fb004b799a5a29d03",
+                      "continuationEntries":
+                        [
+                          {
+                            "entryID": "668820191cb99dfdc244c23c",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the first",
+                          },
+                        ],
+                    }
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
