@@ -36,4 +36,5 @@ module.exports = {
     dbName: process.env.DBNAME,
     localDeploy: process.env.LOCALDEPLOY,
     testing: process.env.TESTING,
+    mochaTestingUrl: process.env.MOCHA_TESTING_URL,
 }

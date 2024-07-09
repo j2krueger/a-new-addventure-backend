@@ -3,8 +3,6 @@
 const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
 
-console.log(`Update check: 2024-07-05T16:44`);
-
 async function paramId(req, res, next, value) {
   const entryID = value;
   try {
@@ -39,8 +37,6 @@ async function createStory(req, res) {
     return res.status(400).json({ error: "Missing story title." });
   } else if (typeof bodyText != 'string') {
     return res.status(400).json({ error: "Missing story text." });
-  } else if (typeof entryTitle != 'string') {
-    return res.status(400).json({ error: "Missing entry title." });
   }
 
   try {

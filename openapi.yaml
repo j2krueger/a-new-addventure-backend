@@ -405,7 +405,6 @@ paths:
             example:
               {
                 "storyTitle": "Random Title",
-                "entryTitle": "Chapter the zeroeth",
                 "bodyText": "Genji no monogatari",
               }
       responses:
@@ -947,12 +946,9 @@ components:
     NewStory:
       required:
         - storyTitle
-        - entryTitle
         - bodyText
       properties:
         storyTitle:
-          type: string
-        entryTitle:
           type: string
         bodyText:
           type: string
