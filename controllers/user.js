@@ -84,7 +84,7 @@ function logoutUser(req, res, next) {
 }
 
 async function getUser(req, res) {
-    const userList = await User.find();
+    const userList = await User.find().collation({ locale: "en" }).sort({ userName: 1 });
     const result = userList.map(user => user.basicInfo())
     res.status(200).json(result);
 }
@@ -95,8 +95,11 @@ async function getUser(req, res) {
 
 async function getUserInfoByID(req, res, next) {
     try {
-        const result = await User.findById(req.params.id);
-        if (!result){
+        if (typeof req.params.userID != 'string' || !/^[0-9a-f]{24}$/.test(req.params.userID)) {
+            return res.status(400).json({ error: "That is not a properly formatted userID." })
+        }
+        const result = await User.findById(req.params.userID);
+        if (!result) {
             return res.status(404).json({ error: "There is no user with that user ID." });
         }
         res.status(200).json(await result.publicInfo());
@@ -109,18 +112,17 @@ async function getProfile(req, res) {
     res.status(200).json(await req.authenticatedUser.privateProfile());
 }
 
-async function putProfile(req, res, next){
+async function putProfile(req, res, next) {
     try {
         const result = await req.authenticatedUser.applySettings(req.body);
         req.session.user = result;
         res.status(200).json(await result.privateProfile());
     } catch (err) {
-        if(err.message == "Invalid request."){
-            res.status(400).json({error: err.message});
-        }else{
-            res.status(500).json(err);
+        if (err.message == "Invalid request.") {
+            return res.status(400).json({ error: err.message });
+        } else {
+            next(err);
         }
-        next(err);
     }
 }
 

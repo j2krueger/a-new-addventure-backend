@@ -218,6 +218,49 @@ paths:
               $ref: "#/components/schemas/Settings"
             example: { "publishEmail": true, "bio": "This is a new bio." }
       responses:
+        "200":
+          description: "Return the user's private profile data"
+          content:
+            application/json:
+              examples:
+                registered:
+                  value:
+                    {
+                      "userID": "668490250029a28118a8d1be",
+                      "userName": "Freddy",
+                      "email": "Freddy@example.com",
+                      "bio": "I HAVE decided what to put in my bio yet.",
+                      "publishEmail": true,
+                      "darkMode": false,
+                      "publishedEntries":
+                        [
+                          {
+                            "entryID": "6685cf32fb208efa4de7dfab",
+                            "storyTitle": "Story Title",
+                            "entryTitle": null,
+                          },
+                          {
+                            "entryID": "6685d031715453a8be27589b",
+                            "storyTitle": "Super Good Title",
+                            "entryTitle": null,
+                          },
+                          {
+                            "entryID": "6688142fb004b799a5a29d03",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the zeroeth",
+                          },
+                          {
+                            "entryID": "668820191cb99dfdc244c23c",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the first",
+                          },
+                          {
+                            "entryID": "668857a03f120ae7785257d4",
+                            "storyTitle": "Random Title",
+                            "entryTitle": "Chapter the zeroeth",
+                          },
+                        ],
+                    }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -489,8 +532,7 @@ paths:
       tags:
         - Entry
       summary: Edit an entry
-      description:
-        "Edit an entry's entry title, keywords, and entry text. Can only be done by admins, mods, and the user who created the entry."
+      description: "Edit an entry's entry title, keywords, and entry text. Can only be done by admins, mods, and the user who created the entry."
       operationId: edit_entry
       parameters:
         - name: entryID
@@ -525,10 +567,7 @@ paths:
             schema:
               $ref: "#/components/schemas/ContinueStory"
             example:
-              {
-                "entryTitle": "Chapter the first",
-                "bodyText": "Mononoke Hime",
-              }
+              { "entryTitle": "Chapter the first", "bodyText": "Mononoke Hime" }
       responses:
         "201":
           description: "Successfully created entry"
@@ -938,7 +977,7 @@ components:
     Settings:
       properties:
         bio:
-          type: boolean
+          type: string
         publishEmail:
           type: boolean
         darkMode:
