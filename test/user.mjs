@@ -24,7 +24,7 @@ before(async function () {
 })
 
 after(async function () {
-    // await User.deleteOne({ userName: newUserName }); // accumulate a few for pagination testing
+    await User.deleteOne({ userName: newUserName });
     mongoose.disconnect();
 })
 
