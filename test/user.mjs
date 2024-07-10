@@ -1,14 +1,13 @@
 "use strict";
 
-import { expect, use } from 'chai';  // Creates local variables `expect` and `use`; useful for plugin use
+import { expect, use } from 'chai';
 import chaiHttp from "chai-http";
 const chai = use(chaiHttp);
-
-
 const constants = (await import('../helpers/constants.js')).default;
 const mongoose = (await import("mongoose")).default;
-const User = (await import('../models/user.js')).default;
+const agent = chai.request.agent(constants.mochaTestingUrl);
 
+const User = (await import('../models/user.js')).default;
 const newUserName = "test-" + Math.random();
 const newEmail = newUserName + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();
@@ -16,7 +15,6 @@ let newUserPrivateProfile;
 let newUserPublicInfo;
 let newUserBasicInfo;
 
-const agent = chai.request.agent(constants.mochaTestingUrl);
 
 before(async function () {
     mongoose.connect(constants.databaseURI, { dbName: constants.dbName })
@@ -215,9 +213,73 @@ describe('login with missing password', function () {
 })
 
 describe('get users', function () {
-    it('should return a 200 OK and an array of users.basicInfo()', function (done) {
+    it('should return a 200 OK and an array of users.publicInfo() with no more than constants.entriesPerPage entries', function (done) {
         agent
             .get('/user')
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.an('array');
+                expect(res.body).to.have.lengthOf.at.most(constants.entriesPerPage);
+                for (const user of res.body) {
+                    expect(user.userID).to.be.a('string').that.matches(/^[0-9a-f]{24}$/);
+                    expect(user.userName).to.be.a('string');
+                    expect(user.email).to.be.a('string');
+                    expect(user.bio).to.be.a('string');
+                    expect(user.publishedEntries).to.be.an('array')
+                }
+                done();
+            })
+    })
+})
+
+describe('get users with query string {regex: f}', function () {
+    it('should return a 200 OK and an array of users.publicInfo() with each userName including an f', function (done) {
+        agent
+            .get('/user')
+            .query({regex: 'f'})
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.an('array');
+                for (const user of res.body) {
+                    expect(user.userID).to.be.a('string').with.lengthOf(24);
+                    expect(user.userName).to.be.a('string').which.matches('f');
+                    expect(user.email).to.be.a('string');
+                    expect(user.bio).to.be.a('string');
+                    expect(user.publishedEntries).to.be.an('array')
+                }
+                done();
+            })
+    })
+})
+
+describe('get users with query string {regex: f, i:1}', function () {
+    it('should return a 200 OK and an array of users.publicInfo() with each userName including an F or an f', function (done) {
+        agent
+            .get('/user')
+            .query({regex: 'f', i:1})
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.an('array');
+                for (const user of res.body) {
+                    expect(user.userID).to.be.a('string').with.lengthOf(24);
+                    expect(user.userName).to.be.a('string').which.matches(/f/i);
+                    expect(user.email).to.be.a('string');
+                    expect(user.bio).to.be.a('string');
+                    expect(user.publishedEntries).to.be.an('array')
+                }
+                done();
+            })
+    })
+})
+
+describe('get users with query string {page: 2}', function () {
+    it('should return a 200 OK and an array of users.publicInfo() corresponding to page 2 of the results', function (done) {
+        agent
+            .get('/user')
+            .query({page: 2})
             .end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
@@ -225,6 +287,9 @@ describe('get users', function () {
                 for (const user of res.body) {
                     expect(user.userID).to.be.a('string').with.lengthOf(24);
                     expect(user.userName).to.be.a('string');
+                    expect(user.email).to.be.a('string');
+                    expect(user.bio).to.be.a('string');
+                    expect(user.publishedEntries).to.be.an('array')
                 }
                 done();
             })

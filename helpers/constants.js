@@ -11,7 +11,7 @@ const oneDayInMilliseconds = 24 * oneHourInMilliseconds;
 const oneWeekInMilliseconds = 7 * oneDayInMilliseconds;
 const oneMonthInMilliseconds = 30 * oneDayInMilliseconds;
 const oneYearInMilliseconds = 365 * oneDayInMilliseconds;
-const entriesPerPage = 100;
+const entriesPerPage = 20;
 
 module.exports = {
     // Useful lengths of time

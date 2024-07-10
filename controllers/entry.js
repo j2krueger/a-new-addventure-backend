@@ -79,12 +79,12 @@ async function continueStory(req, res) {
 }
 
 async function getEntryList(req, res) {
-  const pageNumber = Number.isSafeInteger(req.query?.page) && req.query.page > 0 ? req.query.page : 1;
-  const result = await Entry.find({}, null, {
-    sort: { createDate: -1 },
-    skip: (pageNumber - 1) * constants.entriesPerPage,
-    limit: constants.entriesPerPage,
-  })
+  const { page } = req.query;
+  const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
+  const result = await Entry.find()
+    .sort({ createDate: -1 })
+    .skip(zPage * constants.entriesPerPage)
+    .limit(constants.entriesPerPage);
   res.status(200).json(result);
 }
 

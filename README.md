@@ -138,6 +138,11 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 
 ---
 ## Database schemas:
+created indices:
+{
+  authorName: "hashed"
+}
+
 
 Table users {
   userId integer [primary key]

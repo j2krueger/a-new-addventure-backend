@@ -272,10 +272,26 @@ paths:
         - Search
       summary: "Get a list of users, sorted alphabetically."
       description:
-        "Get a list of users, sorted alphabetically. If there's a query\
-        \ string, only return the users whose userNames match that query string.\
-        \ Each name should be linked to it's respective public profile."
+        "Get a list of users, in publicInfo format, sorted alphabetically. If there's a query string, only return the users whose userNames\
+        \ match that query string."
       operationId: get_users
+      parameters:
+        - in: query
+          name: regex
+          schema:
+            type: string
+          description: "If present, only returns users whose userName matches the regex, case sensitive unless i is set to a non-empty value."
+        - in: query
+          name: i
+          schema:
+            type: string
+          description: "If set to a non-empty value, regex match is done case insensitively. Ignored if regex is not set."
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+          description: "Returns the indicated page number of the result list. If not set, is equivalent to setting page=1"
       responses:
         "200":
           description: "List of users found."
@@ -286,16 +302,25 @@ paths:
                   value:
                     [
                       {
-                        "userID": "667afb5feb94737bf4556b7e",
-                        "userName": "Hank R. Chief",
+                        "userID": "668ee1dae1dcd980cf0739e0",
+                        "userName": "FreddySaturn",
+                        "email": "",
+                        "bio": "I haven't decided what to put in my bio yet.",
+                        "publishedEntries": [],
                       },
                       {
-                        "userID": "667b294248b8805d71a96a03",
-                        "userName": "apmanager",
+                        "userID": "668ee27de1dcd980cf073a08",
+                        "userName": "FreddySedna",
+                        "email": "",
+                        "bio": "I haven't decided what to put in my bio yet.",
+                        "publishedEntries": [],
                       },
                       {
-                        "userID": "6683586c0027ed9802194900",
-                        "userName": "Freddy",
+                        "userID": "668ee31ae1dcd980cf073a17",
+                        "userName": "FreddyTitan",
+                        "email": "",
+                        "bio": "I haven't decided what to put in my bio yet.",
+                        "publishedEntries": [],
                       },
                     ]
         "404":

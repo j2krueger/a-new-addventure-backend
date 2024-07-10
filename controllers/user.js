@@ -84,8 +84,20 @@ function logoutUser(req, res, next) {
 }
 
 async function getUser(req, res) {
-    const userList = await User.find().collation({ locale: "en" }).sort({ userName: 1 });
-    const result = userList.map(user => user.basicInfo())
+    const { regex, i, page } = req.query;
+    const zPage = (Number.isSafeInteger(Number(page)) && page > 0) ? page - 1 : 0;
+    const mongoQuery = {};
+    if (regex) {
+        mongoQuery.userName = { $regex: regex };
+        if (i) {
+            mongoQuery.userName["$options"] = 'i';
+        }
+    }
+    const userList = await User.find(mongoQuery)
+        .collation({ locale: "en" })
+        .sort({ userName: 1 })
+        .skip(zPage * constants.entriesPerPage).limit(constants.entriesPerPage);
+    const result = await  Promise.all(userList.map(async user => user.publicInfo()));
     res.status(200).json(result);
 }
 
