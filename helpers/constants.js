@@ -11,7 +11,6 @@ const oneDayInMilliseconds = 24 * oneHourInMilliseconds;
 const oneWeekInMilliseconds = 7 * oneDayInMilliseconds;
 const oneMonthInMilliseconds = 30 * oneDayInMilliseconds;
 const oneYearInMilliseconds = 365 * oneDayInMilliseconds;
-const entriesPerPage = 20;
 
 module.exports = {
     // Useful lengths of time
@@ -25,7 +24,6 @@ module.exports = {
 
     // Standardise these across the application
     loginExpirationTime: oneWeekInMilliseconds,
-    entriesPerPage,
 
     // configuration values loaded from .env
     databaseURI: process.env.DATABASEURI,
@@ -37,4 +35,5 @@ module.exports = {
     localDeploy: process.env.LOCALDEPLOY,
     testing: process.env.TESTING,
     mochaTestingUrl: process.env.MOCHA_TESTING_URL,
+    entriesPerPage: Number(process.env.ENTRIES_PER_PAGE),
 }
