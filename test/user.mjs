@@ -1,13 +1,14 @@
 "use strict";
 
-import { expect, use } from 'chai';
-import chaiHttp from "chai-http";
-const chai = use(chaiHttp);
-const constants = (await import('../helpers/constants.js')).default;
-const mongoose = (await import("mongoose")).default;
-const agent = chai.request.agent(constants.mochaTestingUrl);
+import * as globals from './globals.mjs';
+const { expect,
+    constants,
+    mongoose,
+    agent,
+    User,
+    expectMongoObjectID,
+} = globals;
 
-const User = (await import('../models/user.js')).default;
 const newUserName = "test-" + Math.random();
 const newEmail = newUserName + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();
@@ -16,11 +17,11 @@ let newUserPublicInfo;
 // eslint-disable-next-line no-unused-vars
 let newUserBasicInfo;
 
-describe('The user handling routes', function () {
-    before(async function () {
+describe('Test the user handling routes', function () {
+    before(function (done) {
         mongoose.connect(constants.databaseURI, { dbName: constants.dbName })
-            .then(() => console.log('Database Connected'))
-            .catch(() => console.log("Database not conected"))
+            .then(() => { console.log('Database Connected'); done() })
+            .catch(() => { console.log("Database not conected"); done() })
 
     })
 
@@ -28,6 +29,8 @@ describe('The user handling routes', function () {
         await User.deleteOne({ userName: newUserName });
         mongoose.disconnect();
     })
+
+    this.slow(1000);
 
     describe('Register a new randomly generated user', function () {
         it('should return a 201 created and a user.privateProfile() with the given userName and email', function (done) {
@@ -40,7 +43,7 @@ describe('The user handling routes', function () {
                     expect(res.body).to.be.an('object');
                     expect(res.body.userName).to.equal(newUserName);
                     expect(res.body.email).to.equal(newEmail);
-                    expect(res.body.userID).to.be.a('string').with.lengthOf(24);
+                    expectMongoObjectID(res.body.userID);
                     expect(res.body.bio).to.equal("I haven't decided what to put in my bio yet.");
                     expect(res.body.publishEmail).to.equal(false);
                     expect(res.body.darkMode).to.equal(false);
@@ -223,7 +226,7 @@ describe('The user handling routes', function () {
                     expect(res.body).to.be.an('array');
                     expect(res.body).to.have.lengthOf.at.most(constants.entriesPerPage);
                     for (const user of res.body) {
-                        expect(user.userID).to.be.a('string').that.matches(/^[0-9a-f]{24}$/);
+                        expectMongoObjectID(user.userID);
                         expect(user.userName).to.be.a('string');
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
@@ -244,7 +247,7 @@ describe('The user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array');
                     for (const user of res.body) {
-                        expect(user.userID).to.be.a('string').with.lengthOf(24);
+                        expectMongoObjectID(user.userID);
                         expect(user.userName).to.be.a('string').which.matches('f');
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
@@ -265,7 +268,7 @@ describe('The user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array');
                     for (const user of res.body) {
-                        expect(user.userID).to.be.a('string').with.lengthOf(24);
+                        expectMongoObjectID(user.userID);
                         expect(user.userName).to.be.a('string').which.matches(/f/i);
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
@@ -286,7 +289,7 @@ describe('The user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array');
                     for (const user of res.body) {
-                        expect(user.userID).to.be.a('string').with.lengthOf(24);
+                        expectMongoObjectID(user.userID);
                         expect(user.userName).to.be.a('string');
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
