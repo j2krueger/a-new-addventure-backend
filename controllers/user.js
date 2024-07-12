@@ -96,8 +96,9 @@ async function getUser(req, res) {
     const userList = await User.find(mongoQuery)
         .collation({ locale: "en" })
         .sort({ userName: 1 })
-        .skip(zPage * constants.entriesPerPage).limit(constants.entriesPerPage);
-    const result = await  Promise.all(userList.map(async user => user.publicInfo()));
+        .skip(zPage * constants.entriesPerPage)
+        .limit(constants.entriesPerPage);
+    const result = await Promise.all(userList.map(async user => user.publicInfo()));
     res.status(200).json(result);
 }
 

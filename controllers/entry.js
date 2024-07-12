@@ -81,10 +81,12 @@ async function continueStory(req, res) {
 async function getEntryList(req, res) {
   const { page } = req.query;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
-  const result = await Entry.find()
+  const entryList = await Entry.find()
     .sort({ createDate: -1 })
     .skip(zPage * constants.entriesPerPage)
     .limit(constants.entriesPerPage);
+  const result = entryList.map(entry => entry.summary());
+  console.log('\n   Debug: entry.js: ', result);
   res.status(200).json(result);
 }
 
