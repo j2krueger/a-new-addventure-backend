@@ -28,6 +28,8 @@ describe('Test the user handling routes', function () {
     })
 
     after(async function () {
+        await agent
+            .post('/logout');
         await User.deleteOne({ userName: newUserName });
         mongoose.disconnect();
     })

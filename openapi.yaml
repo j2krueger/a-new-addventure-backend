@@ -168,27 +168,27 @@ paths:
                       "publishedEntries":
                         [
                           {
-                            "entryID": "6685cf32fb208efa4de7dfab",
+                            "entryId": "6685cf32fb208efa4de7dfab",
                             "storyTitle": "Story Title",
                             "entryTitle": null,
                           },
                           {
-                            "entryID": "6685d031715453a8be27589b",
+                            "entryId": "6685d031715453a8be27589b",
                             "storyTitle": "Super Good Title",
                             "entryTitle": null,
                           },
                           {
-                            "entryID": "6688142fb004b799a5a29d03",
+                            "entryId": "6688142fb004b799a5a29d03",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the zeroeth",
                           },
                           {
-                            "entryID": "668820191cb99dfdc244c23c",
+                            "entryId": "668820191cb99dfdc244c23c",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the first",
                           },
                           {
-                            "entryID": "668857a03f120ae7785257d4",
+                            "entryId": "668857a03f120ae7785257d4",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the zeroeth",
                           },
@@ -235,27 +235,27 @@ paths:
                       "publishedEntries":
                         [
                           {
-                            "entryID": "6685cf32fb208efa4de7dfab",
+                            "entryId": "6685cf32fb208efa4de7dfab",
                             "storyTitle": "Story Title",
                             "entryTitle": null,
                           },
                           {
-                            "entryID": "6685d031715453a8be27589b",
+                            "entryId": "6685d031715453a8be27589b",
                             "storyTitle": "Super Good Title",
                             "entryTitle": null,
                           },
                           {
-                            "entryID": "6688142fb004b799a5a29d03",
+                            "entryId": "6688142fb004b799a5a29d03",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the zeroeth",
                           },
                           {
-                            "entryID": "668820191cb99dfdc244c23c",
+                            "entryId": "668820191cb99dfdc244c23c",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the first",
                           },
                           {
-                            "entryID": "668857a03f120ae7785257d4",
+                            "entryId": "668857a03f120ae7785257d4",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the zeroeth",
                           },
@@ -368,27 +368,27 @@ paths:
                       "publishedEntries":
                         [
                           {
-                            "entryID": "6685cf32fb208efa4de7dfab",
+                            "entryId": "6685cf32fb208efa4de7dfab",
                             "storyTitle": "Story Title",
                             "entryTitle": null,
                           },
                           {
-                            "entryID": "6685d031715453a8be27589b",
+                            "entryId": "6685d031715453a8be27589b",
                             "storyTitle": "Super Good Title",
                             "entryTitle": null,
                           },
                           {
-                            "entryID": "6688142fb004b799a5a29d03",
+                            "entryId": "6688142fb004b799a5a29d03",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the zeroeth",
                           },
                           {
-                            "entryID": "668820191cb99dfdc244c23c",
+                            "entryId": "668820191cb99dfdc244c23c",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the first",
                           },
                           {
-                            "entryID": "668857a03f120ae7785257d4",
+                            "entryId": "668857a03f120ae7785257d4",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the zeroeth",
                           },
@@ -413,6 +413,19 @@ paths:
           schema:
             type: integer
           description: "The page number of results the user is requesting. Absence is equivalent to 'page=1'"
+        - in: query
+          name: regex
+          schema:
+            type: string
+          description: "A regular expression, only entries that match regexp in one of the fields specified in 'fields' will be returned"
+        - in: query
+          name: fields
+          schema:
+            type: string
+          description:
+            "a string containing letters specifying fields in which to look for matches of 'regexp' with the following\
+            \ correspondence: 's': 'storyTitle, 'e': 'entryTitle', 'a': 'authorName', 'b': 'bodyText'. If 'fields' is not specified,\
+            \ it defaults to 'seab'"
       tags:
         - Entry
       summary: GET a list of recent entries
@@ -428,30 +441,53 @@ paths:
                   value:
                     [
                       {
-                        "_id": "668820191cb99dfdc244c23c",
-                        "authorName": "Freddy",
-                        "entryTitle": "Chapter the first",
-                        "bodyText": "Mononoke Hime",
-                        "previousEntry": "6688142fb004b799a5a29d03",
-                        "flagId": null,
-                        "likes": 0,
-                        "createDate": "2024-07-05T16:32:25.490Z",
                         "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668d51e61be56166aaaa6cc2",
                         "storyTitle": "Random Title",
-                        "__v": 0,
+                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "authorName": "Freddy",
                       },
                       {
-                        "_id": "6688142fb004b799a5a29d03",
-                        "authorName": "Freddy",
-                        "entryTitle": "Chapter the zeroeth",
-                        "storyTitle": "Random Title",
-                        "bodyText": "Genji no monogatari",
-                        "previousEntry": null,
-                        "flagId": null,
-                        "likes": 0,
-                        "createDate": "2024-07-05T15:41:35.510Z",
                         "storyId": "6688142fb004b799a5a29d03",
-                        "__v": 0,
+                        "entryId": "668c47c3e0989ccd9cd6eca8",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "adding another to list of entries",
+                        "authorName": "apmanager",
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668c4771e0989ccd9cd6ec8a",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "adding to this entries list of sub entries",
+                        "authorName": "apmanager",
+                      },
+                      {
+                        "storyId": "66885d8e6715f290d4ce03a9",
+                        "entryId": "668892f10371e6c253583148",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "dddddddddddd",
+                        "authorName": "apmanager",
+                      },
+                      {
+                        "storyId": "668857a03f120ae7785257d4",
+                        "entryId": "668857a03f120ae7785257d4",
+                        "storyTitle": "Random Title",
+                        "entryTitle": null,
+                        "authorName": "Freddy",
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668820191cb99dfdc244c23c",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the first",
+                        "authorName": "Freddy",
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "6688142fb004b799a5a29d03",
+                        "storyTitle": "Random Title",
+                        "entryTitle": null,
+                        "authorName": "Freddy",
                       },
                     ]
         default:
@@ -506,16 +542,16 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
-  /entry/{entryID}:
+  /entry/{entryId}:
     summary: GET/POST/PUT/DELETE a particular entry
     get:
       tags:
         - Entry
       summary: GET a particular entry by ID
-      description: "Gets entry data, and an array named continuationEntries containing entryIDs and entry titles from continuation entries."
+      description: "Gets entry data, and an array named continuationEntries containing entryIds and entry titles from continuation entries."
       operationId: get_entry_by_id
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -531,7 +567,7 @@ paths:
                 registered:
                   value:
                     {
-                      "entryID": "6688142fb004b799a5a29d03",
+                      "entryId": "6688142fb004b799a5a29d03",
                       "authorName": "Freddy",
                       "entryTitle": "Chapter the zeroeth",
                       "storyTitle": "Random Title",
@@ -544,7 +580,7 @@ paths:
                       "continuationEntries":
                         [
                           {
-                            "entryID": "668820191cb99dfdc244c23c",
+                            "entryId": "668820191cb99dfdc244c23c",
                             "storyTitle": "Random Title",
                             "entryTitle": "Chapter the first",
                           },
@@ -560,7 +596,7 @@ paths:
       description: "Edit an entry's entry title, keywords, and entry text. Can only be done by admins, mods, and the user who created the entry."
       operationId: edit_entry
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -574,11 +610,11 @@ paths:
     post:
       tags:
         - Entry
-      summary: "Post a continuation of entry {entryID}"
-      description: "Post a new entry continuing entry {entryID} including entry title, and entry text."
+      summary: "Post a continuation of entry {entryId}"
+      description: "Post a new entry continuing entry {entryId} including entry title, and entry text."
       operationId: post_entry
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: The ID of the entry being continued.
           required: true
@@ -586,7 +622,7 @@ paths:
           explode: false
           schema: {}
       requestBody:
-        description: "Post a new entry continuing entry {entryID} including entry title, and entry text."
+        description: "Post a new entry continuing entry {entryId} including entry title, and entry text."
         content:
           application/json:
             schema:
@@ -634,7 +670,7 @@ paths:
         \ only be done by admins, mods, and the creating user."
       operationId: delete_entry
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -645,7 +681,7 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
-  /entry/{entryID}/flag:
+  /entry/{entryId}/flag:
     summary: POST a flag for review on the entry
     post:
       tags:
@@ -656,7 +692,7 @@ paths:
         \ Must include reason for flagging."
       operationId: flag_entry
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -667,7 +703,7 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
-  /entry/{entryID}/keyword/{keyword}:
+  /entry/{entryId}/keyword/{keyword}:
     summary: GET/POST/DELETE keywords
     get:
       tags:
@@ -680,7 +716,7 @@ paths:
         \ keywords."
       operationId: get_keywords
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -709,7 +745,7 @@ paths:
         \ anyone else gets their keywords submitted to a mod queue."
       operationId: post_new_keywords
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -738,7 +774,7 @@ paths:
         \ request submitted to mod queue."
       operationId: delete_keywords
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -756,7 +792,7 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
-  /entry/{entryID}/comment:
+  /entry/{entryId}/comment:
     summary: GET/POST comments on entry
     get:
       tags:
@@ -768,7 +804,7 @@ paths:
         comment entry will have the userName of the user who posted it attatched.
       operationId: get_comments
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -787,7 +823,7 @@ paths:
       description: Post a new comment to an entry. Any logged in user.
       operationId: post_comment
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -798,7 +834,7 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
-  /entry/{entryID}/comment/{commentID}:
+  /entry/{entryId}/comment/{commentId}:
     summary: PUT/DELETE a comment
     put:
       tags:
@@ -808,14 +844,14 @@ paths:
       description: Edit a comment. Admin/mod/comment creator only.
       operationId: edit_comment
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
           style: simple
           explode: false
           schema: {}
-        - name: commentID
+        - name: commentId
           in: path
           description: the ID of the comment
           required: true
@@ -834,14 +870,14 @@ paths:
       description: Delete a comment. Admin/mod/comment creator only.
       operationId: delete_comment
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
           style: simple
           explode: false
           schema: {}
-        - name: commentID
+        - name: commentId
           in: path
           description: the ID of the comment
           required: true
@@ -852,7 +888,7 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
-  /entry/{entryID}/comment/{commentID}/flag:
+  /entry/{entryId}/comment/{commentId}/flag:
     summary: POST a flag for review on a comment
     post:
       tags:
@@ -863,14 +899,14 @@ paths:
       description: "Post a flag for review on a comment, inserted into mod queue"
       operationId: flag_comment
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
           style: simple
           explode: false
           schema: {}
-        - name: commentID
+        - name: commentId
           in: path
           description: the ID of the comment
           required: true
@@ -881,7 +917,7 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
-  /chain/{entryID}:
+  /chain/{entryId}:
     summary: GET the entry chain ending at the specified entry
     get:
       tags:
@@ -894,7 +930,7 @@ paths:
         \ entry title for the next entry in the chain if applicable."
       operationId: get_chain
       parameters:
-        - name: entryID
+        - name: entryId
           in: path
           description: the ID of the entry
           required: true
@@ -905,47 +941,6 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: Chain
-  /search:
-    summary: GET/GET+query string search for entries
-    get:
-      tags:
-        - Entry
-        - Search
-      summary: Get a list of entries selected and sorted by query string.
-      description:
-        Get a list of entries selected and sorted by query string. Default
-        to all entries sorted by newest first.
-      operationId: get_search_results
-      responses:
-        "200":
-          description: "Successfully found a list of entries."
-          content:
-            application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      entries:
-                        [
-                          {
-                            storyTitle: "Jerry's Journey",
-                            entryTitle: "A Fork in the Road",
-                            authorName: "Freddy",
-                            authorID: 1973,
-                            entryID:123,
-                          },
-                        ],
-                    }
-        "404":
-          description: "No matching entries found."
-          content:
-            application/json:
-              examples:
-                registered:
-                  value: { entries: [] }
-        default:
-          description: Default error sample response
-      x-swagger-router-controller: Entry
   /keywords:
     summary: GET a list of defined keywords
     get:

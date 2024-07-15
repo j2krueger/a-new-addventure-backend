@@ -4,9 +4,9 @@ const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
 
 async function paramId(req, res, next, value) {
-  const entryID = value;
+  const entryId = value;
   try {
-    const result = await Entry.findById(entryID);
+    const result = await Entry.findById(entryId);
     if (result) {
       req.foundEntryByID = result;
     }
@@ -31,7 +31,7 @@ const getEntry = async (req, res) => {
 };
 
 async function createStory(req, res) {
-  const { storyTitle, bodyText, entryTitle, } = req.body;
+  const { storyTitle, bodyText, } = req.body;
 
   if (typeof storyTitle != 'string') {
     return res.status(400).json({ error: "Missing story title." });
@@ -41,7 +41,6 @@ async function createStory(req, res) {
 
   try {
     const entry = new Entry({
-      entryTitle,
       storyTitle,
       bodyText,
       previousEntry: null,
@@ -49,7 +48,7 @@ async function createStory(req, res) {
     });
     await entry.saveNewStory();
 
-    return res.status(201).json(entry);
+    return res.status(201).json(entry.fullInfo());
   } catch (error) {
     return res.status(500).json(error);
   }
@@ -79,14 +78,32 @@ async function continueStory(req, res) {
 }
 
 async function getEntryList(req, res) {
-  const { page } = req.query;
+  const fieldLookup = {
+    s: 'storyTitle',
+    e: 'entryTitle',
+    a: 'authorName',
+    b: 'bodyText',
+  }
+  const { page, regex, fields } = req.query;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
-  const entryList = await Entry.find()
+  const entryQuery = {};
+  const fieldsArray = (fields || "seab").split('').map(field => fieldLookup[field]);
+  if (regex) {
+    entryQuery["$or"] = [];
+    // entryQuery["$or"] = [{ authorName: { $regex: regex } }]
+    for (const field of fieldsArray) {
+      if (field) {
+        const queryPart = {};
+        queryPart[field] = { $regex: regex };
+        entryQuery["$or"].push(queryPart);
+      }
+    }
+  }
+  const entryList = await Entry.find(entryQuery)
     .sort({ createDate: -1 })
     .skip(zPage * constants.entriesPerPage)
     .limit(constants.entriesPerPage);
   const result = entryList.map(entry => entry.summary());
-  console.log('\n   Debug: entry.js: ', result);
   res.status(200).json(result);
 }
 

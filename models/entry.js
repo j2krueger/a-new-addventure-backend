@@ -15,7 +15,7 @@ const entrySchema = new Schema({
     },
     entryTitle: {
         type: String,
-        required: ['Entry Title is needed'],
+        default: null,
     },
     storyTitle: {
         type: String,
@@ -55,21 +55,27 @@ entrySchema.methods.saveContinuationEntry = async function saveContinuationEntry
 }
 
 entrySchema.methods.summary = function summary() {
-    return { entryID: this._id, storyTitle: this.storyTitle, entryTitle: this.entryTitle };
+    return {
+        storyId: this.storyId,
+        entryId: this._id,
+        storyTitle: this.storyTitle,
+        entryTitle: this.entryTitle,
+        authorName: this.authorName
+    };
 }
 
-entrySchema.methods.fullInfo = function fullInfo(){
+entrySchema.methods.fullInfo = function fullInfo() {
     return {
-        entryID: this._id,
-        authorName: this.authorName,
-        entryTitle: this.entryTitle,
+        storyId: this.storyId,
+        entryId: this._id,
         storyTitle: this.storyTitle,
+        entryTitle: this.entryTitle,
+        authorName: this.authorName,
         bodyText: this.bodyText,
         previousEntry: this.previousEntry,
         flagId: this.flagId,
         likes: this.likes,
         createDate: this.createDate,
-        storyId: this.storyId,
     };
 }
 
@@ -77,9 +83,9 @@ entrySchema.methods.getContinuations = async function getContinuations() {
     return (await Entry.find({ previousEntry: this._id })).map(entry => entry.summary());
 }
 
-entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithContinuations(){
+entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithContinuations() {
     return {
-        entryID: this._id,
+        entryId: this._id,
         authorName: this.authorName,
         entryTitle: this.entryTitle,
         storyTitle: this.storyTitle,

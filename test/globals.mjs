@@ -19,7 +19,9 @@ export {
     constants,
     mongoose,
     agent,
+    // models
     User,
     Entry,
+    // functions
     expectMongoObjectID,
 };
