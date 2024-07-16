@@ -2,9 +2,13 @@
 
 import * as globals from './globals.mjs';
 const { expect,
-    constants,
     agent,
+    constants,
+    newUserName,
+    // newEmail,
+    newPassword,
     expectMongoObjectID,
+    populateUserInfo,
 } = globals;
 
 describe('Test the entry handling routes', function () {
@@ -118,6 +122,39 @@ describe('Test the entry handling routes', function () {
                 expect(entry.authorName).to.be.a('string');
                 expect(entry.authorName + ' ' + entry.entryTitle).to.be.a('string').which.matches(/dd/);
             }
+        });
+    });
+
+    describe('POST /entry with {storyTitle: "Deterministic title", bodyText: "Deterministic text"}', function () {
+        it('should return a 201 CREATED and the entry.fullInfo()', async function () {
+            const loginRes = await agent
+                .post('/login')
+                .send({ name: newUserName, password: newPassword });
+
+            expect(loginRes).to.have.status(200);
+
+            const res = await agent
+                .post('/entry')
+                .send({ storyTitle: "Deterministic title", bodyText: "Deterministic text" });
+
+            expect(res).to.have.status(201);
+            expectMongoObjectID(res.body.storyId);
+            expect(res.body.entryId).to.deep.equal(res.body.storyId);
+            expect(res.body.storyTitle).to.deep.equal("Deterministic title");
+            expect(res.body.entryTitle).to.be.null;
+            expect(res.body.authorName).to.deep.equal(newUserName);
+            expect(res.body.bodyText).to.deep.equal("Deterministic text");
+            expect(res.body.previousEntry).to.be.null;
+            expect(res.body.flagId).to.be.null;
+            expect(res.body.likes).to.deep.equal(0);
+            expect(res.body.createDate).to.be.a('string');
+
+            const updateRes = await agent
+                .get('/profile');
+
+            expect(updateRes).to.have.status(200);
+            populateUserInfo(updateRes.body);
+
         });
     });
 

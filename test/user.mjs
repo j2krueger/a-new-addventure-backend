@@ -2,64 +2,20 @@
 
 import * as globals from './globals.mjs';
 const { expect,
-    constants,
-    mongoose,
+    // mongoose,
     agent,
-    User,
+    constants,
+    newUserName,
+    newEmail,
+    newPassword,
+    newUserPrivateProfile,
+    newUserPublicInfo,
+    // User,
     expectMongoObjectID,
 } = globals;
 
-const newUserName = "test-" + Math.random();
-const newEmail = newUserName + "@example.com";
-const newPassword = Math.random() + "-" + Math.random();
-let newUserPrivateProfile;
-let newUserPublicInfo;
-// eslint-disable-next-line no-unused-vars
-let newUserBasicInfo;
 
 describe('Test the user handling routes', function () {
-    before(async function () {
-        try {
-            mongoose.connect(constants.databaseURI, { dbName: constants.dbName });
-            console.log('Database Connected');
-        } catch (error) {
-            console.log("Database not conected: ", error)
-        }
-    })
-
-    after(async function () {
-        await agent
-            .post('/logout');
-        await User.deleteOne({ userName: newUserName });
-        mongoose.disconnect();
-    })
-
-    this.slow(1000);
-
-    describe('Register a new randomly generated user', function () {
-        it('should return a 201 created and a user.privateProfile() with the given userName and email', async function () {
-            const res = await agent
-                .post('/register')
-                .send({ userName: newUserName, email: newEmail, password: newPassword });
-
-            expect(res).to.have.status(201);
-            expect(res.body).to.be.an('object');
-            expect(res.body.userName).to.equal(newUserName);
-            expect(res.body.email).to.equal(newEmail);
-            expectMongoObjectID(res.body.userID);
-            expect(res.body.bio).to.equal("I haven't decided what to put in my bio yet.");
-            expect(res.body.publishEmail).to.equal(false);
-            expect(res.body.darkMode).to.equal(false);
-            expect(res.body.publishedEntries).to.be.an('array');
-            expect(res.body.publishedEntries).to.have.lengthOf(0);
-            newUserPrivateProfile = res.body;
-            {
-                const { userID, userName, email, publishEmail, bio, publishedEntries } = newUserPrivateProfile;
-                newUserPublicInfo = { userID, userName, email: publishEmail ? email : "", bio, publishedEntries };
-                newUserBasicInfo = { userID, userName };
-            }
-        })
-    })
 
     describe('Register a user with a duplicate userName', function () {
         it('should return a 409 conflict status code', async function () {
@@ -125,7 +81,7 @@ describe('Test the user handling routes', function () {
             expect(res).to.have.status(200);
             expect(res).to.have.cookie('connect.sid');
             expect(res).to.have.cookie('token');
-            expect(res.body).to.deep.equal(newUserPrivateProfile);
+            expect(res.body).to.deep.equal(newUserPrivateProfile());
         })
     })
 
@@ -136,7 +92,7 @@ describe('Test the user handling routes', function () {
                 .send({ name: newEmail, password: newPassword });
 
             expect(res).to.have.status(200);
-            expect(res.body).to.deep.equal(newUserPrivateProfile);
+            expect(res.body).to.deep.equal(newUserPrivateProfile());
         })
     })
 
@@ -258,10 +214,10 @@ describe('Test the user handling routes', function () {
     describe('get user by userID', function () {
         it('should return a 200 OK and the user.publicInfo()', async function () {
             const res = await agent
-                .get('/user/' + newUserPrivateProfile.userID);
+                .get('/user/' + newUserPrivateProfile().userID);
 
             expect(res).to.have.status(200);
-            expect(res.body).to.deep.equal(newUserPublicInfo);
+            expect(res.body).to.deep.equal(newUserPublicInfo());
         })
     })
 
@@ -307,7 +263,7 @@ describe('Test the user handling routes', function () {
                 .get('/profile');
 
             expect(res2).to.have.status(200);
-            expect(res2.body).to.deep.equal(newUserPrivateProfile);
+            expect(res2.body).to.deep.equal(newUserPrivateProfile());
         });
     });
 
@@ -336,8 +292,10 @@ describe('Test the user handling routes', function () {
                 .send({ darkMode: !newUserPrivateProfile.darkMode });
 
             expect(res2).to.have.status(200);
-            newUserPrivateProfile.darkMode = !newUserPrivateProfile.darkMode;
-            expect(res2.body).to.deep.equal(newUserPrivateProfile);
+            const tempNewUserPrivateProfile = newUserPrivateProfile();
+            tempNewUserPrivateProfile.darkMode = !tempNewUserPrivateProfile.darkMode;
+            expect(res2.body).to.deep.equal(tempNewUserPrivateProfile);
+            globals.populateUserInfo(tempNewUserPrivateProfile);
         });
     });
 
