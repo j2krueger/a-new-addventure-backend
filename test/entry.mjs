@@ -7,7 +7,7 @@ const { expect,
     newUserName,
     // newEmail,
     newPassword,
-    expectMongoObjectID,
+    expectMongoObjectId,
     populateUserInfo,
 } = globals;
 
@@ -23,8 +23,8 @@ describe('Test the entry handling routes', function () {
             expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
             for (const entry of res.body) {
                 expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
-                expectMongoObjectID(entry.storyId);
-                expectMongoObjectID(entry.entryId);
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
                 expect(entry.storyTitle).to.be.a('string');
                 if (entry.storyId == entry.entryId) {
                     expect(entry.entryTitle).to.be.null;
@@ -46,8 +46,8 @@ describe('Test the entry handling routes', function () {
             expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
             for (const entry of res.body) {
                 expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
-                expectMongoObjectID(entry.storyId);
-                expectMongoObjectID(entry.entryId);
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
                 expect(entry.storyTitle).to.be.a('string');
                 if (entry.storyId == entry.entryId) {
                     expect(entry.entryTitle).to.be.null;
@@ -69,8 +69,8 @@ describe('Test the entry handling routes', function () {
             expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
             for (const entry of res.body) {
                 expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
-                expectMongoObjectID(entry.storyId);
-                expectMongoObjectID(entry.entryId);
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
                 expect(entry.storyTitle).to.be.a('string');
                 expect(entry.entryTitle).to.be.a('string').which.matches(/dd/);
                 expect(entry.authorName).to.be.a('string');
@@ -88,8 +88,8 @@ describe('Test the entry handling routes', function () {
             expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
             for (const entry of res.body) {
                 expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
-                expectMongoObjectID(entry.storyId);
-                expectMongoObjectID(entry.entryId);
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
                 expect(entry.storyTitle).to.be.a('string').which.matches(/beginning/);
                 if (entry.storyId == entry.entryId) {
                     expect(entry.entryTitle).to.be.null;
@@ -111,8 +111,8 @@ describe('Test the entry handling routes', function () {
             expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
             for (const entry of res.body) {
                 expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
-                expectMongoObjectID(entry.storyId);
-                expectMongoObjectID(entry.entryId);
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
                 expect(entry.storyTitle).to.be.a('string');
                 if (entry.storyId == entry.entryId) {
                     expect(entry.entryTitle).to.be.null;
@@ -138,7 +138,7 @@ describe('Test the entry handling routes', function () {
                 .send({ storyTitle: "Deterministic title", bodyText: "Deterministic text" });
 
             expect(res).to.have.status(201);
-            expectMongoObjectID(res.body.storyId);
+            expectMongoObjectId(res.body.storyId);
             expect(res.body.entryId).to.deep.equal(res.body.storyId);
             expect(res.body.storyTitle).to.deep.equal("Deterministic title");
             expect(res.body.entryTitle).to.be.null;

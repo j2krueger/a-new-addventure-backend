@@ -44,7 +44,7 @@ const userSchema = new Schema({
 
 userSchema.methods.privateProfile = async function privateProfile() {
   return {
-    userID: this._id,
+    userId: this._id,
     userName: this.userName,
     email: this.email,
     bio: this.bio,
@@ -56,7 +56,7 @@ userSchema.methods.privateProfile = async function privateProfile() {
 
 userSchema.methods.publicInfo = async function publicInfo() {
   return {
-    userID: this._id,
+    userId: this._id,
     userName: this.userName,
     email: this.publishEmail ? this.email : "",
     bio: this.bio,
@@ -65,7 +65,7 @@ userSchema.methods.publicInfo = async function publicInfo() {
 }
 
 userSchema.methods.basicInfo = function basicInfo() {
-  return { userID: this._id, userName: this.userName };
+  return { userId: this._id, userName: this.userName };
 }
 
 

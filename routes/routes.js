@@ -19,7 +19,7 @@ router.post('/register', userControllers.registerUser);
 router.post('/login', userControllers.loginUser);
 router.post('/logout', userControllers.logoutUser);
 router.get('/user', userControllers.getUser);
-router.get('/user/:userID', userControllers.getUserInfoByID);
+router.get('/user/:userId', userControllers.getUserInfoById);
 router.get('/profile', userAuth, userControllers.getProfile);
 router.put('/profile', userAuth, userControllers.putProfile)
 

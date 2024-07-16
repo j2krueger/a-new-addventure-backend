@@ -13,7 +13,7 @@ const {
     User,
     Entry,
     populateUserInfo,
-    expectMongoObjectID,
+    expectMongoObjectId,
 } = globals;
 
 export const mochaHooks = {
@@ -32,7 +32,7 @@ export const mochaHooks = {
         expect(res.body).to.be.an('object');
         expect(res.body.userName).to.equal(newUserName);
         expect(res.body.email).to.equal(newEmail);
-        expectMongoObjectID(res.body.userID);
+        expectMongoObjectId(res.body.userId);
         expect(res.body.bio).to.equal("I haven't decided what to put in my bio yet.");
         expect(res.body.publishEmail).to.equal(false);
         expect(res.body.darkMode).to.equal(false);

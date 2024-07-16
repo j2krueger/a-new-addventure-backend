@@ -57,7 +57,7 @@ async function loginUser(req, res, next) {
                     const token = jwt.sign(
                         {
                             email: user.email,
-                            userID: user._id,
+                            userId: user._id,
                             userName: user.userName,
                         },
                         constants.jwtSecret,
@@ -102,18 +102,18 @@ async function getUser(req, res) {
     res.status(200).json(result);
 }
 
-// async function paramUserID(req, res, next, value) {
-//     const userID = value;
+// async function paramUserId(req, res, next, value) {
+//     const userId = value;
 // }
 
-async function getUserInfoByID(req, res, next) {
+async function getUserInfoById(req, res, next) {
     try {
-        if (typeof req.params.userID != 'string' || !/^[0-9a-f]{24}$/.test(req.params.userID)) {
-            return res.status(400).json({ error: "That is not a properly formatted userID." })
+        if (typeof req.params.userId != 'string' || !/^[0-9a-f]{24}$/.test(req.params.userId)) {
+            return res.status(400).json({ error: "That is not a properly formatted userId." })
         }
-        const result = await User.findById(req.params.userID);
+        const result = await User.findById(req.params.userId);
         if (!result) {
-            return res.status(404).json({ error: "There is no user with that user ID." });
+            return res.status(404).json({ error: "There is no user with that userId." });
         }
         res.status(200).json(await result.publicInfo());
     } catch (err) {
@@ -144,8 +144,8 @@ module.exports = {
     loginUser,
     logoutUser,
     getUser,
-    // paramUserID,
-    getUserInfoByID,
+    // paramUserId,
+    getUserInfoById,
     getProfile,
     putProfile,
 };

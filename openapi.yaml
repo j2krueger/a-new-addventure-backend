@@ -40,7 +40,7 @@ paths:
                 registered:
                   value:
                     {
-                      "userID": "66845f61c806ebe5276df8db",
+                      "userId": "66845f61c806ebe5276df8db",
                       "userName": "Freddy",
                       "email": "Freddy@example.com",
                       "bio": "I haven't decided what to put in my bio yet.",
@@ -90,7 +90,7 @@ paths:
                 registered:
                   value:
                     {
-                      "userID": "667afb5feb94737bf4556b7e",
+                      "userId": "667afb5feb94737bf4556b7e",
                       "userName": "Hank R. Chief",
                       "email": "Hank@example.com",
                       "bio": "I haven't decided what to put in my bio yet.",
@@ -159,7 +159,7 @@ paths:
                 registered:
                   value:
                     {
-                      "userID": "668490250029a28118a8d1be",
+                      "userId": "668490250029a28118a8d1be",
                       "userName": "Freddy",
                       "email": "Freddy@example.com",
                       "bio": "I HAVE decided what to put in my bio yet.",
@@ -226,7 +226,7 @@ paths:
                 registered:
                   value:
                     {
-                      "userID": "668490250029a28118a8d1be",
+                      "userId": "668490250029a28118a8d1be",
                       "userName": "Freddy",
                       "email": "Freddy@example.com",
                       "bio": "I HAVE decided what to put in my bio yet.",
@@ -302,21 +302,21 @@ paths:
                   value:
                     [
                       {
-                        "userID": "668ee1dae1dcd980cf0739e0",
+                        "userId": "668ee1dae1dcd980cf0739e0",
                         "userName": "FreddySaturn",
                         "email": "",
                         "bio": "I haven't decided what to put in my bio yet.",
                         "publishedEntries": [],
                       },
                       {
-                        "userID": "668ee27de1dcd980cf073a08",
+                        "userId": "668ee27de1dcd980cf073a08",
                         "userName": "FreddySedna",
                         "email": "",
                         "bio": "I haven't decided what to put in my bio yet.",
                         "publishedEntries": [],
                       },
                       {
-                        "userID": "668ee31ae1dcd980cf073a17",
+                        "userId": "668ee31ae1dcd980cf073a17",
                         "userName": "FreddyTitan",
                         "email": "",
                         "bio": "I haven't decided what to put in my bio yet.",
@@ -333,7 +333,7 @@ paths:
         default:
           description: Default error sample response
       x-swagger-router-controller: User
-  /user/{userID}:
+  /user/{userId}:
     summary: GET a user's public profile
     get:
       tags:
@@ -345,7 +345,7 @@ paths:
         \ and comments, possibly other stuff we think of later."
       operationId: get_public_profile
       parameters:
-        - name: userID
+        - name: userId
           in: path
           description: the ID of the user
           required: true
@@ -361,7 +361,7 @@ paths:
                 registered:
                   value:
                     {
-                      "userID": "668490250029a28118a8d1be",
+                      "userId": "668490250029a28118a8d1be",
                       "userName": "Freddy",
                       "email": "Freddy@example.com",
                       "bio": "I HAVE decided what to put in my bio yet.",

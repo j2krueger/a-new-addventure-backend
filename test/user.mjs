@@ -11,7 +11,7 @@ const { expect,
     newUserPrivateProfile,
     newUserPublicInfo,
     // User,
-    expectMongoObjectID,
+    expectMongoObjectId,
 } = globals;
 
 
@@ -149,7 +149,7 @@ describe('Test the user handling routes', function () {
             expect(res).to.have.status(200);
             expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
             for (const user of res.body) {
-                expectMongoObjectID(user.userID);
+                expectMongoObjectId(user.userId);
                 expect(user.userName).to.be.a('string');
                 expect(user.email).to.be.a('string');
                 expect(user.bio).to.be.a('string');
@@ -167,7 +167,7 @@ describe('Test the user handling routes', function () {
             expect(res).to.have.status(200);
             expect(res.body).to.be.an('array');
             for (const user of res.body) {
-                expectMongoObjectID(user.userID);
+                expectMongoObjectId(user.userId);
                 expect(user.userName).to.be.a('string').which.matches('f');
                 expect(user.email).to.be.a('string');
                 expect(user.bio).to.be.a('string');
@@ -185,7 +185,7 @@ describe('Test the user handling routes', function () {
             expect(res).to.have.status(200);
             expect(res.body).to.be.an('array');
             for (const user of res.body) {
-                expectMongoObjectID(user.userID);
+                expectMongoObjectId(user.userId);
                 expect(user.userName).to.be.a('string').which.matches(/f/i);
                 expect(user.email).to.be.a('string');
                 expect(user.bio).to.be.a('string');
@@ -203,7 +203,7 @@ describe('Test the user handling routes', function () {
             expect(res).to.have.status(200);
             expect(res.body).to.be.an('array');
             for (const user of res.body) {
-                expectMongoObjectID(user.userID);
+                expectMongoObjectId(user.userId);
                 expect(user.userName).to.be.a('string');
                 expect(user.email).to.be.a('string');
                 expect(user.bio).to.be.a('string');
@@ -212,33 +212,33 @@ describe('Test the user handling routes', function () {
         })
     })
 
-    describe('get user by userID', function () {
+    describe('get user by userId', function () {
         it('should return a 200 OK and the user.publicInfo()', async function () {
             const res = await agent
-                .get('/user/' + newUserPrivateProfile().userID);
+                .get('/user/' + newUserPrivateProfile().userId);
 
             expect(res).to.have.status(200);
             expect(res.body).to.deep.equal(newUserPublicInfo());
         })
     })
 
-    describe('get user by nonexistant userID', function () {
+    describe('get user by nonexistant userId', function () {
         it('should return a 404 not found and an error message', async function () {
             const res = await agent
                 .get('/user/000000000000000000000000');
 
             expect(res).to.have.status(404);
-            expect(res.body).to.deep.equal({ error: "There is no user with that user ID." });
+            expect(res.body).to.deep.equal({ error: "There is no user with that userId." });
         })
     })
 
-    describe('get user by badly formed userID', function () {
+    describe('get user by badly formed userId', function () {
         it('should return a 400 bad request and an error message', async function () {
             const res = await agent
                 .get('/user/notANidSTRING');
 
             expect(res).to.have.status(400);
-            expect(res.body).to.deep.equal({ error: "That is not a properly formatted userID." });
+            expect(res.body).to.deep.equal({ error: "That is not a properly formatted userId." });
         })
     })
 

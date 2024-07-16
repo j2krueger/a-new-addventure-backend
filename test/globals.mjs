@@ -19,9 +19,9 @@ let _newUserBasicInfo;
 
 function populateUserInfo(newUser) {
     _newUserPrivateProfile = newUser;
-    const { userID, userName, email, publishEmail, bio, publishedEntries } = newUser;
-    _newUserPublicInfo = { userID, userName, email: publishEmail ? email : "", bio, publishedEntries };
-    _newUserBasicInfo = { userID, userName };
+    const { userId, userName, email, publishEmail, bio, publishedEntries } = newUser;
+    _newUserPublicInfo = { userId, userName, email: publishEmail ? email : "", bio, publishedEntries };
+    _newUserBasicInfo = { userId, userName };
 }
 
 function newUserPrivateProfile() {
@@ -32,7 +32,7 @@ function newUserPublicInfo() {
     return _newUserPublicInfo;
 }
 
-function expectMongoObjectID(object) {
+function expectMongoObjectId(object) {
     expect(object).to.be.a('string').that.matches(/^[0-9a-f]{24}$/);
 }
 
@@ -58,5 +58,5 @@ export {
     Entry,
     // functions
     populateUserInfo,
-    expectMongoObjectID,
+    expectMongoObjectId,
 };

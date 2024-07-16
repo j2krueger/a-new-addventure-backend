@@ -8,7 +8,7 @@ async function paramId(req, res, next, value) {
   try {
     const result = await Entry.findById(entryId);
     if (result) {
-      req.foundEntryByID = result;
+      req.foundEntryById = result;
     }
     next();
   } catch (err) {
@@ -67,9 +67,9 @@ async function continueStory(req, res) {
       bodyText,
       entryTitle,
       authorName: req.authenticatedUser.userName,
-      previousEntry: req.foundEntryByID._id,
+      previousEntry: req.foundEntryById._id,
     })
-    await entry.saveContinuationEntry(req.foundEntryByID);
+    await entry.saveContinuationEntry(req.foundEntryById);
 
     return res.status(201).json(entry);
   } catch (error) {
