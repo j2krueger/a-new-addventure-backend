@@ -16,6 +16,7 @@ const { expect,
 
 
 describe('Test the user handling routes', function () {
+    this.slow(1000);
 
     describe('Register a user with a duplicate userName', function () {
         it('should return a 409 conflict status code', async function () {
