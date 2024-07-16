@@ -216,7 +216,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Settings"
-            example: { "publishEmail": true, "bio": "This is a new bio." }
+            example: { "publishEmail": true, "bio": "This is a new bio.", "darkMode": false }
       responses:
         "200":
           description: "Return the user's private profile data"
