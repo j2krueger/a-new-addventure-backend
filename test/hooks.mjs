@@ -45,7 +45,8 @@ export const mochaHooks = {
         await agent
             .post('/logout');
         await User.deleteOne({ userName: newUserName });
-        await Entry.deleteMany({authorName: {$regex: "^test"}});
+        await User.deleteOne({ userName: 'test' + newUserName });
+        await Entry.deleteMany({ authorName: { $regex: "^test" } });
         mongoose.disconnect();
 
     }

@@ -329,7 +329,7 @@ paths:
             application/json:
               examples:
                 registered:
-                  value: []
+                  value: {error: "No matching users found."}
         default:
           description: Default error sample response
       x-swagger-router-controller: User

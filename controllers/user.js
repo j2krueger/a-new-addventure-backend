@@ -99,7 +99,12 @@ async function getUser(req, res) {
         .skip(zPage * constants.entriesPerPage)
         .limit(constants.entriesPerPage);
     const result = await Promise.all(userList.map(async user => user.publicInfo()));
-    res.status(200).json(result);
+    if(result.length){
+        return res.status(200).json(result);
+    } else{
+        return res.status(404).json({error: "No matching users found."})
+    }
+    
 }
 
 // async function paramUserId(req, res, next, value) {

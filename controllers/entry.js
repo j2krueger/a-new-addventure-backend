@@ -101,15 +101,20 @@ async function getEntryList(req, res) {
   const { page, regex, fields, order } = req.query;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
   const entryQuery = {};
-  const fieldsArray = (fields || "seab").split('').map(field => fieldLookup[field]);
   if (regex) {
     entryQuery["$or"] = [];
-    // entryQuery["$or"] = [{ authorName: { $regex: regex } }]
-    for (const field of fieldsArray) {
-      if (field) {
+    for (const fieldChar of (fields || "seab")) {
+      if (fieldChar in fieldLookup) {
+        const field = fieldLookup[fieldChar];
         const queryPart = {};
         queryPart[field] = { $regex: regex };
-        entryQuery["$or"].push(queryPart);
+        if (!entryQuery["$or"].find(element => field in element)) {
+          entryQuery["$or"].push(queryPart);
+        } else {
+          return res.status(400).json({ error: "Misformed query string." });
+        }
+      } else {
+        return res.status(400).json({ error: "Misformed query string." });
       }
     }
   }
@@ -117,8 +122,10 @@ async function getEntryList(req, res) {
   const sortArray = (order || "C").split('').map(order => orderLookup[order]);
   if (order) {
     for (const sortField of sortArray) {
-      if (sortField) {
+      if (sortField && !(sortField[0] in sortQuery)) {
         sortQuery[sortField[0]] = sortField[1];
+      } else {
+        return res.status(400).json({ error: "Misformed query string." });
       }
     }
   }
