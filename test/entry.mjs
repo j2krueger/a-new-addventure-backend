@@ -125,6 +125,137 @@ describe('Test the entry handling routes', function () {
         });
     });
 
+    describe('GET /entry with search query string {order: "a"}', function () {
+        it('should return a 200 OK list of entries sorted in increasing order by author', async function () {
+            const res = await agent
+                .get('/entry')
+                .query({ order: "a" });
+
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
+            let previous = res.body[0].authorName;
+            for (const entry of res.body) {
+                expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
+                expect(entry.storyTitle).to.be.a('string');
+                if (entry.storyId == entry.entryId) {
+                    expect(entry.entryTitle).to.be.null;
+                } else {
+                    expect(entry.entryTitle).to.be.a('string');
+                }
+                expect(entry.authorName).to.be.a('string');
+                expect(previous.toLowerCase() <= entry.authorName.toLowerCase()).to.be.true;
+                previous = entry.authorName;
+            }
+        });
+    });
+
+    describe('GET /entry with search query string {order: "A"}', function () {
+        it('should return a 200 OK list of entries sorted in decreasing order by author', async function () {
+            const res = await agent
+                .get('/entry')
+                .query({ order: "A" });
+
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
+            let previous = res.body[0].authorName;
+            for (const entry of res.body) {
+                expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
+                expect(entry.storyTitle).to.be.a('string');
+                if (entry.storyId == entry.entryId) {
+                    expect(entry.entryTitle).to.be.null;
+                } else {
+                    expect(entry.entryTitle).to.be.a('string');
+                }
+                expect(entry.authorName).to.be.a('string');
+                expect(previous.toLowerCase() >= entry.authorName.toLowerCase()).to.be.true;
+                previous = entry.authorName;
+            }
+        });
+    });
+
+    describe('GET /entry with search query string {order: "e"}', function () {
+        it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
+            const res = await agent
+                .get('/entry')
+                .query({ order: "e" });
+
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
+            let previous = res.body[0].entryTitle;
+            for (const entry of res.body) {
+                expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
+                expect(entry.storyTitle).to.be.a('string');
+                if (entry.storyId == entry.entryId) {
+                    expect(entry.entryTitle).to.be.null;
+                } else {
+                    expect(entry.entryTitle).to.be.a('string');
+                    expect(previous == null || previous.toLowerCase() <= entry.entryTitle.toLowerCase()).to.be.true;
+                    previous = entry.entryTitle;
+                }
+            }
+        });
+    });
+
+    describe('GET /entry with search query string {order: "E"}', function () {
+        it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
+            const res = await agent
+                .get('/entry')
+                .query({ order: "E" });
+
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
+            let previous = res.body[0].entryTitle;
+            for (const entry of res.body) {
+                expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
+                expect(entry.storyTitle).to.be.a('string');
+                if (entry.storyId == entry.entryId) {
+                    expect(entry.entryTitle).to.be.null;
+                } else {
+                    expect(entry.entryTitle).to.be.a('string');
+                    expect(entry.entryTitle == null || previous.toLowerCase() >= entry.entryTitle.toLowerCase()).to.be.true;
+                    previous = entry.entryTitle;
+                }
+            }
+        });
+    });
+
+    describe('GET /entry with search query string {order: "sE"}', function () {
+        it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
+            const res = await agent
+                .get('/entry')
+                .query({ order: "sE" });
+
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an('array').which.has.lengthOf.at.most(constants.entriesPerPage);
+            let previous = res.body[0];
+            for (const entry of res.body) {
+                expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                expectMongoObjectId(entry.storyId);
+                expectMongoObjectId(entry.entryId);
+                expect(entry.storyTitle).to.be.a('string');
+                if (entry.storyId == entry.entryId) {
+                    expect(entry.entryTitle).to.be.null;
+                } else {
+                    expect(entry.entryTitle).to.be.a('string');
+                }
+                if (previous.storyTitle.toLowerCase() == entry.storyTitle.toLowerCase()) {
+                    expect(entry.entryTitle == null || previous.entryTitle.toLowerCase() >= entry.entryTitle.toLowerCase()).to.be.true;
+                } else {
+                    expect(previous.storyTitle.toLowerCase() < entry.storyTitle.toLowerCase())
+                }
+                previous = entry;
+            }
+        });
+    });
+
     describe('POST /entry with {storyTitle: "Deterministic title", bodyText: "Deterministic text"}', function () {
         it('should return a 201 CREATED and the entry.fullInfo()', async function () {
             const loginRes = await agent

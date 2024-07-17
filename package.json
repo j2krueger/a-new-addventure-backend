@@ -8,7 +8,8 @@
     "start": "node index.js",
     "lint": "./node_modules/.bin/eslint *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
     "finddebug": "grep Debug -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
-    "findfixme": "grep FIXME -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js"
+    "findfixme": "grep FIXME -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
+    "precommit": "npm test ; npm run lint ; npm run finddebug ; npm run findfixme"
   },
   "repository": {
     "type": "git",

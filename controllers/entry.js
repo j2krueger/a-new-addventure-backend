@@ -84,7 +84,21 @@ async function getEntryList(req, res) {
     a: 'authorName',
     b: 'bodyText',
   }
-  const { page, regex, fields } = req.query;
+  const orderLookup = {
+    s: ['storyTitle', 1],
+    e: ['entryTitle', 1],
+    a: ['authorName', 1],
+    l: ['likes', 1],
+    c: ['createDate', 1],
+    b: ['bodyText', 1],
+    S: ['storyTitle', -1],
+    E: ['entryTitle', -1],
+    A: ['authorName', -1],
+    L: ['likes', -1],
+    C: ['createDate', -1],
+    B: ['bodyText', -1],
+  }
+  const { page, regex, fields, order } = req.query;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
   const entryQuery = {};
   const fieldsArray = (fields || "seab").split('').map(field => fieldLookup[field]);
@@ -99,8 +113,19 @@ async function getEntryList(req, res) {
       }
     }
   }
+  const sortQuery = {}
+  const sortArray = (order || "C").split('').map(order => orderLookup[order]);
+  if (order) {
+    for (const sortField of sortArray) {
+      if (sortField) {
+        sortQuery[sortField[0]] = sortField[1];
+      }
+    }
+  }
+  sortQuery["_id"] = 1; // make sure the sort order is completely unambiguous so it plays well with pagination
   const entryList = await Entry.find(entryQuery)
-    .sort({ createDate: -1 })
+    .collation({ locale: "en" })
+    .sort(sortQuery)
     .skip(zPage * constants.entriesPerPage)
     .limit(constants.entriesPerPage);
   const result = entryList.map(entry => entry.summary());

@@ -424,8 +424,18 @@ paths:
             type: string
           description:
             "a string containing letters specifying fields in which to look for matches of 'regexp' with the following\
-            \ correspondence: 's': 'storyTitle, 'e': 'entryTitle', 'a': 'authorName', 'b': 'bodyText'. If 'fields' is not specified,\
+            \ correspondence: s: storyTitle, e: entryTitle, a: authorName, b: bodyText. If 'fields' is not specified,\
             \ it defaults to 'seab'"
+        - in: query
+          name: order
+          schema:
+            type: string
+          description:
+            "a string specifying the sort order of the results. Each of the following letters specifies a field: s:storyTitle, e:entryTitle,\
+            \ a:authorName, l:likes, c:createDate, b:bodyText. Lowercase letters specify ascending order, capital letters specify decending order.\
+            \ Fields specified earlier take priority over fields specified later, e.g. if 'order' is 'sE', then entries will be sorted in alphabetical\
+            \ order by storyTitle, and entries with the same storyTitle will be sorted in reverse alphabetical order by entryTitle. Text field sorts\
+            \ are case insensitive. If 'order' is not specified, it defaults to 'C' (newest first)."
       tags:
         - Entry
       summary: GET a list of recent entries
