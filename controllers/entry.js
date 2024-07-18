@@ -71,7 +71,7 @@ async function continueStory(req, res) {
     })
     await entry.saveContinuationEntry(req.foundEntryById);
 
-    return res.status(201).json(entry);
+    return res.status(201).json(entry.fullInfo());
   } catch (error) {
     return res.status(500).json(error);
   }

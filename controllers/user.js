@@ -41,13 +41,13 @@ async function loginUser(req, res, next) {
     const name = req.body?.name;
     const password = req.body?.password;
     if (!name) {
-        res.status(400).json({ error: "Missing name." });
+        return res.status(400).json({ error: "Missing name." });
     } else if (!password) {
-        res.status(400).json({ error: "Missing password." });
+        return res.status(400).json({ error: "Missing password." });
     } else {
         const user = await User.findOne({ userName: name }) || await User.findOne({ email: name });
         if (!user || !await bcrypt.compare(password, user.passwordHash)) {
-            res.status(401).json({ error: "Incorrect name or password." });
+            return res.status(401).json({ error: "Incorrect name or password." });
         } else {
             req.session.regenerate(function (err) {
                 if (err) next(err);
@@ -69,7 +69,7 @@ async function loginUser(req, res, next) {
                         secure: true,
                         sameSite: 'none',
                     });
-                    res.status(200).json(await user.privateProfile());
+                    return res.status(200).json(await user.privateProfile());
                 });
             })
         }
@@ -99,12 +99,12 @@ async function getUser(req, res) {
         .skip(zPage * constants.entriesPerPage)
         .limit(constants.entriesPerPage);
     const result = await Promise.all(userList.map(async user => user.publicInfo()));
-    if(result.length){
+    if (result.length) {
         return res.status(200).json(result);
-    } else{
-        return res.status(404).json({error: "No matching users found."})
+    } else {
+        return res.status(404).json({ error: "No matching users found." })
     }
-    
+
 }
 
 // async function paramUserId(req, res, next, value) {

@@ -3,6 +3,7 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 const Entry = require('./entry');
+const constants = require('../helpers/constants');
 
 const userSchema = new Schema({
   userName: {
@@ -42,6 +43,12 @@ const userSchema = new Schema({
   },
 });
 
+userSchema.methods.getPublishedEntries = async function getPublishedEntries() {
+  return (
+    await Entry.find({ authorName: this.userName }).collation({ locale: "en" }).sort({ createDate: -1 }).limit(constants.entriesPerPage)
+  ).map(entry => entry.summary());
+}
+
 userSchema.methods.privateProfile = async function privateProfile() {
   return {
     userId: this._id,
@@ -50,7 +57,7 @@ userSchema.methods.privateProfile = async function privateProfile() {
     bio: this.bio,
     publishEmail: this.publishEmail,
     darkMode: this.darkMode,
-    publishedEntries: (await Entry.find({ authorName: this.userName })).map(entry => entry.summary()),
+    publishedEntries: await this.getPublishedEntries(),
   };
 }
 
@@ -60,7 +67,7 @@ userSchema.methods.publicInfo = async function publicInfo() {
     userName: this.userName,
     email: this.publishEmail ? this.email : "",
     bio: this.bio,
-    publishedEntries: (await Entry.find({ authorName: this.userName })).map(entry => entry.summary()),
+    publishedEntries: await this.getPublishedEntries(),
   };
 }
 

@@ -318,35 +318,188 @@ describe('Test the entry handling routes', function () {
         });
     });
 
-    describe('POST /entry with {storyTitle: "Deterministic title", bodyText: "Deterministic text"}', function () {
-        it('should return a 201 CREATED and the entry.fullInfo()', async function () {
-            const loginRes = await agent
-                .post('/login')
-                .send({ name: newUserName, password: newPassword });
+    describe('Test the POST /entry route', function () {
+        describe('Happy paths', function () {
+            describe('POST /entry with {storyTitle: "Deterministic story title", bodyText: "Deterministic text"}', function () {
+                it('should return a 201 CREATED and the entry.fullInfo(), and add entry to the author\'s publishedEntries', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
 
-            expect(loginRes).to.have.status(200);
+                    expect(loginRes).to.have.status(200);
 
-            const res = await agent
-                .post('/entry')
-                .send({ storyTitle: "Deterministic title", bodyText: "Deterministic text" });
+                    const res = await agent
+                        .post('/entry')
+                        .send({ storyTitle: "Deterministic story title", bodyText: "Deterministic text" });
 
-            expect(res).to.have.status(201);
-            expectMongoObjectId(res.body.storyId);
-            expect(res.body.entryId).to.deep.equal(res.body.storyId);
-            expect(res.body.storyTitle).to.deep.equal("Deterministic title");
-            expect(res.body.entryTitle).to.be.null;
-            expect(res.body.authorName).to.deep.equal(newUserName);
-            expect(res.body.bodyText).to.deep.equal("Deterministic text");
-            expect(res.body.previousEntry).to.be.null;
-            expect(res.body.flagId).to.be.null;
-            expect(res.body.likes).to.deep.equal(0);
-            expect(res.body.createDate).to.be.a('string');
+                    expect(res).to.have.status(201);
+                    expectMongoObjectId(res.body.storyId);
+                    expect(res.body.entryId).to.deep.equal(res.body.storyId);
+                    expect(res.body.storyTitle).to.deep.equal("Deterministic story title");
+                    expect(res.body.entryTitle).to.be.null;
+                    expect(res.body.authorName).to.deep.equal(newUserName);
+                    expect(res.body.bodyText).to.deep.equal("Deterministic text");
+                    expect(res.body.previousEntry).to.be.null;
+                    expect(res.body.flagId).to.be.null;
+                    expect(res.body.likes).to.deep.equal(0);
+                    expect(res.body.createDate).to.be.a('string');
 
-            const updateRes = await agent
-                .get('/profile');
+                    const updateRes = await agent
+                        .get('/profile');
 
-            expect(updateRes).to.have.status(200);
-            populateUserInfo(updateRes.body);
+                    expect(updateRes).to.have.status(200);
+                    expect(updateRes.body.publishedEntries).to.be.an('array').with.lengthOf(1);
+
+                    const { storyId, entryId, storyTitle, entryTitle, authorName, } = res.body;
+                    const entrySummary = { storyId, entryId, storyTitle, entryTitle, authorName, };
+                    expect(entrySummary).to.deep.equal(updateRes.body.publishedEntries[0]);
+
+                    populateUserInfo(updateRes.body);
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Logout and POST /entry with {storyTitle: "Deterministic story title", bodyText: "Deterministic text"}', function () {
+                it('should redirect to /login', async function () {
+                    const res = await agent
+                        .post('/logout');
+
+                    expect(res).to.have.status(200);
+                    const res2 = await agent
+                        .post('/entry')
+                        .send({ storyTitle: "Deterministic story title", bodyText: "Deterministic text" });
+
+                    expect(res2).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('POST /entry with {storyTitle: "Deterministic story title"}', function () {
+                it('should return a 400 bad request and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry')
+                        .send({ storyTitle: "Deterministic story title" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Missing story text." })
+                });
+            });
+
+            describe('Post /entry with {bodyText: "Deterministic text"}', function () {
+                it('should return a 400 bad request and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry')
+                        .send({ bodyText: "Deterministic text" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Missing story title." })
+                        ;
+                });
+            });
+        });
+    });
+
+    describe('Test the POST /entry/:entryId route', function () {
+        describe('Happy paths', function () {
+            describe('POST /entry/6695b2573550c66db1ab9106 with {entryTitle: "Deterministic entry title", bodyText: "Deterministic text"}', function () {
+                it('should return a 201 created and the entry.fullInfo() and add entry to the author\'s publishedEntries', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry/6695b2573550c66db1ab9106')
+                        .send({ entryTitle: "Deterministic entry title", bodyText: "Deterministic text" });
+
+                    expect(res).to.have.status(201);
+                    expectMongoObjectId(res.body.entryId);
+                    expect(res.body.storyId).to.deep.equal("6695b2573550c66db1ab9106");
+                    expect(res.body.storyTitle).to.deep.equal("In the beginning...");
+                    expect(res.body.entryTitle).to.deep.equal("Deterministic entry title");
+                    expect(res.body.authorName).to.deep.equal(newUserName);
+                    expect(res.body.bodyText).to.deep.equal("Deterministic text");
+                    expect(res.body.previousEntry).to.deep.equal("6695b2573550c66db1ab9106");
+                    expect(res.body.flagId).to.be.null;
+                    expect(res.body.likes).to.deep.equal(0);
+                    expect(res.body.createDate).to.be.a('string');
+
+                    const updateRes = await agent
+                        .get('/profile');
+
+                    expect(updateRes).to.have.status(200);
+                    expect(updateRes.body.publishedEntries).to.be.an('array').with.lengthOf(2);
+
+                    const { storyId, entryId, storyTitle, entryTitle, authorName, } = res.body;
+                    const entrySummary = { storyId, entryId, storyTitle, entryTitle, authorName, };
+                    expect(entrySummary).to.deep.equal(updateRes.body.publishedEntries[0]);
+
+                    populateUserInfo(updateRes.body);
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Logout and POST /entry/6695b2573550c66db1ab9106 with {entryTitle: "Deterministic entry title", bodyText: "Deterministic text', function () {
+                it('should redirect to /login', async function () {
+                    const res = await agent
+                        .post('/logout');
+
+                    expect(res).to.have.status(200);
+                    const res2 = await agent
+                        .post('/entry/6695b2573550c66db1ab9106')
+                        .send({ entryTitle: "Deterministic entry title", bodyText: "Deterministic text" });
+
+                    expect(res2).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('POST /entry/6695b2573550c66db1ab9106 with {entryTitle: "Deterministic entry title"}', function () {
+                it('should return a 400 misformed and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry/6695b2573550c66db1ab9106')
+                        .send({ entryTitle: "Deterministic entry title" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Missing story text." })
+                });
+            });
+
+            describe('POST /entry/6695b2573550c66db1ab9106 with {bodyText: "Deterministic text"}', function () {
+                it('should return a 400 misformed and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry/6695b2573550c66db1ab9106')
+                        .send({ bodyText: "Deterministic text" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Missing entry title." })
+                });
+            });
 
         });
     });
