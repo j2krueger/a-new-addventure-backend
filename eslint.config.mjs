@@ -4,8 +4,8 @@ import mochaPlugin from 'eslint-plugin-mocha';
 
 
 export default [
-  {files: ["**/*.js"], languageOptions: {sourceType: "commonjs"}},
-  {languageOptions: { globals: globals.browser }},
+  { files: ["**/*.js"], languageOptions: { sourceType: "commonjs" } },
+  { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   mochaPlugin.configs.flat.recommended // or `mochaPlugin.configs.flat.all` to enable all
 ];

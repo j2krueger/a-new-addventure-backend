@@ -15,7 +15,7 @@ const mongoStore = MongoStore.create({
     ttl: constants.loginExpirationTime,
 });
 
-if(constants.testing){
+if (constants.testing) {
     console.log('\n   constants: ', constants);
 }
 

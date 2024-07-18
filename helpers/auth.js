@@ -3,7 +3,7 @@
 const User = require('../models/user.js');
 
 async function userAuth(req, res, next) {
-    if(req.authenticatedUser){ // We've already done this on this request, no need to hit the database again
+    if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
         return next()
     }
     if (req?.session?.user?._id) {
