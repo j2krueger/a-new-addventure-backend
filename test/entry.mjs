@@ -342,8 +342,25 @@ describe('Test the entry handling routes', function () {
         });
 
         describe('Sad paths', function () {
-            // FIXME misformed entryId
-            // FIXME nonexistant entryId
+            describe('GET /entry/notAnEntryId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const res = await agent
+                        .get('/entry/notAnEntryId');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                });
+            });
+
+            describe('GET /entry/000000000000000000000000', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const res = await agent
+                        .get('/entry/000000000000000000000000');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                });
+            });
         });
     });
 
