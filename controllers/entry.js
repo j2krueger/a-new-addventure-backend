@@ -3,31 +3,23 @@
 const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
 
-async function paramId(req, res, next, value) {
+async function paramEntryId(req, res, next, value) {
   const entryId = value;
   try {
     const result = await Entry.findById(entryId);
     if (result) {
       req.foundEntryById = result;
+    } else {
+      return res.status(404).json({ error: "Entry not found." })
     }
-    next();
+    return next();
   } catch (err) {
     return next(err)
   }
 }
 
-const getEntry = async (req, res) => {
-  try {
-    const entryId = req.params.id;
-    const entry = await Entry.findById(entryId);
-    const result = await entry.fullInfoWithContinuations();
-
-    // Send the user data back to the client
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error fetching entry:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+const getEntryById = async (req, res) => {
+  res.status(200).json(await req.foundEntryById.fullInfoWithContinuations());
 };
 
 async function createStory(req, res) {
@@ -140,8 +132,8 @@ async function getEntryList(req, res) {
 }
 
 module.exports = {
-  paramId,
-  getEntry,
+  paramEntryId,
+  getEntryById,
   createStory,
   continueStory,
   getEntryList,

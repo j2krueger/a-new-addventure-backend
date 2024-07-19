@@ -4,8 +4,25 @@ const constants = require('../helpers/constants');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const User = require('../models/user');
+const Follow = require('../models/follow');
 const jwt = require('jsonwebtoken');
 
+
+async function paramUserId(req, res, next, value) {
+    if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
+        return res.status(400).json({ error: "That is not a properly formatted userId." })
+    }
+    try {
+        const result = await User.findById(value);
+        if (!result) {
+            return res.status(404).json({ error: "There is no user with that userId." });
+        }
+        req.foundUserById = result;
+        return next()
+    } catch (error) {
+        return next(error);
+    }
+}
 
 async function registerUser(req, res) {
     if (!req.body?.password) {
@@ -107,23 +124,8 @@ async function getUser(req, res) {
 
 }
 
-// async function paramUserId(req, res, next, value) {
-//     const userId = value;
-// }
-
-async function getUserInfoById(req, res, next) {
-    try {
-        if (typeof req.params.userId != 'string' || !/^[0-9a-f]{24}$/.test(req.params.userId)) {
-            return res.status(400).json({ error: "That is not a properly formatted userId." })
-        }
-        const result = await User.findById(req.params.userId);
-        if (!result) {
-            return res.status(404).json({ error: "There is no user with that userId." });
-        }
-        res.status(200).json(await result.publicInfo());
-    } catch (err) {
-        return next(err)
-    }
+async function getUserInfoById(req, res) {
+    return res.status(200).json(await req.foundUserById.publicInfo())
 }
 
 async function getProfile(req, res) {
@@ -144,13 +146,32 @@ async function putProfile(req, res, next) {
     }
 }
 
+async function followUser(req, res, next) {
+    const query = { follower: req.session.user._id, following: req.foundUserById._id };
+    if (query.follower == query.following) {
+        return res.status(409).json({ error: "Following yourself means you're going around in circles." });
+    }
+    const alreadyFollowed = await Follow.findOne(query);
+    if (alreadyFollowed) {
+        return res.status(409).json({ error: "You are already following that user." });
+    }
+    const newFollow = new Follow(query);
+    try {
+        await newFollow.save();
+        return res.status(200).json({ message: "Follow successful." });
+    } catch (error) {
+        return next(error)
+    }
+}
+
 module.exports = {
+    paramUserId,
     registerUser,
     loginUser,
     logoutUser,
     getUser,
-    // paramUserId,
     getUserInfoById,
     getProfile,
     putProfile,
+    followUser,
 };

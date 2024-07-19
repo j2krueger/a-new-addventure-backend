@@ -15,18 +15,20 @@ router.use(cors({
 }));
 
 //Auth post routers
+router.param('userId', userControllers.paramUserId)
 router.post('/register', userControllers.registerUser);
 router.post('/login', userControllers.loginUser);
 router.post('/logout', userControllers.logoutUser);
 router.get('/user', userControllers.getUser);
 router.get('/user/:userId', userControllers.getUserInfoById);
+router.post('/user/:userId/follow', userAuth, userControllers.followUser);
 router.get('/profile', userAuth, userControllers.getProfile);
 router.put('/profile', userAuth, userControllers.putProfile)
 
-router.param('id', entryControllers.paramId);
-router.get('/entry/:id', entryControllers.getEntry);
+router.param('entryId', entryControllers.paramEntryId);
+router.get('/entry/:entryId', entryControllers.getEntryById);
 router.post('/entry', userAuth, entryControllers.createStory);
-router.post('/entry/:id', userAuth, entryControllers.continueStory);
+router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
 router.get('/entry', entryControllers.getEntryList);
 
 if (constants.localDeploy && constants.testing) { // use on loca

@@ -297,6 +297,106 @@ describe('Test the user handling routes', function () {
         });
     });
 
+    describe('Test the POST /user/:userId/follow route', function () {
+        describe('Happy paths', function () {
+            describe('Login and POST /user/668490250029a28118a8d1be/follow', function () {
+                it('should return 200 ok and a success message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/user/668490250029a28118a8d1be/follow');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal({ message: "Follow successful." });
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('POST /user/668490250029a28118a8d1be/follow when not logged in', function () {
+                it('should redirect to /login', async function () {
+                    const logoutRes = await agent
+                        .post('/logout');
+
+                    expect(logoutRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/user/668490250029a28118a8d1be/follow');
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('Login and POST /user/blarg/follow', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/user/blarg/follow');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted userId." });
+                });
+            });
+
+            describe('Login and POST /user/000000000000000000000000/follow', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/user/000000000000000000000000/follow');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no user with that userId." })
+                });
+            });
+
+            describe('Login and POST /user/{ownUserId}/follow', function () {
+                it('should return a 409 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/user/' + loginRes.body.userId + '/follow');
+
+                    expect(res).to.have.status(409);
+                    expect(res.body).to.deep.equal({ error: "Following yourself means you're going around in circles." })
+                });
+            });
+
+            describe('Login and POST /user/668490250029a28118a8d1be/follow again', function () {
+                it('should return a 409 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/user/668490250029a28118a8d1be/follow');
+
+                    expect(res).to.have.status(409);
+                    expect(res.body).to.deep.equal({ error: "You are already following that user." })
+                });
+            });
+        });
+    });
+
     describe('Test POST /logout path', function () {
         it('should return a 200 ok and a response message', async function () {
             const res = await agent

@@ -318,6 +318,35 @@ describe('Test the entry handling routes', function () {
         });
     });
 
+    describe('Test the GET /entry/:entryId route', function () {
+        describe('Happy paths', function () {
+            describe('GET /entry/6695b2573550c66db1ab9106', function () {
+                it('should return a 200 OK and the entry.fullInfoWithContinuations', async function () {
+                    const res = await agent
+                        .get('/entry/6695b2573550c66db1ab9106');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body.entryId).to.deep.equal('6695b2573550c66db1ab9106');
+                    expect(res.body.authorName).to.deep.equal('Freddy');
+                    expect(res.body.entryTitle).to.be.null;
+                    expect(res.body.storyTitle).to.deep.equal('In the beginning...');
+                    expect(res.body.bodyText).to.match(/Wakamolensis/);
+                    expect(res.body.previousEntry).to.be.null;
+                    expect(res.body.flagId).to.be.null;
+                    expect(res.body.likes).to.deep.equal(0);
+                    expect(res.body.createDate).to.be.a('string');
+                    expect(res.body.storyId).to.deep.equal('6695b2573550c66db1ab9106');
+                    expect(res.body.continuationEntries).to.be.an('array');
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            // misformed entryId
+            // nonexistant entryId
+        });
+    });
+
     describe('Test the POST /entry route', function () {
         describe('Happy paths', function () {
             describe('POST /entry with {storyTitle: "Deterministic story title", bodyText: "Deterministic text"}', function () {

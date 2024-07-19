@@ -10,7 +10,8 @@
     "finddebug": "grep Debug -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
     "findfixme": "grep FIXME -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
     "findID": "grep ID -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
-    "precommit": "npm test ; npm audit ; npm run lint ; npm run finddebug ; npm run findfixme ; npm run findID"
+    "findcrud": "grep \"Debug\\|FIXME\\|ID\" -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
+    "precommit": "npm test ; npm audit ; npm run lint ; npm run findcrud"
   },
   "repository": {
     "type": "git",
