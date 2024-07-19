@@ -4,13 +4,16 @@ const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
 
 async function paramEntryId(req, res, next, value) {
+  if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
+    return res.status(400).json({ error: "That is not a properly formatted entryId." })
+  }
   const entryId = value;
   try {
     const result = await Entry.findById(entryId);
     if (result) {
       req.foundEntryById = result;
     } else {
-      return res.status(404).json({ error: "Entry not found." })
+      return res.status(404).json({ error: "There is no entry with that entryId." })
     }
     return next();
   } catch (err) {

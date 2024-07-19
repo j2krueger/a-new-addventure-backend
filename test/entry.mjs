@@ -342,8 +342,8 @@ describe('Test the entry handling routes', function () {
         });
 
         describe('Sad paths', function () {
-            // misformed entryId
-            // nonexistant entryId
+            // FIXME misformed entryId
+            // FIXME nonexistant entryId
         });
     });
 

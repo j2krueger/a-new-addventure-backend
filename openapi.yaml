@@ -36,30 +36,34 @@ paths:
           description: "If the registration is successful, return the users private profile information to indicate success."
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      "userId": "66845f61c806ebe5276df8db",
-                      "userName": "Freddy",
-                      "email": "Freddy@example.com",
-                      "bio": "I haven't decided what to put in my bio yet.",
-                      "publishEmail": false,
-                    }
+              example:
+                {
+                  "userId": "66845f61c806ebe5276df8db",
+                  "userName": "Freddy",
+                  "email": "Freddy@example.com",
+                  "bio": "I haven't decided what to put in my bio yet.",
+                  "publishEmail": false,
+                }
         "400":
           description: "If any of the fields are missing, return an error."
           content:
             application/json:
               examples:
-                duplicateUsername:
-                  value: { "error": "Missing userName, email, or password." }
+                missingPassword:
+                  value: { "error": "Missing password." }
+                missingUserName:
+                  value: { "error": "Missing userName." }
+                missingEmail:
+                  value: { "error": "Missing email." }
         "409":
           description: "Username or Email are already in use."
           content:
             application/json:
               examples:
-                registered:
-                  value: { "error": "Username or email are already in use." }
+                duplicateUserName:
+                  value: { "error": "Username already in use." }
+                duplicateEmail:
+                  value: { "error": "Email already in use." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -86,30 +90,28 @@ paths:
           description: "If the login is successful, return the users private profile information to indicate success."
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      "userId": "667afb5feb94737bf4556b7e",
-                      "userName": "Hank R. Chief",
-                      "email": "Hank@example.com",
-                      "bio": "I haven't decided what to put in my bio yet.",
-                      "publishEmail": false,
-                    }
+              example:
+                {
+                  "userId": "667afb5feb94737bf4556b7e",
+                  "userName": "Hank R. Chief",
+                  "email": "Hank@example.com",
+                  "bio": "I haven't decided what to put in my bio yet.",
+                  "publishEmail": false,
+                }
         "400":
           description: "Missing field."
           content:
             application/json:
               examples:
-                registered:
-                  value: { "error": "Missing name or password." }
+                missingName:
+                  value: { "error": "Missing name." }
+                missingPassword:
+                  value: { "error": "Missing password." }
         "401":
           description: "Login failed."
           content:
             application/json:
-              examples:
-                registered:
-                  value: { "error": "Incorrect name or password." }
+              example: { "error": "Incorrect name or password." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -132,9 +134,7 @@ paths:
             \ so we'll call that a success condition too."
           content:
             application/json:
-              examples:
-                registered:
-                  value: { "message": "Logout successful." }
+              example: { "message": "Logout successful." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -155,52 +155,48 @@ paths:
           description: "Returns the private profile information of the logged in user."
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      "userId": "668490250029a28118a8d1be",
-                      "userName": "Freddy",
-                      "email": "Freddy@example.com",
-                      "bio": "I HAVE decided what to put in my bio yet.",
-                      "publishEmail": true,
-                      "darkMode": false,
-                      "publishedEntries":
-                        [
-                          {
-                            "entryId": "6685cf32fb208efa4de7dfab",
-                            "storyTitle": "Story Title",
-                            "entryTitle": null,
-                          },
-                          {
-                            "entryId": "6685d031715453a8be27589b",
-                            "storyTitle": "Super Good Title",
-                            "entryTitle": null,
-                          },
-                          {
-                            "entryId": "6688142fb004b799a5a29d03",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the zeroeth",
-                          },
-                          {
-                            "entryId": "668820191cb99dfdc244c23c",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the first",
-                          },
-                          {
-                            "entryId": "668857a03f120ae7785257d4",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the zeroeth",
-                          },
-                        ],
-                    }
+              example:
+                {
+                  "userId": "668490250029a28118a8d1be",
+                  "userName": "Freddy",
+                  "email": "Freddy@example.com",
+                  "bio": "I HAVE decided what to put in my bio yet.",
+                  "publishEmail": true,
+                  "darkMode": false,
+                  "publishedEntries":
+                    [
+                      {
+                        "entryId": "6685cf32fb208efa4de7dfab",
+                        "storyTitle": "Story Title",
+                        "entryTitle": null,
+                      },
+                      {
+                        "entryId": "6685d031715453a8be27589b",
+                        "storyTitle": "Super Good Title",
+                        "entryTitle": null,
+                      },
+                      {
+                        "entryId": "6688142fb004b799a5a29d03",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the zeroeth",
+                      },
+                      {
+                        "entryId": "668820191cb99dfdc244c23c",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the first",
+                      },
+                      {
+                        "entryId": "668857a03f120ae7785257d4",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the zeroeth",
+                      },
+                    ],
+                }
         "401":
           description: "If no user is logged in, return an error"
           content:
             application/json:
-              examples:
-                registered:
-                  value: { "error": "No user logged in." }
+              example: { "error": "No user logged in." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -216,51 +212,54 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Settings"
-            example: { "publishEmail": true, "bio": "This is a new bio.", "darkMode": false }
+            example:
+              {
+                "publishEmail": true,
+                "bio": "This is a new bio.",
+                "darkMode": false,
+              }
       responses:
         "200":
           description: "Return the user's private profile data"
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      "userId": "668490250029a28118a8d1be",
-                      "userName": "Freddy",
-                      "email": "Freddy@example.com",
-                      "bio": "I HAVE decided what to put in my bio yet.",
-                      "publishEmail": true,
-                      "darkMode": false,
-                      "publishedEntries":
-                        [
-                          {
-                            "entryId": "6685cf32fb208efa4de7dfab",
-                            "storyTitle": "Story Title",
-                            "entryTitle": null,
-                          },
-                          {
-                            "entryId": "6685d031715453a8be27589b",
-                            "storyTitle": "Super Good Title",
-                            "entryTitle": null,
-                          },
-                          {
-                            "entryId": "6688142fb004b799a5a29d03",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the zeroeth",
-                          },
-                          {
-                            "entryId": "668820191cb99dfdc244c23c",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the first",
-                          },
-                          {
-                            "entryId": "668857a03f120ae7785257d4",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the zeroeth",
-                          },
-                        ],
-                    }
+              example:
+                {
+                  "userId": "668490250029a28118a8d1be",
+                  "userName": "Freddy",
+                  "email": "Freddy@example.com",
+                  "bio": "I HAVE decided what to put in my bio yet.",
+                  "publishEmail": true,
+                  "darkMode": false,
+                  "publishedEntries":
+                    [
+                      {
+                        "entryId": "6685cf32fb208efa4de7dfab",
+                        "storyTitle": "Story Title",
+                        "entryTitle": null,
+                      },
+                      {
+                        "entryId": "6685d031715453a8be27589b",
+                        "storyTitle": "Super Good Title",
+                        "entryTitle": null,
+                      },
+                      {
+                        "entryId": "6688142fb004b799a5a29d03",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the zeroeth",
+                      },
+                      {
+                        "entryId": "668820191cb99dfdc244c23c",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the first",
+                      },
+                      {
+                        "entryId": "668857a03f120ae7785257d4",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the zeroeth",
+                      },
+                    ],
+                }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -297,39 +296,35 @@ paths:
           description: "List of users found."
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    [
-                      {
-                        "userId": "668ee1dae1dcd980cf0739e0",
-                        "userName": "FreddySaturn",
-                        "email": "",
-                        "bio": "I haven't decided what to put in my bio yet.",
-                        "publishedEntries": [],
-                      },
-                      {
-                        "userId": "668ee27de1dcd980cf073a08",
-                        "userName": "FreddySedna",
-                        "email": "",
-                        "bio": "I haven't decided what to put in my bio yet.",
-                        "publishedEntries": [],
-                      },
-                      {
-                        "userId": "668ee31ae1dcd980cf073a17",
-                        "userName": "FreddyTitan",
-                        "email": "",
-                        "bio": "I haven't decided what to put in my bio yet.",
-                        "publishedEntries": [],
-                      },
-                    ]
+              example:
+                [
+                  {
+                    "userId": "668ee1dae1dcd980cf0739e0",
+                    "userName": "FreddySaturn",
+                    "email": "",
+                    "bio": "I haven't decided what to put in my bio yet.",
+                    "publishedEntries": [],
+                  },
+                  {
+                    "userId": "668ee27de1dcd980cf073a08",
+                    "userName": "FreddySedna",
+                    "email": "",
+                    "bio": "I haven't decided what to put in my bio yet.",
+                    "publishedEntries": [],
+                  },
+                  {
+                    "userId": "668ee31ae1dcd980cf073a17",
+                    "userName": "FreddyTitan",
+                    "email": "",
+                    "bio": "I haven't decided what to put in my bio yet.",
+                    "publishedEntries": [],
+                  },
+                ]
         "404":
           description: "No users matching the search string found."
           content:
             application/json:
-              examples:
-                registered:
-                  value: {error: "No matching users found."}
+              example: { error: "No matching users found." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -357,50 +352,93 @@ paths:
           description: "Successfully retrieved user profile."
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      "userId": "668490250029a28118a8d1be",
-                      "userName": "Freddy",
-                      "email": "Freddy@example.com",
-                      "bio": "I HAVE decided what to put in my bio yet.",
-                      "publishedEntries":
-                        [
-                          {
-                            "entryId": "6685cf32fb208efa4de7dfab",
-                            "storyTitle": "Story Title",
-                            "entryTitle": null,
-                          },
-                          {
-                            "entryId": "6685d031715453a8be27589b",
-                            "storyTitle": "Super Good Title",
-                            "entryTitle": null,
-                          },
-                          {
-                            "entryId": "6688142fb004b799a5a29d03",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the zeroeth",
-                          },
-                          {
-                            "entryId": "668820191cb99dfdc244c23c",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the first",
-                          },
-                          {
-                            "entryId": "668857a03f120ae7785257d4",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the zeroeth",
-                          },
-                        ],
-                    }
+              example:
+                {
+                  "userId": "668490250029a28118a8d1be",
+                  "userName": "Freddy",
+                  "email": "Freddy@example.com",
+                  "bio": "I HAVE decided what to put in my bio yet.",
+                  "publishedEntries":
+                    [
+                      {
+                        "entryId": "6685cf32fb208efa4de7dfab",
+                        "storyTitle": "Story Title",
+                        "entryTitle": null,
+                      },
+                      {
+                        "entryId": "6685d031715453a8be27589b",
+                        "storyTitle": "Super Good Title",
+                        "entryTitle": null,
+                      },
+                      {
+                        "entryId": "6688142fb004b799a5a29d03",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the zeroeth",
+                      },
+                      {
+                        "entryId": "668820191cb99dfdc244c23c",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the first",
+                      },
+                      {
+                        "entryId": "668857a03f120ae7785257d4",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the zeroeth",
+                      },
+                    ],
+                }
         "404":
           description: "User not found."
           content:
             application/json:
+              example: { "error": "There is no user with that user ID." }
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: User
+  /user/{userId}/follow:
+    summary: Allows a logged-in user to follow another author
+    post:
+      tags:
+        - User
+      summary: Follow another user
+      description: "If a user is logged in, posting to this route causes the logged in user to follow the user whose ID is in the path parameter."
+      operationId: get_public_profile
+      parameters:
+        - name: userId
+          in: path
+          description: the ID of the user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: "Successfully followed another user."
+          content:
+            application/json:
+              example: { "message": "Follow successful." }
+        "400":
+          description: "Not a valid userId format"
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted userId." }
+        "404":
+          description: "User not found."
+          content:
+            application/json:
+              example: { "error": "There is no user with that user ID." }
+        "409":
+          description: "You can only follow a given user once."
+          content:
+            application/json:
               examples:
-                registered:
-                  value: { "error": "There is no user with that user ID." }
+                duplicate:
+                  value: { "error": "You are already following that user." }
+                circular:
+                  value:
+                    {
+                      "error": "Following yourself means you're going around in circles.",
+                    }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -446,60 +484,58 @@ paths:
           description: "Successfully found entries."
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    [
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668d51e61be56166aaaa6cc2",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "Suddenly, a wild accountant appears!",
-                        "authorName": "Freddy",
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668c47c3e0989ccd9cd6eca8",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "adding another to list of entries",
-                        "authorName": "apmanager",
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668c4771e0989ccd9cd6ec8a",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "adding to this entries list of sub entries",
-                        "authorName": "apmanager",
-                      },
-                      {
-                        "storyId": "66885d8e6715f290d4ce03a9",
-                        "entryId": "668892f10371e6c253583148",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "dddddddddddd",
-                        "authorName": "apmanager",
-                      },
-                      {
-                        "storyId": "668857a03f120ae7785257d4",
-                        "entryId": "668857a03f120ae7785257d4",
-                        "storyTitle": "Random Title",
-                        "entryTitle": null,
-                        "authorName": "Freddy",
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668820191cb99dfdc244c23c",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the first",
-                        "authorName": "Freddy",
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "6688142fb004b799a5a29d03",
-                        "storyTitle": "Random Title",
-                        "entryTitle": null,
-                        "authorName": "Freddy",
-                      },
-                    ]
+              example:
+                [
+                  {
+                    "storyId": "6688142fb004b799a5a29d03",
+                    "entryId": "668d51e61be56166aaaa6cc2",
+                    "storyTitle": "Random Title",
+                    "entryTitle": "Suddenly, a wild accountant appears!",
+                    "authorName": "Freddy",
+                  },
+                  {
+                    "storyId": "6688142fb004b799a5a29d03",
+                    "entryId": "668c47c3e0989ccd9cd6eca8",
+                    "storyTitle": "Random Title",
+                    "entryTitle": "adding another to list of entries",
+                    "authorName": "apmanager",
+                  },
+                  {
+                    "storyId": "6688142fb004b799a5a29d03",
+                    "entryId": "668c4771e0989ccd9cd6ec8a",
+                    "storyTitle": "Random Title",
+                    "entryTitle": "adding to this entries list of sub entries",
+                    "authorName": "apmanager",
+                  },
+                  {
+                    "storyId": "66885d8e6715f290d4ce03a9",
+                    "entryId": "668892f10371e6c253583148",
+                    "storyTitle": "Random Title",
+                    "entryTitle": "dddddddddddd",
+                    "authorName": "apmanager",
+                  },
+                  {
+                    "storyId": "668857a03f120ae7785257d4",
+                    "entryId": "668857a03f120ae7785257d4",
+                    "storyTitle": "Random Title",
+                    "entryTitle": null,
+                    "authorName": "Freddy",
+                  },
+                  {
+                    "storyId": "6688142fb004b799a5a29d03",
+                    "entryId": "668820191cb99dfdc244c23c",
+                    "storyTitle": "Random Title",
+                    "entryTitle": "Chapter the first",
+                    "authorName": "Freddy",
+                  },
+                  {
+                    "storyId": "6688142fb004b799a5a29d03",
+                    "entryId": "6688142fb004b799a5a29d03",
+                    "storyTitle": "Random Title",
+                    "entryTitle": null,
+                    "authorName": "Freddy",
+                  },
+                ]
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
@@ -526,29 +562,29 @@ paths:
           description: "Successfully created entry."
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      "authorName": "Freddy",
-                      "entryTitle": "Chapter the zeroeth",
-                      "storyTitle": "Random Title",
-                      "bodyText": "Genji no monogatari",
-                      "previousEntry": null,
-                      "flagId": null,
-                      "likes": 0,
-                      "_id": "6688142fb004b799a5a29d03",
-                      "createDate": "2024-07-05T15:41:35.510Z",
-                      "storyId": "6688142fb004b799a5a29d03",
-                      "__v": 0,
-                    }
+              example:
+                {
+                  "authorName": "Freddy",
+                  "entryTitle": "Chapter the zeroeth",
+                  "storyTitle": "Random Title",
+                  "bodyText": "Genji no monogatari",
+                  "previousEntry": null,
+                  "flagId": null,
+                  "likes": 0,
+                  "_id": "6688142fb004b799a5a29d03",
+                  "createDate": "2024-07-05T15:41:35.510Z",
+                  "storyId": "6688142fb004b799a5a29d03",
+                  "__v": 0,
+                }
         "400":
           description: "Bad request."
           content:
             application/json:
               examples:
-                registered:
+                missingStoryTitle:
                   value: { "error": "Missing story title." }
+                missingBodyText:
+                  value: { "error": "Missing story text." }
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
@@ -573,29 +609,37 @@ paths:
           description: "Entry found"
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      "entryId": "6688142fb004b799a5a29d03",
-                      "authorName": "Freddy",
-                      "entryTitle": "Chapter the zeroeth",
-                      "storyTitle": "Random Title",
-                      "bodyText": "Genji no monogatari",
-                      "previousEntry": null,
-                      "flagId": null,
-                      "likes": 0,
-                      "createDate": "2024-07-05T15:41:35.510Z",
-                      "storyId": "6688142fb004b799a5a29d03",
-                      "continuationEntries":
-                        [
-                          {
-                            "entryId": "668820191cb99dfdc244c23c",
-                            "storyTitle": "Random Title",
-                            "entryTitle": "Chapter the first",
-                          },
-                        ],
-                    }
+              example:
+                {
+                  "entryId": "6688142fb004b799a5a29d03",
+                  "authorName": "Freddy",
+                  "entryTitle": "Chapter the zeroeth",
+                  "storyTitle": "Random Title",
+                  "bodyText": "Genji no monogatari",
+                  "previousEntry": null,
+                  "flagId": null,
+                  "likes": 0,
+                  "createDate": "2024-07-05T15:41:35.510Z",
+                  "storyId": "6688142fb004b799a5a29d03",
+                  "continuationEntries":
+                    [
+                      {
+                        "entryId": "668820191cb99dfdc244c23c",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Chapter the first",
+                      },
+                    ],
+                }
+        "400":
+          description: "userId not well formed"
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted userId." }
+        "404":
+          description: "userId not found"
+          content:
+            application/json:
+              example: { "error": "There is no user with that userId." }
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
@@ -644,29 +688,36 @@ paths:
           description: "Successfully created entry"
           content:
             application/json:
-              examples:
-                registered:
-                  value:
-                    {
-                      "authorName": "Freddy",
-                      "entryTitle": "Chapter the first",
-                      "bodyText": "Mononoke Hime",
-                      "previousEntry": "6688142fb004b799a5a29d03",
-                      "flagId": null,
-                      "likes": 0,
-                      "_id": "668820191cb99dfdc244c23c",
-                      "createDate": "2024-07-05T16:32:25.490Z",
-                      "storyId": "6688142fb004b799a5a29d03",
-                      "storyTitle": "Random Title",
-                      "__v": 0,
-                    }
+              example:
+                {
+                  "authorName": "Freddy",
+                  "entryTitle": "Chapter the first",
+                  "bodyText": "Mononoke Hime",
+                  "previousEntry": "6688142fb004b799a5a29d03",
+                  "flagId": null,
+                  "likes": 0,
+                  "_id": "668820191cb99dfdc244c23c",
+                  "createDate": "2024-07-05T16:32:25.490Z",
+                  "storyId": "6688142fb004b799a5a29d03",
+                  "storyTitle": "Random Title",
+                  "__v": 0,
+                }
         "400":
           description: "Bad request."
           content:
             application/json:
               examples:
-                registered:
+                missingEntryTitle:
                   value: { "error": "Missing entry title." }
+                missingStoryText:
+                  value: { "error": "Missing story text." }
+                misformedEntryId:
+                  value: { "error": "That is not a properly formatted entryId." }
+        "404":
+          description: "entryId not found"
+          content:
+            application/json:
+              example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
       x-swagger-router-controller: Entry
