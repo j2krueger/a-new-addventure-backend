@@ -7,6 +7,7 @@ const router = express.Router();
 const cors = require('cors');
 const userControllers = require('../controllers/user');
 const entryControllers = require('../controllers/entry');
+const miscControllers = require('../controllers/misc');
 
 
 router.use(cors({
@@ -30,6 +31,8 @@ router.get('/entry/:entryId', entryControllers.getEntryById);
 router.post('/entry', userAuth, entryControllers.createStory);
 router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
 router.get('/entry', entryControllers.getEntryList);
+
+router.post('/message', miscControllers.postMessage);
 
 if (constants.localDeploy && constants.testing) { // use on loca
     router.get('/sessioncheck', function (req, res) {

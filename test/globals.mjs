@@ -9,6 +9,8 @@ const agent = chai.request.agent(constants.mochaTestingUrl);
 
 import User from '../models/user.js';
 import Entry from '../models/entry.js';
+import Follow from '../models/follow.js';
+import Message from '../models/message.js';
 
 const newUserName = "test-" + Math.random();
 const newEmail = newUserName + "@example.com";
@@ -56,6 +58,8 @@ export {
     // models
     User,
     Entry,
+    Follow,
+    Message,
     // functions
     populateUserInfo,
     expectMongoObjectId,

@@ -10,8 +10,11 @@ const {
     newUserName,
     newEmail,
     newPassword,
+    newUserBasicInfo,
     User,
     Entry,
+    Message,
+    Follow,
     populateUserInfo,
     expectMongoObjectId,
 } = globals;
@@ -47,6 +50,8 @@ export const mochaHooks = {
         await User.deleteOne({ userName: newUserName });
         await User.deleteOne({ userName: 'test' + newUserName });
         await Entry.deleteMany({ authorName: { $regex: "^test" } });
+        await Message.deleteMany({ messageText: { $regex: "test message" } });
+        await Follow.deleteMany({ follower: newUserBasicInfo().userId });
         mongoose.disconnect();
 
     }
