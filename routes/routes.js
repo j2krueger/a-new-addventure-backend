@@ -1,7 +1,7 @@
 "use strict";
 
 const constants = require('../helpers/constants');
-const userAuth = require('../helpers/auth');
+const { userAuth, adminAuth } = require('../helpers/auth');
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
@@ -33,6 +33,7 @@ router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
 router.get('/entry', entryControllers.getEntryList);
 
 router.post('/message', miscControllers.postMessage);
+router.get('/message', adminAuth, miscControllers.getMessage)
 
 if (constants.localDeploy && constants.testing) { // use on loca
     router.get('/sessioncheck', function (req, res) {

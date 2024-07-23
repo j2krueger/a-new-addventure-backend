@@ -980,12 +980,52 @@ paths:
           description: Default error sample response
       x-swagger-router-controller: Entry
   /message:
-    summary: Messages to the site admins/mods
+    summary: Messages to the site admins
+    get:
+      tags:
+        - Message
+      summary: GET messages
+      description: "If there is a logged in user that is an admin, return a list of messages. Otherwise, redirect to /login"
+      operationId: get_message
+      parameters:
+        - in: query
+          name: unread
+          schema:
+            type: boolean
+          description: "If unread is set to true, the GET will only return messages that have read set to false, otherwise it will return all messages."
+      responses:
+        "200":
+          description: "list of messages found"
+          content:
+            application/json:
+              example:
+                [
+                  {
+                    "_id": "669ee7ff790d78a45a605c98",
+                    "name": "Anonymous",
+                    "email": "No email",
+                    "messageText": "This is an anonymous message to the admins",
+                    "verified": false,
+                    "read": true,
+                    "__v": 0,
+                  },
+                  {
+                    "_id": "669ee8ce790d78a45a605c9c",
+                    "name": "Anonymous",
+                    "email": "No email",
+                    "messageText": "This is an anonymous message to the admins",
+                    "verified": false,
+                    "read": false,
+                    "__v": 0,
+                  },
+                ]
+        default:
+          description: Default error sample response
     post:
       tags:
         - Message
-      summary: POST messages to the site admins/mods
-      description: "POST a message to the site admins/mods."
+      summary: POST messages to the site admins
+      description: "POST a message to the site admins."
       operationId: post_message
       requestBody:
         description:
@@ -1004,7 +1044,7 @@ paths:
                   {
                     "name": "Freddy",
                     "email": "Freddy@example.com",
-                    "messageText": "This is a message to the admins.",
+                    "messageText": "This is an unverified message to the admins.",
                   }
               anonymous:
                 value: { "messageText": "Eye think ewe knead a spell checker." }

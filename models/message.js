@@ -20,7 +20,11 @@ const messageSchema = new Schema({
     verified: {
         type: Boolean,
         default: false,
-    }
+    },
+    read: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 

@@ -28,6 +28,14 @@ async function postMessage(req, res) {
     }
 }
 
+async function getMessage(req, res) {
+    const { unread } = req.query;
+    const query = unread ? { read: false } : {};
+    const messages = await Message.find(query);
+    res.status(200).json(messages);
+}
+
 module.exports = {
     postMessage,
+    getMessage,
 }
