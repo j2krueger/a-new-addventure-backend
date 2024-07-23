@@ -1029,10 +1029,12 @@ paths:
       operationId: post_message
       requestBody:
         description:
-          "The body JSON must include messageText, and optionally any or all of name, email, and useLoginInfo. If useLoginInfo is set to true,\
-          \ and the submitter of the form is a logged in user, the name and email of the message are set to the user's userName and email, and the message\
-          \ is marked as verified when it is added to the database. If useLoginInfo is set to true and the submitter is not logged in, they are redirected\
-          \ to /login. If useLoginInfo is set to false, or not included, then name and email (if present) will be used to set their respective fields, and\
+          "The body JSON must include messageText, and optionally any or all of name, email, and useLoginInfo. If useLoginInfo is set to true, and the\
+          \ submitter of the form is a logged in user, the name and email of the message are set to the user's userName and email, and the message is\
+          \ marked as verified when it is added to the database. If useLoginInfo is not set, but the name and email match the userName and email of a\
+          \ logged in user, then the email is marked as verified. If useLoginInfo is set to true and the submitter is not logged in, they are redirected\
+          \ to /login. If useLoginInfo is set to false, or not included, and either there is no logged in user, or the name or email provided do not match\
+          \ the username and email of the logged in user, then name and email will be used to set their respective submitted values (if present), and\
           \ the message will not be marked as verified."
         content:
           application/json:

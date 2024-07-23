@@ -6,16 +6,19 @@ const User = require('../models/user');
 
 async function postMessage(req, res) {
     const { name, email, messageText, useLoginInfo } = req.body;
-    if (messageText && typeof messageText == 'string') {
+    let loggedInUser = null;
+    if (typeof messageText == 'string') {
         try {
-            if (useLoginInfo) {
-                if (req?.session?.user?._id && await User.findById(req.session.user._id)) {
-                    const message = new Message({ name: req.session.user.userName, email: req.session.user.email, messageText, verified: true });
-                    await message.save();
-                } else {
+            if (req?.session?.user?._id) {
+                loggedInUser = await User.findById(req.session.user._id);
+            }
+            if (loggedInUser && (useLoginInfo || (name == loggedInUser.userName && email == loggedInUser.email))) {
+                const message = new Message({ name: loggedInUser.userName, email: loggedInUser.email, messageText, verified: true });
+                await message.save();
+            } else {
+                if (useLoginInfo) {
                     return res.redirect('/login');
                 }
-            } else {
                 const message = new Message({ name, email, messageText });
                 await message.save();
             }
