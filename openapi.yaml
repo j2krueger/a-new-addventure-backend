@@ -626,7 +626,8 @@ paths:
                 {
                   "entryId": "6688142fb004b799a5a29d03",
                   "authorName": "Freddy",
-                  "entryTitle": "Chapter the zeroeth",
+                  "authorId": "668490250029a28118a8d1be",
+                  "entryTitle": null,
                   "storyTitle": "Random Title",
                   "bodyText": "Genji no monogatari",
                   "previousEntry": null,
@@ -637,9 +638,25 @@ paths:
                   "continuationEntries":
                     [
                       {
+                        "storyId": "6688142fb004b799a5a29d03",
                         "entryId": "668820191cb99dfdc244c23c",
                         "storyTitle": "Random Title",
                         "entryTitle": "Chapter the first",
+                        "authorName": "Freddy",
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668c4771e0989ccd9cd6ec8a",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "adding to this entries list of sub entries",
+                        "authorName": "apmanager",
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668d51e61be56166aaaa6cc2",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "authorName": "Freddy",
                       },
                     ],
                 }

@@ -328,6 +328,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body.entryId).to.deep.equal('6695b2573550c66db1ab9106');
                     expect(res.body.authorName).to.deep.equal('Freddy');
+                    expectMongoObjectId(res.body.authorId);
                     expect(res.body.entryTitle).to.be.null;
                     expect(res.body.storyTitle).to.deep.equal('In the beginning...');
                     expect(res.body.bodyText).to.match(/Wakamolensis/);
@@ -384,6 +385,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body.storyTitle).to.deep.equal("Deterministic story title");
                     expect(res.body.entryTitle).to.be.null;
                     expect(res.body.authorName).to.deep.equal(newUserName);
+                    expectMongoObjectId(res.body.authorId);
                     expect(res.body.bodyText).to.deep.equal("Deterministic text");
                     expect(res.body.previousEntry).to.be.null;
                     expect(res.body.flagId).to.be.null;
@@ -477,6 +479,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body.storyTitle).to.deep.equal("In the beginning...");
                     expect(res.body.entryTitle).to.deep.equal("Deterministic entry title");
                     expect(res.body.authorName).to.deep.equal(newUserName);
+                    expectMongoObjectId(res.body.authorId);
                     expect(res.body.bodyText).to.deep.equal("Deterministic text");
                     expect(res.body.previousEntry).to.deep.equal("6695b2573550c66db1ab9106");
                     expect(res.body.flagId).to.be.null;

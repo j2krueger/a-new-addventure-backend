@@ -64,13 +64,14 @@ entrySchema.methods.summary = function summary() {
     };
 }
 
-entrySchema.methods.fullInfo = function fullInfo() {
+entrySchema.methods.fullInfo = async function fullInfo() {
     return {
         storyId: this.storyId,
         entryId: this._id,
         storyTitle: this.storyTitle,
         entryTitle: this.entryTitle,
         authorName: this.authorName,
+        authorId: (await mongoose.model('User').findOne({ userName: this.authorName }))._id,
         bodyText: this.bodyText,
         previousEntry: this.previousEntry,
         flagId: this.flagId,
@@ -87,6 +88,7 @@ entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithConti
     return {
         entryId: this._id,
         authorName: this.authorName,
+        authorId: (await mongoose.model('User').findOne({ userName: this.authorName }))._id,
         entryTitle: this.entryTitle,
         storyTitle: this.storyTitle,
         bodyText: this.bodyText,
