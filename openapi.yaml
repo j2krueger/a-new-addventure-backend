@@ -402,7 +402,7 @@ paths:
         - User
       summary: Follow another user
       description: "If a user is logged in, posting to this route causes the logged in user to follow the user whose ID is in the path parameter."
-      operationId: get_public_profile
+      operationId: follow_user
       parameters:
         - name: userId
           in: path
