@@ -1,16 +1,26 @@
 "use strict";
 
 import * as globals from './globals.mjs';
-const { expect,
+const {
+    // resources
+    expect,
     // mongoose,
     agent,
+    // constants
     constants,
     newUserName,
     newEmail,
     newPassword,
     newUserPrivateProfile,
     newUserPublicInfo,
-    // User,
+    // newUserBasicInfo,
+    // models
+    User,
+    // Entry,
+    // Follow,
+    // Message,
+    // functions
+    populateUserInfo,
     expectMongoObjectId,
 } = globals;
 
@@ -312,6 +322,9 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Follow successful." });
+                    const newUser = await User.findOne({ userName: newUserName });
+                    const newUserProfile = await newUser.privateProfile();
+                    populateUserInfo(newUserProfile);
                 });
             });
         });
@@ -411,17 +424,17 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('login and get profile', function () {
                 it('should return 200 OK and logged in users.privateProfile()', async function () {
-                    const res = await agent
+                    const loginRes = await agent
                         .post('/login')
                         .send({ name: newUserName, password: newPassword });
 
-                    expect(res).to.have.status(200);
+                    expect(loginRes).to.have.status(200);
 
-                    const res2 = await agent
+                    const res = await agent
                         .get('/profile');
 
-                    expect(res2).to.have.status(200);
-                    expect(res2.body).to.deep.equal(newUserPrivateProfile());
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal(newUserPrivateProfile());
                 });
             });
         });
@@ -459,7 +472,7 @@ describe('Test the user handling routes', function () {
                     const tempNewUserPrivateProfile = newUserPrivateProfile();
                     tempNewUserPrivateProfile.darkMode = !tempNewUserPrivateProfile.darkMode;
                     expect(res2.body).to.deep.equal(tempNewUserPrivateProfile);
-                    globals.populateUserInfo(tempNewUserPrivateProfile);
+                    populateUserInfo(tempNewUserPrivateProfile);
                 });
             });
         });

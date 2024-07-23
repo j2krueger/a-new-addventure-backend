@@ -3,6 +3,7 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 const Entry = require('./entry');
+const Follow = require('./follow');
 const constants = require('../helpers/constants');
 
 const userSchema = new Schema({
@@ -54,10 +55,13 @@ userSchema.methods.privateProfile = async function privateProfile() {
     userId: this._id,
     userName: this.userName,
     email: this.email,
+    admin: this.admin,
+    moderator: this.moderator,
     bio: this.bio,
     publishEmail: this.publishEmail,
     darkMode: this.darkMode,
     publishedEntries: await this.getPublishedEntries(),
+    followedAuthors: await Follow.getFollowedAuthors(this._id),
   };
 }
 

@@ -20,7 +20,7 @@ let _newUserPublicInfo;
 let _newUserBasicInfo;
 
 function populateUserInfo(newUser) {
-    _newUserPrivateProfile = newUser;
+    _newUserPrivateProfile = JSON.parse(JSON.stringify(newUser));
     const { userId, userName, email, publishEmail, bio, publishedEntries } = newUser;
     _newUserPublicInfo = { userId, userName, email: publishEmail ? email : "", bio, publishedEntries };
     _newUserBasicInfo = { userId, userName };

@@ -160,35 +160,56 @@ paths:
                   "userId": "668490250029a28118a8d1be",
                   "userName": "Freddy",
                   "email": "Freddy@example.com",
+                  "admin": true,
+                  "moderator": false,
                   "bio": "I HAVE decided what to put in my bio yet.",
                   "publishEmail": true,
-                  "darkMode": false,
+                  "darkMode": true,
                   "publishedEntries":
                     [
                       {
-                        "entryId": "6685cf32fb208efa4de7dfab",
-                        "storyTitle": "Story Title",
+                        "storyId": "6695b2573550c66db1ab9106",
+                        "entryId": "6695b2573550c66db1ab9106",
+                        "storyTitle": "In the beginning...",
                         "entryTitle": null,
+                        "authorName": "Freddy",
                       },
                       {
-                        "entryId": "6685d031715453a8be27589b",
-                        "storyTitle": "Super Good Title",
-                        "entryTitle": null,
-                      },
-                      {
-                        "entryId": "6688142fb004b799a5a29d03",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668d51e61be56166aaaa6cc2",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the zeroeth",
+                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "authorName": "Freddy",
                       },
                       {
+                        "storyId": "668857a03f120ae7785257d4",
+                        "entryId": "668857a03f120ae7785257d4",
+                        "storyTitle": "Random Title",
+                        "entryTitle": null,
+                        "authorName": "Freddy",
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
                         "entryId": "668820191cb99dfdc244c23c",
                         "storyTitle": "Random Title",
                         "entryTitle": "Chapter the first",
+                        "authorName": "Freddy",
                       },
                       {
-                        "entryId": "668857a03f120ae7785257d4",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "6688142fb004b799a5a29d03",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the zeroeth",
+                        "entryTitle": null,
+                        "authorName": "Freddy",
+                      },
+                    ],
+                  "followedAuthors":
+                    [
+                      {
+                        "_id": "669ffaa5f285d2a9ea1577c2",
+                        "follower": "668490250029a28118a8d1be",
+                        "following": "667b294248b8805d71a96a03",
+                        "__v": 0,
                       },
                     ],
                 }
