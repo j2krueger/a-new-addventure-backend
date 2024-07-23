@@ -203,15 +203,7 @@ paths:
                         "authorName": "Freddy",
                       },
                     ],
-                  "followedAuthors":
-                    [
-                      {
-                        "_id": "669ffaa5f285d2a9ea1577c2",
-                        "follower": "668490250029a28118a8d1be",
-                        "following": "667b294248b8805d71a96a03",
-                        "__v": 0,
-                      },
-                    ],
+                  "followedAuthors": ["667b294248b8805d71a96a03"],
                 }
         "401":
           description: "If no user is logged in, return an error"

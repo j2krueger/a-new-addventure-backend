@@ -16,11 +16,13 @@ const followSchema = new Schema({
 });
 
 followSchema.statics.getFollowers = async function getFollowers(followingId) {
-    return await Follow.find({ following: followingId }).sort({ follower: 1 });
+    const followersList = await Follow.find({ following: followingId }).sort({ follower: 1 });
+    return followersList.map(entry => entry.follower);
 }
 
 followSchema.statics.getFollowedAuthors = async function getFollowedAuthors(followerId) {
-    return await Follow.find({ follower: followerId }).sort({ followed: 1 });
+    const followedAuthorsList = await Follow.find({ follower: followerId }).sort({ followed: 1 });
+    return followedAuthorsList.map(entry => entry.following);
 }
 
 
