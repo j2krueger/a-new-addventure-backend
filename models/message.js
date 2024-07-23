@@ -17,6 +17,10 @@ const messageSchema = new Schema({
         type: String,
         required: ['Message text is needed'],
     },
+    createDate: {
+        type: Date,
+        default: Date.now,
+    },
     verified: {
         type: Boolean,
         default: false,

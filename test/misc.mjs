@@ -160,6 +160,7 @@ describe('Test miscelaneous routes', function () {
                     for (const message of res.body) {
                         expectMongoObjectId(message._id);
                         expect(message.messageText).to.be.a('string');
+                        expect(message.createDate).to.be.a('string');
                         expect(message.name).to.be.a('string');
                         expect(message.email).to.be.a('string');
                         expect(message.read).to.be.a('boolean');
@@ -185,6 +186,7 @@ describe('Test miscelaneous routes', function () {
                     for (const message of res.body) {
                         expectMongoObjectId(message._id);
                         expect(message.messageText).to.be.a('string');
+                        expect(message.createDate).to.be.a('string');
                         expect(message.name).to.be.a('string');
                         expect(message.email).to.be.a('string');
                         expect(message.read).to.be.false;

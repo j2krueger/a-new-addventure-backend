@@ -1014,21 +1014,33 @@ paths:
               example:
                 [
                   {
-                    "_id": "669ee7ff790d78a45a605c98",
+                    "_id": "669fdd90d88a3ce68dde514f",
                     "name": "Anonymous",
-                    "email": "No email",
-                    "messageText": "This is an anonymous message to the admins",
+                    "email": "Anonymous@example.com",
+                    "messageText": "This should NOT be a verified message",
                     "verified": false,
-                    "read": true,
+                    "read": false,
                     "__v": 0,
+                    "createDate": "2024-07-23T19:30:14.089Z",
                   },
                   {
-                    "_id": "669ee8ce790d78a45a605c9c",
+                    "_id": "66a00443827cfd41d2557be0",
+                    "name": "Anonymous",
+                    "email": "Anonymous@example.com",
+                    "messageText": "This should NOT be a verified message",
+                    "verified": false,
+                    "read": false,
+                    "__v": 0,
+                    "createDate": "2024-07-23T19:30:14.089Z",
+                  },
+                  {
+                    "_id": "66a004c0e6e6a8e16fca8210",
                     "name": "Anonymous",
                     "email": "No email",
                     "messageText": "This is an anonymous message to the admins",
                     "verified": false,
                     "read": false,
+                    "createDate": "2024-07-23T19:30:08.007Z",
                     "__v": 0,
                   },
                 ]
