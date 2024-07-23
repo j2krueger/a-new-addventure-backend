@@ -203,7 +203,29 @@ paths:
                         "authorName": "Freddy",
                       },
                     ],
-                  "followedAuthors": ["667b294248b8805d71a96a03"],
+                  "followedAuthors":
+                    [
+                      {
+                        "userId": "667b294248b8805d71a96a03",
+                        "userName": "apmanager",
+                      },
+                      {
+                        "userId": "668ee18ae1dcd980cf0739c2",
+                        "userName": "BlackLagoon",
+                      },
+                      {
+                        "userId": "668ee1cfe1dcd980cf0739db",
+                        "userName": "FreddyJupiter",
+                      },
+                      {
+                        "userId": "668ee198e1dcd980cf0739c7",
+                        "userName": "FreddyMercury",
+                      },
+                      {
+                        "userId": "668ee23ce1dcd980cf0739f9",
+                        "userName": "FreddyQuaoar",
+                      },
+                    ],
                 }
         "401":
           description: "If no user is logged in, return an error"

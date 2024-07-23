@@ -1,28 +1,35 @@
 "use strict";
 
 const { ObjectId } = require('mongodb');
-const mongoose = require('mongoose')
-const { Schema } = mongoose
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+const User = require('./user');
 
 const followSchema = new Schema({
     follower: {
         type: ObjectId,
+        ref: User,
         required: ["Needs a follower"],
     },
     following: {
         type: ObjectId,
+        ref: User,
         required: ["Needs someone to follow"],
     },
 });
 
 followSchema.statics.getFollowers = async function getFollowers(followingId) {
-    const followersList = await Follow.find({ following: followingId }).sort({ follower: 1 });
-    return followersList.map(entry => entry.follower);
+    const followersList = await Follow.find({ following: followingId }).populate('follower');
+    return followersList
+        .map(entry => { return { userId: entry.follower._id, userName: entry.follower.userName } })
+        .sort((a, b) => { return (a.userName.toLowerCase() < b.userName.toLowerCase()) ? -1 : (a.userName.toLowerCase() > b.userName.toLowerCase()) ? 1 : 0 });
 }
 
 followSchema.statics.getFollowedAuthors = async function getFollowedAuthors(followerId) {
-    const followedAuthorsList = await Follow.find({ follower: followerId }).sort({ followed: 1 });
-    return followedAuthorsList.map(entry => entry.following);
+    const followedAuthorsList = await Follow.find({ follower: followerId }).populate({ path: 'following' });
+    return followedAuthorsList
+        .map(entry => { return { userId: entry.following._id, userName: entry.following.userName } })
+        .sort((a, b) => { return (a.userName.toLowerCase() < b.userName.toLowerCase()) ? -1 : (a.userName.toLowerCase() > b.userName.toLowerCase()) ? 1 : 0 });
 }
 
 
