@@ -68,9 +68,19 @@ async function putMessage(req, res, next) {
     }
 }
 
+async function deleteMessage(req, res, next) {
+    try {
+        await Message.findByIdAndDelete(req.foundMessageById._id);
+        return res.status(204).end();
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     paramMessageId,
     postMessage,
     getMessage,
     putMessage,
+    deleteMessage,
 }

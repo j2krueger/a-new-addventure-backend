@@ -1186,6 +1186,39 @@ paths:
           content:
             application/json:
               example: { "error": "Invalid request." }
+        "404":
+          description: MessageId not found."
+          content:
+            application/json:
+              example: { "error": "There is no message with that messageId." }
+    delete:
+      tags:
+        - Message
+        - Admin
+      summary: Delete a message
+      description: If there is a logged in user that is an admin, allow them to delete the message.
+      operationId: delete_message
+      parameters:
+        - name: messageId
+          in: path
+          description: the ID of the message
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "204":
+          description: Successfully deleted message.
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "Invalid request." }
+        "404":
+          description: MessageId not found."
+          content:
+            application/json:
+              example: { "error": "There is no message with that messageId." }
   /chain/{entryId}:
     summary: GET the entry chain ending at the specified entry
     get:

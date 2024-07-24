@@ -301,6 +301,40 @@ describe('Test miscelaneous routes', function () {
                 });
             });
 
+            describe('Login as admin and do a PUT with a nonexistant messageId', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: "Freddy", password: "s33krit!" });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .put('/admin/message/000000000000000000000000')
+                        .send({ read: "string" });
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no message with that messageId." })
+                });
+            });
+
+            describe('Login as admin and do a Put with a misformed ID', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: "Freddy", password: "s33krit!" });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .put('/admin/message/notAmessageId')
+                        .send({ read: "string" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted messageId." })
+                });
+            });
+
             describe('Login as non-admin and try to mark a message as read', function () {
                 it('should redirect to /login', async function () {
                     const loginRes = await agent
@@ -336,6 +370,105 @@ describe('Test miscelaneous routes', function () {
                     const res = await agent
                         .put('/admin/message/' + testMessage._id)
                         .send({ read: true });
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+        });
+    });
+
+    describe('Test the DELETE /admin/message/:messageId route', function () {
+        describe('Happy paths', function () {
+            describe('Login as admin and delete a message', function () {
+                it('should return a 204 status and delete the message from the database', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: "Freddy", password: "s33krit!" });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+
+                    expect(testMessage).to.not.be.null;
+
+                    const res = await agent
+                        .delete('/admin/message/' + testMessage._id);
+
+                    expect(res).to.have.status(204);
+
+                    const reTestMessage = await Message.findById(testMessage._id)
+                    expect(reTestMessage).to.be.null;
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Login as admin and delete a nonexistant message', function () {
+                it('should return a 404 and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: "Freddy", password: "s33krit!" });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .delete('/admin/message/000000000000000000000000');
+
+                    expect(res).to.have.status(404);
+
+                    expect(res.body).to.deep.equal({ error: "There is no message with that messageId." });
+                });
+            });
+
+            describe('Login as admin and delete a misformed messageId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: "Freddy", password: "s33krit!" });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .delete('/admin/message/notAmessageId');
+
+                    expect(res).to.have.status(400);
+
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted messageId." });
+                });
+            });
+
+            describe('Login as non admin and try to delete a message', function () {
+                it('should redirect to /login', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+
+                    expect(testMessage).to.not.be.null;
+
+                    const res = await agent
+                        .delete('/admin/message/' + testMessage._id);
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('Logout and delete a message', function () {
+                it('should redirect to /login', async function () {
+                    const logoutRes = await agent
+                        .post('/logout');
+
+                    expect(logoutRes).to.have.status(200);
+
+                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+
+                    expect(testMessage).to.not.be.null;
+
+                    const res = await agent
+                        .delete('/admin/message/' + testMessage._id);
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });

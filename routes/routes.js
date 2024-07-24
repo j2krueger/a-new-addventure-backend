@@ -38,7 +38,8 @@ router.param('messageId', miscControllers.paramMessageId);
 // admin routes
 router.use('/admin', adminAuth);
 router.get('/admin/message', miscControllers.getMessage);
-router.put('/admin/message/:messageId', miscControllers.putMessage)
+router.put('/admin/message/:messageId', miscControllers.putMessage);
+router.delete('/admin/message/:messageId', miscControllers.deleteMessage);
 
 if (constants.localDeploy && constants.testing) { // use on loca
     router.get('/sessioncheck', function (req, res) {
