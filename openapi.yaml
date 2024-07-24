@@ -295,6 +295,11 @@ paths:
                       },
                     ],
                 }
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              example: { error: "Invalid request." }
         default:
           description: Default error sample response
       x-swagger-router-controller: User
@@ -1032,10 +1037,61 @@ paths:
           description: Default error sample response
       x-swagger-router-controller: Entry
   /message:
-    summary: Messages to the site admins
+    summary: Post messages to the site admins
+    post:
+      tags:
+        - Message
+      summary: POST messages to the site admins
+      description: "POST a message to the site admins."
+      operationId: post_message
+      requestBody:
+        description:
+          "The body JSON must include messageText, and optionally any or all of name, email, and useLoginInfo. If useLoginInfo is set to true, and the\
+          \ submitter of the form is a logged in user, the name and email of the message are set to the user's userName and email, and the message is\
+          \ marked as verified when it is added to the database. If useLoginInfo is not set, but the name and email match the userName and email of a\
+          \ logged in user, then the email is marked as verified. If useLoginInfo is set to true and the submitter is not logged in, they are redirected\
+          \ to /login. If useLoginInfo is set to false, or not included, and either there is no logged in user, or the name or email provided do not match\
+          \ the username and email of the logged in user, then name and email will be used to set their respective submitted values (if present), and\
+          \ the message will not be marked as verified."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Message"
+            examples:
+              nameAndEmail:
+                value:
+                  {
+                    "name": "Freddy",
+                    "email": "Freddy@example.com",
+                    "messageText": "This is an unverified message to the admins.",
+                  }
+              anonymous:
+                value: { "messageText": "Eye think ewe knead a spell checker." }
+              loggedIn:
+                value:
+                  {
+                    "useLoginInfo": true,
+                    "messageText": "This is a verified message to the admins.",
+                  }
+      responses:
+        "200":
+          description: "Successfully created message"
+          content:
+            application/json:
+              example: { "message": "Message sent." }
+        "400":
+          description: "Bad request."
+          content:
+            application/json:
+              example: { "error": "Message text is missing." }
+        default:
+          description: Default error sample response
+  /admin/message:
+    summary: Admin route to read messages POSTed to /message
     get:
       tags:
         - Message
+        - Admin
       summary: GET messages
       description: "If there is a logged in user that is an admin, return a list of messages. Otherwise, redirect to /login"
       operationId: get_message
@@ -1085,54 +1141,51 @@ paths:
                 ]
         default:
           description: Default error sample response
-    post:
+  /admin/message/{messageId}:
+    summary: Admin route to work with individual messages POSTed to /message
+    put:
       tags:
         - Message
-      summary: POST messages to the site admins
-      description: "POST a message to the site admins."
-      operationId: post_message
+        - Admin
+      summary: Mark a particular message as read or unread
+      description: If there is a logged in user that is an admin, allow them to mark the message as read or unread.
+      operationId: mark_message_read
+      parameters:
+        - name: messageId
+          in: path
+          description: the ID of the message
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       requestBody:
-        description:
-          "The body JSON must include messageText, and optionally any or all of name, email, and useLoginInfo. If useLoginInfo is set to true, and the\
-          \ submitter of the form is a logged in user, the name and email of the message are set to the user's userName and email, and the message is\
-          \ marked as verified when it is added to the database. If useLoginInfo is not set, but the name and email match the userName and email of a\
-          \ logged in user, then the email is marked as verified. If useLoginInfo is set to true and the submitter is not logged in, they are redirected\
-          \ to /login. If useLoginInfo is set to false, or not included, and either there is no logged in user, or the name or email provided do not match\
-          \ the username and email of the logged in user, then name and email will be used to set their respective submitted values (if present), and\
-          \ the message will not be marked as verified."
+        description: Submit a request to mark the message as read or unread
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Message"
-            examples:
-              nameAndEmail:
-                value:
-                  {
-                    "name": "Freddy",
-                    "email": "Freddy@example.com",
-                    "messageText": "This is an unverified message to the admins.",
-                  }
-              anonymous:
-                value: { "messageText": "Eye think ewe knead a spell checker." }
-              loggedIn:
-                value:
-                  {
-                    "useLoginInfo": true,
-                    "messageText": "This is a verified message to the admins.",
-                  }
+              $ref: "#/components/schemas/UpdateMessage"
+            example: { "read": true }
       responses:
         "200":
-          description: "Successfully created message"
+          description: Successfully updated messages.
           content:
             application/json:
-              example: { "message": "Message sent." }
+              example:
+                {
+                  "_id": "669fdb11d88a3ce68dde514c",
+                  "name": "Freddy",
+                  "email": "Freddy@example.com",
+                  "messageText": "This should be a verified message",
+                  "verified": true,
+                  "read": true,
+                  "__v": 0,
+                  "createDate": "2024-07-24T19:21:26.156Z",
+                }
         "400":
-          description: "Bad request."
+          description: Bad request.
           content:
             application/json:
-              example: { "error": "Message text is missing." }
-        default:
-          description: Default error sample response
+              example: { "error": "Invalid request." }
   /chain/{entryId}:
     summary: GET the entry chain ending at the specified entry
     get:
@@ -1245,4 +1298,8 @@ components:
         email:
           type: string
         useLoginInfo:
+          type: boolean
+    UpdateMessage:
+      properties:
+        read:
           type: boolean

@@ -142,9 +142,9 @@ describe('Test miscelaneous routes', function () {
         });
     });
 
-    describe('Test the GET /message route', function () {
+    describe('Test the GET /admin/message route', function () {
         describe('Happy paths', function () {
-            describe('Login as admin and GET /message', function () {
+            describe('Login as admin and GET /admin/message', function () {
                 it('should return a 200 status and an array of messages', async function () {
                     const loginRes = await agent
                         .post('/login')
@@ -153,7 +153,7 @@ describe('Test miscelaneous routes', function () {
                     expect(loginRes).to.have.status(200);
 
                     const res = await agent
-                        .get('/message');
+                        .get('/admin/message');
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.least(5);
@@ -169,7 +169,7 @@ describe('Test miscelaneous routes', function () {
                 });
             });
 
-            describe('Login as admin and GET /message with query string {unread: true}', function () {
+            describe('Login as admin and GET /admin/message with query string {unread: true}', function () {
                 it('should return a 200 status and an array of messages with read == false', async function () {
                     const loginRes = await agent
                         .post('/login')
@@ -178,7 +178,7 @@ describe('Test miscelaneous routes', function () {
                     expect(loginRes).to.have.status(200);
 
                     const res = await agent
-                        .get('/message')
+                        .get('/admin/message')
                         .query({ unread: true });
 
                     expect(res).to.have.status(200);
@@ -197,7 +197,7 @@ describe('Test miscelaneous routes', function () {
         });
 
         describe('Sad paths', function () {
-            describe('Login as non-admin and GET /message', function () {
+            describe('Login as non-admin and GET /admin/message', function () {
                 it('should redirect to /login', async function () {
                     const loginRes = await agent
                         .post('/login')
@@ -206,13 +206,13 @@ describe('Test miscelaneous routes', function () {
                     expect(loginRes).to.have.status(200);
 
                     const res = await agent
-                        .get('/message');
+                        .get('/admin/message');
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });
             });
 
-            describe('Logout and GET /message', function () {
+            describe('Logout and GET /admin/message', function () {
                 it('should redirect to /login', async function () {
                     const logoutRes = await agent
                         .post('/logout');
@@ -220,7 +220,122 @@ describe('Test miscelaneous routes', function () {
                     expect(logoutRes).to.have.status(200);
 
                     const res = await agent
-                        .get('/message');
+                        .get('/admin/message');
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+        });
+    });
+
+    describe('Test the PUT /admin/message/:messageId route', function () {
+        describe('Happy paths', function () {
+            describe('Login as admin and mark a message as read', function () {
+                it('should return a 200 status and mark the message as read in the database', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: "Freddy", password: "s33krit!" });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+
+                    expect(testMessage).to.not.be.null;
+
+                    const res = await agent
+                        .put('/admin/message/' + testMessage._id)
+                        .send({ read: true });
+
+                    expect(res).to.have.status(200);
+
+                    const reTestMessage = await Message.findById(testMessage._id);
+
+                    expect(reTestMessage.read).to.be.true;
+                });
+            });
+
+            describe('Login as admin and mark a message as unread', function () {
+                it('should return a 200 status and mark the message as read in the database', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: "Freddy", password: "s33krit!" });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: true });
+
+                    expect(testMessage).to.not.be.null;
+
+                    const res = await agent
+                        .put('/admin/message/' + testMessage._id)
+                        .send({ read: false });
+
+                    expect(res).to.have.status(200);
+
+                    const reTestMessage = await Message.findById(testMessage._id);
+
+                    expect(reTestMessage.read).to.be.false;
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Login as admin and do a bad PUT', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: "Freddy", password: "s33krit!" });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+
+                    expect(testMessage).to.not.be.null;
+
+                    const res = await agent
+                        .put('/admin/message/' + testMessage._id)
+                        .send({ read: "string" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Invalid request." })
+                });
+            });
+
+            describe('Login as non-admin and try to mark a message as read', function () {
+                it('should redirect to /login', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+
+                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+
+                    expect(testMessage).to.not.be.null;
+
+                    const res = await agent
+                        .put('/admin/message/' + testMessage._id)
+                        .send({ read: true });
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('Logout and try to mark a message as read', function () {
+                it('should redirect to /login', async function () {
+                    const logoutRes = await agent
+                        .post('/logout');
+
+                    expect(logoutRes).to.have.status(200);
+
+                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+
+                    expect(testMessage).to.not.be.null;
+
+                    const res = await agent
+                        .put('/admin/message/' + testMessage._id)
+                        .send({ read: true });
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });

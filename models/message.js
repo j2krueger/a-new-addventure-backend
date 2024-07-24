@@ -31,7 +31,21 @@ const messageSchema = new Schema({
     },
 });
 
+const messageSetable = {
+    read: "boolean",
+}
 
+messageSchema.methods.applySettings = async function applySettings(settings) {
+    for (const key in settings) {
+        if (!(key in messageSetable && typeof settings[key] == messageSetable[key])) {
+            throw new Error("Invalid request.");
+        }
+    }
+    for (const key in settings) {
+        this[key] = settings[key];
+    }
+    return (await this.save());
+}
 
 const Message = mongoose.model("Message", messageSchema)
 

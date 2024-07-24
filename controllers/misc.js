@@ -4,6 +4,23 @@
 const Message = require('../models/message');
 const User = require('../models/user');
 
+async function paramMessageId(req, res, next, value) {
+    if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
+        return res.status(400).json({ error: "That is not a properly formatted messageId." })
+    }
+    try {
+        const result = await Message.findById(value);
+        if (!result) {
+            return res.status(404).json({ error: "There is no message with that messageId." });
+        }
+        req.foundMessageById = result;
+        return next()
+    } catch (error) {
+        return next(error);
+    }
+
+}
+
 async function postMessage(req, res) {
     const { name, email, messageText, useLoginInfo } = req.body;
     let loggedInUser = null;
@@ -38,7 +55,22 @@ async function getMessage(req, res) {
     res.status(200).json(messages);
 }
 
+async function putMessage(req, res, next) {
+    try {
+        const result = await req.foundMessageById.applySettings(req.body);
+        res.status(200).json(result);
+    } catch (error) {
+        if (error.message == "Invalid request.") {
+            return res.status(400).json({ error: "Invalid request." });
+        } else {
+            next(error);
+        }
+    }
+}
+
 module.exports = {
+    paramMessageId,
     postMessage,
     getMessage,
+    putMessage,
 }

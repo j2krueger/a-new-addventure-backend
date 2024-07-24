@@ -33,7 +33,12 @@ router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
 router.get('/entry', entryControllers.getEntryList);
 
 router.post('/message', miscControllers.postMessage);
-router.get('/message', adminAuth, miscControllers.getMessage)
+router.param('messageId', miscControllers.paramMessageId);
+
+// admin routes
+router.use('/admin', adminAuth);
+router.get('/admin/message', miscControllers.getMessage);
+router.put('/admin/message/:messageId', miscControllers.putMessage)
 
 if (constants.localDeploy && constants.testing) { // use on loca
     router.get('/sessioncheck', function (req, res) {
