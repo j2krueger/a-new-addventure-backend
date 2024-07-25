@@ -13,7 +13,7 @@ async function paramUserId(req, res, next, value) {
         return res.status(400).json({ error: "That is not a properly formatted userId." })
     }
     try {
-        const result = await User.findById(value);
+        const result = await User.findByIdAndPopulate(value);
         if (!result) {
             return res.status(404).json({ error: "There is no user with that userId." });
         }
@@ -62,7 +62,7 @@ async function loginUser(req, res, next) {
     } else if (!password) {
         return res.status(400).json({ error: "Missing password." });
     } else {
-        const user = await User.findOne({ userName: name }) || await User.findOne({ email: name });
+        const user = await User.findOneAndPopulate({ userName: name }) || await User.findOneAndPopulate({ email: name });
         if (!user || !await bcrypt.compare(password, user.passwordHash)) {
             return res.status(401).json({ error: "Incorrect name or password." });
         } else {

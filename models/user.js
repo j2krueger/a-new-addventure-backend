@@ -2,7 +2,6 @@
 
 const mongoose = require('mongoose')
 const { Schema } = mongoose
-const Entry = require('./entry');
 const constants = require('../helpers/constants');
 
 const userSchema = new Schema({
@@ -41,15 +40,56 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
 });
 
-userSchema.methods.getPublishedEntries = async function getPublishedEntries() {
-  return (
-    await Entry.find({ authorName: this.userName }).collation({ locale: "en" }).sort({ createDate: -1 }).limit(constants.entriesPerPage)
-  ).map(entry => entry.summary());
+userSchema.virtual('publishedEntries', {
+  ref: 'Entry',
+  localField: 'userName',
+  foreignField: 'authorName'
+})
+
+userSchema.virtual('followedAuthors', {
+  ref: 'Follow',
+  localField: '_id',
+  foreignField: 'follower',
+})
+
+userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) {
+  const result = User.findById(id)
+    .populate({
+      path: 'followedAuthors',
+      populate: { path: 'following' },
+      transform: follow => { return { userName: follow.following.userName, userId: follow.following._id } },
+    })
+    .populate({
+      path: 'publishedEntries',
+      limit: constants.entriesPerPage,
+      options: { sort: { createDate: -1 } },
+      transform: entry => entry.summary(),
+    });
+  return result;
 }
 
-userSchema.methods.privateProfile = async function privateProfile() {
+userSchema.statics.findOneAndPopulate = async function findOneAndPopulate(query) {
+  const result = User.findOne(query)
+    .populate({
+      path: 'followedAuthors',
+      populate: { path: 'following' },
+      transform: follow => { return { userName: follow.following.userName, userId: follow.following._id } },
+    })
+    .populate({
+      path: 'publishedEntries',
+      limit: constants.entriesPerPage,
+      options: { sort: { createDate: -1 } },
+      transform: entry => entry.summary(),
+    });
+  return result;
+}
+
+userSchema.methods.privateProfile = function privateProfile() {
   return {
     userId: this._id,
     userName: this.userName,
@@ -59,18 +99,18 @@ userSchema.methods.privateProfile = async function privateProfile() {
     bio: this.bio,
     publishEmail: this.publishEmail,
     darkMode: this.darkMode,
-    publishedEntries: await this.getPublishedEntries(),
-    followedAuthors: await mongoose.model('Follow').getFollowedAuthors(this._id),
+    publishedEntries: this.publishedEntries || [],
+    followedAuthors: this.followedAuthors || [],
   };
 }
 
-userSchema.methods.publicInfo = async function publicInfo() {
+userSchema.methods.publicInfo = function publicInfo() {
   return {
     userId: this._id,
     userName: this.userName,
     email: this.publishEmail ? this.email : "",
     bio: this.bio,
-    publishedEntries: await this.getPublishedEntries(),
+    publishedEntries: this.publishedEntries || [],
   };
 }
 
@@ -97,6 +137,6 @@ userSchema.methods.applySettings = async function applySettings(settings) {
   return (await this.save());
 }
 
-const User = mongoose.model("User", userSchema)
+const User = mongoose.model("User", userSchema);
 
-module.exports = User
+module.exports = User;

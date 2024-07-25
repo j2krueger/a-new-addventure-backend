@@ -7,7 +7,7 @@ async function userAuth(req, res, next) {
         return next()
     }
     if (req?.session?.user?._id) {
-        const user = await User.findById(req.session.user._id);
+        const user = await User.findByIdAndPopulate(req.session.user._id);
         if (user) {
             req.authenticatedUser = user;
             return next();
@@ -21,7 +21,7 @@ async function modAuth(req, res, next) {
         return next()
     }
     if (req?.session?.user?._id) {
-        const user = await User.findById(req.session.user._id);
+        const user = await User.findByIdAndPopulate(req.session.user._id);
         if (user && user.moderator) {
             req.authenticatedUser = user;
             return next();
@@ -35,7 +35,7 @@ async function adminAuth(req, res, next) {
         return next()
     }
     if (req?.session?.user?._id) {
-        const user = await User.findById(req.session.user._id);
+        const user = await User.findByIdAndPopulate(req.session.user._id);
         if (user && user.admin) {
             req.authenticatedUser = user;
             return next();

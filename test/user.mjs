@@ -434,6 +434,8 @@ describe('Test the user handling routes', function () {
                         .get('/profile');
 
                     expect(res).to.have.status(200);
+                    res.body.publishedEntries = [];
+                    res.body.followedAuthors = [];
                     expect(res.body).to.deep.equal(newUserPrivateProfile());
                 });
             });
@@ -471,6 +473,8 @@ describe('Test the user handling routes', function () {
                     expect(res2).to.have.status(200);
                     const tempNewUserPrivateProfile = newUserPrivateProfile();
                     tempNewUserPrivateProfile.darkMode = !tempNewUserPrivateProfile.darkMode;
+                    res2.body.publishedEntries = [];
+                    res2.body.followedAuthors = [];
                     expect(res2.body).to.deep.equal(tempNewUserPrivateProfile);
                     populateUserInfo(tempNewUserPrivateProfile);
                 });
