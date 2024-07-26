@@ -12,7 +12,8 @@ import Entry from '../models/entry.js';
 import Follow from '../models/follow.js';
 import Message from '../models/message.js';
 
-const newUserName = "test-" + Math.random();
+const testString = "testkurmdlqazsvnepyhs";
+const newUserName = testString + Math.random();
 const newEmail = newUserName + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();
 let _newUserPrivateProfile;
@@ -49,6 +50,7 @@ export {
     agent,
     // constants
     constants,
+    testString,
     newUserName,
     newEmail,
     newPassword,

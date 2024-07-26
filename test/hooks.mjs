@@ -7,6 +7,7 @@ const {
     mongoose,
     agent,
     constants,
+    testString,
     newUserName,
     newEmail,
     newPassword,
@@ -47,11 +48,12 @@ export const mochaHooks = {
     async afterAll() {
         await agent
             .post('/logout');
-        await User.deleteOne({ userName: newUserName });
-        await User.deleteOne({ userName: 'test' + newUserName });
-        await Entry.deleteMany({ authorName: { $regex: "^test" } });
-        await Entry.deleteMany({ bodyText: { $regex: "^test" } });
-        await Message.deleteMany({ messageText: { $regex: "test message" } });
+        // await User.deleteOne({ userName: newUserName });
+        // await User.deleteOne({ userName: 'test' + newUserName });
+        await User.deleteMany({ userName: { $regex: testString } });
+        await Entry.deleteMany({ authorName: { $regex: testString } });
+        await Entry.deleteMany({ bodyText: { $regex: testString } });
+        await Message.deleteMany({ messageText: { $regex: testString } });
         await Follow.deleteMany({ follower: newUserBasicInfo().userId });
         mongoose.disconnect();
 

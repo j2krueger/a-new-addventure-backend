@@ -8,6 +8,7 @@ const {
     agent,
     constants,
     // constants,
+    testString,
     newUserName,
     newEmail,
     newPassword,
@@ -29,7 +30,7 @@ describe('Test miscelaneous routes', function () {
 
     describe('Test the POST /message route', function () {
         describe('Happy paths', function () {
-            describe('LOGOUT and POST /message with {name: "Freddy", email: "Freddy@example.com", messageText: "This is a test message."}', function () {
+            describe('LOGOUT and POST /message with {name: "Freddy", email: "Freddy@example.com", messageText: testSring}', function () {
                 it('should return a 200 status code and a success message, and add the message to the database', async function () {
                     const logoutRes = await agent
                         .post('/logout');
@@ -38,36 +39,36 @@ describe('Test miscelaneous routes', function () {
 
                     const res = await agent
                         .post('/message')
-                        .send({ name: "Freddy", email: "Freddy@example.com", messageText: "This is a test message." });
+                        .send({ name: "Freddy", email: "Freddy@example.com", messageText: testString });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Message sent." });
-                    const message = await Message.findOne({ name: "Freddy", email: "Freddy@example.com", messageText: "This is a test message." });
+                    const message = await Message.findOne({ name: "Freddy", email: "Freddy@example.com", messageText: testString });
                     expect(message.name).to.deep.equal("Freddy");
                     expect(message.email).to.deep.equal("Freddy@example.com");
-                    expect(message.messageText).to.deep.equal("This is a test message.");
+                    expect(message.messageText).to.deep.equal(testString);
                     expect(message.verified).to.be.false;
                 });
             });
 
-            describe('POST /message with {messageText: "This is an anonymous test message"}', function () {
+            describe('POST /message with {messageText: testString + "unique1"}', function () {
                 it('should return a 200 status code and a success message, and add the message to the database', async function () {
                     const res = await agent
                         .post('/message')
-                        .send({ messageText: "This is an anonymous test message" });
+                        .send({ messageText: testString + "unique1" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Message sent." });
 
-                    const message = await Message.findOne({ messageText: "This is an anonymous test message" });
+                    const message = await Message.findOne({ messageText: testString + "unique1" });
                     expect(message.name).to.deep.equal("Anonymous");
                     expect(message.email).to.deep.equal("No email");
-                    expect(message.messageText).to.deep.equal("This is an anonymous test message");
+                    expect(message.messageText).to.deep.equal(testString + "unique1");
                     expect(message.verified).to.be.false;
                 });
             });
 
-            describe('Login and POST /message with {useLoginInfo: true, messageText: "This is a logged in test message."}', function () {
+            describe('Login and POST /message with {useLoginInfo: true, messageText: testString + "unique2"}', function () {
                 it('should return a 200 status code and a success message, and add the message to the database', async function () {
                     const loginRes = await agent
                         .post('/login')
@@ -77,20 +78,20 @@ describe('Test miscelaneous routes', function () {
 
                     const res = await agent
                         .post('/message')
-                        .send({ useLoginInfo: true, messageText: "This is a logged in test message." });
+                        .send({ useLoginInfo: true, messageText: testString + "unique2" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Message sent." });
 
-                    const message = await Message.findOne({ messageText: "This is a logged in test message." });
+                    const message = await Message.findOne({ messageText: testString + "unique2" });
                     expect(message.name).to.deep.equal(newUserName);
                     expect(message.email).to.deep.equal(newEmail);
-                    expect(message.messageText).to.deep.equal("This is a logged in test message.");
+                    expect(message.messageText).to.deep.equal(testString + "unique2");
                     expect(message.verified).to.be.true;
                 });
             });
 
-            describe('Login and POST /message with {name: newUserName, email: newEmail, messageText: "This is a logged in test message."}', function () {
+            describe('Login and POST /message with {name: newUserName, email: newEmail, messageText: testString + "unique3"}', function () {
                 it('should return a 200 status code and a success message, and add the message to the database', async function () {
                     const loginRes = await agent
                         .post('/login')
@@ -100,15 +101,15 @@ describe('Test miscelaneous routes', function () {
 
                     const res = await agent
                         .post('/message')
-                        .send({ name: newUserName, email: newEmail, messageText: "This is a logged in test message." });
+                        .send({ name: newUserName, email: newEmail, messageText: testString + "unique3" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Message sent." });
 
-                    const message = await Message.findOne({ messageText: "This is a logged in test message." });
+                    const message = await Message.findOne({ messageText: testString + "unique3" });
                     expect(message.name).to.deep.equal(newUserName);
                     expect(message.email).to.deep.equal(newEmail);
-                    expect(message.messageText).to.deep.equal("This is a logged in test message.");
+                    expect(message.messageText).to.deep.equal(testString + "unique3");
                     expect(message.verified).to.be.true;
                 });
             });
@@ -238,7 +239,7 @@ describe('Test miscelaneous routes', function () {
 
                     expect(loginRes).to.have.status(200);
 
-                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+                    const testMessage = await Message.findOne({ messageText: { $regex: testString }, read: false });
 
                     expect(testMessage).to.not.be.null;
 
@@ -262,7 +263,7 @@ describe('Test miscelaneous routes', function () {
 
                     expect(loginRes).to.have.status(200);
 
-                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: true });
+                    const testMessage = await Message.findOne({ messageText: { $regex: testString }, read: true });
 
                     expect(testMessage).to.not.be.null;
 
@@ -288,7 +289,7 @@ describe('Test miscelaneous routes', function () {
 
                     expect(loginRes).to.have.status(200);
 
-                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+                    const testMessage = await Message.findOne({ messageText: { $regex: testString }, read: false });
 
                     expect(testMessage).to.not.be.null;
 
@@ -344,7 +345,7 @@ describe('Test miscelaneous routes', function () {
                     expect(loginRes).to.have.status(200);
 
 
-                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+                    const testMessage = await Message.findOne({ messageText: { $regex: testString }, read: false });
 
                     expect(testMessage).to.not.be.null;
 
@@ -363,7 +364,7 @@ describe('Test miscelaneous routes', function () {
 
                     expect(logoutRes).to.have.status(200);
 
-                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+                    const testMessage = await Message.findOne({ messageText: { $regex: testString }, read: false });
 
                     expect(testMessage).to.not.be.null;
 
@@ -387,7 +388,7 @@ describe('Test miscelaneous routes', function () {
 
                     expect(loginRes).to.have.status(200);
 
-                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+                    const testMessage = await Message.findOne({ messageText: { $regex: testString }, read: false });
 
                     expect(testMessage).to.not.be.null;
 
@@ -445,7 +446,7 @@ describe('Test miscelaneous routes', function () {
 
                     expect(loginRes).to.have.status(200);
 
-                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+                    const testMessage = await Message.findOne({ messageText: { $regex: testString }, read: false });
 
                     expect(testMessage).to.not.be.null;
 
@@ -463,7 +464,7 @@ describe('Test miscelaneous routes', function () {
 
                     expect(logoutRes).to.have.status(200);
 
-                    const testMessage = await Message.findOne({ messageText: { $regex: "test message" }, read: false });
+                    const testMessage = await Message.findOne({ messageText: { $regex: testString }, read: false });
 
                     expect(testMessage).to.not.be.null;
 
