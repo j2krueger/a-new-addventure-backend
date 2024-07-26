@@ -323,7 +323,7 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Follow successful." });
                     const newUser = await User.findOne({ userName: newUserName });
-                    const newUserProfile = await newUser.privateProfile();
+                    const newUserProfile = newUser.privateProfile();
                     populateUserInfo(newUserProfile);
                 });
             });

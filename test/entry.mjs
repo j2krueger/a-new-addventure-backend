@@ -24,7 +24,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -47,7 +47,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -70,7 +70,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -89,7 +89,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string').which.matches(/beginning/);
@@ -112,7 +112,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -159,7 +159,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0].authorName;
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -185,7 +185,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0].authorName;
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -211,7 +211,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0].entryTitle;
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -236,7 +236,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0].entryTitle;
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -261,7 +261,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0];
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName');
+                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId');
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');

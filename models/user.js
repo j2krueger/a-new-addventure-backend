@@ -58,7 +58,7 @@ userSchema.virtual('followedAuthors', {
 })
 
 userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) {
-  const result = User.findById(id)
+  const result = await User.findById(id)
     .populate({
       path: 'followedAuthors',
       populate: { path: 'following' },
@@ -70,11 +70,17 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
       options: { sort: { createDate: -1 } },
       transform: entry => entry.summary(),
     });
+  if (result) {
+    result.followedAuthors.sort((a, b) => {
+      const al = a.userName.toLowerCase(), bl = b.userName.toLowerCase();
+      return (al < bl) ? -1 : (al > bl) ? 1 : 0;
+    })
+  }
   return result;
 }
 
 userSchema.statics.findOneAndPopulate = async function findOneAndPopulate(query) {
-  const result = User.findOne(query)
+  const result = await User.findOne(query)
     .populate({
       path: 'followedAuthors',
       populate: { path: 'following' },
@@ -86,6 +92,12 @@ userSchema.statics.findOneAndPopulate = async function findOneAndPopulate(query)
       options: { sort: { createDate: -1 } },
       transform: entry => entry.summary(),
     });
+  if (result) {
+    result.followedAuthors.sort((a, b) => {
+      const al = a.userName.toLowerCase(), bl = b.userName.toLowerCase();
+      return (al < bl) ? -1 : (al > bl) ? 1 : 0;
+    })
+  }
   return result;
 }
 

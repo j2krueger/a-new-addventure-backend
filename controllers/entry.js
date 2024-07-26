@@ -9,7 +9,7 @@ async function paramEntryId(req, res, next, value) {
   }
   const entryId = value;
   try {
-    const result = await Entry.findById(entryId);
+    const result = await Entry.findByIdAndPopulate(entryId);
     if (result) {
       req.foundEntryById = result;
     } else {
@@ -125,11 +125,7 @@ async function getEntryList(req, res) {
     }
   }
   sortQuery["_id"] = 1; // make sure the sort order is completely unambiguous so it plays well with pagination
-  const entryList = await Entry.find(entryQuery)
-    .collation({ locale: "en" })
-    .sort(sortQuery)
-    .skip(zPage * constants.entriesPerPage)
-    .limit(constants.entriesPerPage);
+  const entryList = await Entry.findAndPopulate(entryQuery, sortQuery, zPage * constants.entriesPerPage, constants.entriesPerPage);
   const result = entryList.map(entry => entry.summary());
   res.status(200).json(result);
 }

@@ -50,7 +50,7 @@ async function registerUser(req, res) {
         } catch (err) {
             return res.status(500).json(err);
         }
-        res.status(201).json(await newUser.privateProfile());
+        res.status(201).json(newUser.privateProfile());
     }
 }
 
@@ -86,7 +86,7 @@ async function loginUser(req, res, next) {
                         secure: true,
                         sameSite: 'none',
                     });
-                    return res.status(200).json(await user.privateProfile());
+                    return res.status(200).json(user.privateProfile());
                 });
             })
         }
@@ -129,14 +129,14 @@ async function getUserInfoById(req, res) {
 }
 
 async function getProfile(req, res) {
-    res.status(200).json(await req.authenticatedUser.privateProfile());
+    res.status(200).json(req.authenticatedUser.privateProfile());
 }
 
 async function putProfile(req, res, next) {
     try {
         const result = await req.authenticatedUser.applySettings(req.body);
         req.session.user = result;
-        res.status(200).json(await result.privateProfile());
+        res.status(200).json(result.privateProfile());
     } catch (err) {
         if (err.message == "Invalid request.") {
             return res.status(400).json({ error: err.message });
