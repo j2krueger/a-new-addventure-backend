@@ -1,14 +1,29 @@
 "use strict";
 
 import * as globals from './globals.mjs';
-const { expect,
+const {
+    // resources
+    expect,
+    // mongoose,
     agent,
+    // constants
     constants,
+    testString,
     newUserName,
     // newEmail,
     newPassword,
-    expectMongoObjectId,
+    newUserPrivateProfile,
+    // newUserPublicInfo,
+    // newUserBasicInfo,
+    // models
+    // User,
+    Entry,
+    // Follow,
+    // Message,
+    Like,
+    // functions
     populateUserInfo,
+    expectMongoObjectId,
 } = globals;
 
 describe('Test the entry handling routes', function () {
@@ -525,15 +540,15 @@ describe('Test the entry handling routes', function () {
         describe('Sad paths', function () {
             describe('Logout and POST /entry/6695b2573550c66db1ab9106 with {entryTitle: "Deterministic entry title", bodyText: "Deterministic text', function () {
                 it('should redirect to /login', async function () {
-                    const res = await agent
+                    const logoutRes = await agent
                         .post('/logout');
 
-                    expect(res).to.have.status(200);
-                    const res2 = await agent
+                    expect(logoutRes).to.have.status(200);
+                    const res = await agent
                         .post('/entry/6695b2573550c66db1ab9106')
                         .send({ entryTitle: "Deterministic entry title", bodyText: "Deterministic text" });
 
-                    expect(res2).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });
             });
 
@@ -571,6 +586,119 @@ describe('Test the entry handling routes', function () {
                 });
             });
 
+        });
+    });
+
+    describe('Test the POST /entry/:entryId/like route', function () {
+        describe('Happy paths', function () {
+            describe('Login and POST /entry/6695b2573550c66db1ab9106/like', function () {
+                it('should return a 200 status and a success message, and add a like to the database', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry/6695b2573550c66db1ab9106/like');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal({ message: "Entry liked." });
+                    const likeRes = Like.findOne({ user: newUserPrivateProfile().userId, entry: '6695b2573550c66db1ab9106' });
+                    expect(likeRes).to.not.be.null;
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Logout and POST a like to a story', function () {
+                it('should redirect to /login', async function () {
+                    const logoutRes = await agent
+                        .post('/logout');
+
+                    expect(logoutRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry/6695b2573550c66db1ab9106/like');
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('Login, post an entry, and like the entry', function () {
+                it('should return a 409 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const entryRes = await agent
+                        .post('/entry')
+                        .send({ storyTitle: "Title", bodyText: testString });
+
+                    expect(entryRes).to.have.status(201);
+
+                    const res = await agent
+                        .post('/entry/' + entryRes.body.entryId + '/like');
+
+                    expect(res).to.have.status(409);
+
+                    expect(res.body).to.deep.equal({ error: "You cannot like your own entries." });
+
+                    const delRes = await Entry.findByIdAndDelete(entryRes.body.entryId);
+
+                    expect(delRes).to.not.be.null;
+                });
+            });
+
+            describe('Login and POST a like to an already liked story', function () {
+                it('should return a 409 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry/6695b2573550c66db1ab9106/like');
+
+                    expect(res).to.have.status(409);
+                    expect(res.body).to.deep.equal({ error: "You have already liked that entry." });
+                });
+            });
+
+            describe('Login and POST a like to a nonexistant story', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry/000000000000000000000000/like');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                });
+            });
+
+            describe('Login and POST a like to a misformed storyId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .post('/entry/blarg/like');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                });
+            });
         });
     });
 

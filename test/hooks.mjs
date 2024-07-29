@@ -3,21 +3,29 @@
 import * as globals from './globals.mjs';
 
 const {
+    // resources
     expect,
     mongoose,
     agent,
+    // constants
     constants,
     testString,
     newUserName,
     newEmail,
     newPassword,
+    // newUserPrivateProfile,
+    // newUserPublicInfo,
     newUserBasicInfo,
+    // models
     User,
     Entry,
-    Message,
     Follow,
+    Message,
+    Like,
+    // functions
     populateUserInfo,
     expectMongoObjectId,
+
 } = globals;
 
 export const mochaHooks = {
@@ -48,13 +56,12 @@ export const mochaHooks = {
     async afterAll() {
         await agent
             .post('/logout');
-        // await User.deleteOne({ userName: newUserName });
-        // await User.deleteOne({ userName: 'test' + newUserName });
         await User.deleteMany({ userName: { $regex: testString } });
         await Entry.deleteMany({ authorName: { $regex: testString } });
         await Entry.deleteMany({ bodyText: { $regex: testString } });
         await Message.deleteMany({ messageText: { $regex: testString } });
         await Follow.deleteMany({ follower: newUserBasicInfo().userId });
+        await Like.deleteMany({ user: newUserBasicInfo().userId });
         mongoose.disconnect();
 
     }

@@ -11,6 +11,7 @@ import User from '../models/user.js';
 import Entry from '../models/entry.js';
 import Follow from '../models/follow.js';
 import Message from '../models/message.js';
+import Like from '../models/like.js';
 
 const testString = "testkurmdlqazsvnepyhs";
 const newUserName = testString + Math.random();
@@ -62,6 +63,7 @@ export {
     Entry,
     Follow,
     Message,
+    Like,
     // functions
     populateUserInfo,
     expectMongoObjectId,

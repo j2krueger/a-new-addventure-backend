@@ -2,6 +2,7 @@
 
 const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
+const Like = require('../models/like');
 
 async function paramEntryId(req, res, next, value) {
   if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
@@ -130,10 +131,29 @@ async function getEntryList(req, res) {
   res.status(200).json(result);
 }
 
+async function likeEntry(req, res, next) {
+  try {
+    if (req.foundEntryById.authorId.equals(req.authenticatedUser._id)) {
+      return res.status(409).json({ error: "You cannot like your own entries." });
+    }
+    const likeQuery = { user: req.authenticatedUser._id, entry: req.foundEntryById._id };
+    const found = await Like.findOne(likeQuery);
+    if (found) {
+      return res.status(409).json({ error: "You have already liked that entry." });
+    }
+    const like = new Like(likeQuery);
+    await like.save();
+    res.status(200).json({ message: "Entry liked." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   paramEntryId,
   getEntryById,
   createStory,
   continueStory,
   getEntryList,
+  likeEntry,
 }

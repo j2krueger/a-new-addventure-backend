@@ -823,15 +823,56 @@ paths:
       responses:
         default:
           description: Default error sample response
+  /entry/{entryId}/like:
+    summary: POST or DELETE a like to an entry
+    post:
+      tags:
+        - Entry
+      summary: Like an entry
+      description: "Like an entry. You cannot like your own entries, or like an entry multiple times."
+      operationId: like_entry
+      parameters:
+        - name: entryId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: Like successfully posted.
+          content:
+            application/json:
+              example: { "message": "Entry liked." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted entryId." }
+        "404":
+          description: entryId not found."
+          content:
+            application/json:
+              example: { "error": "There is no entry with that entryId." }
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              examples:
+                duplicateLike:
+                  value: { "error": "You have already liked that entry." }
+                likeOwnEntry:
+                  value: { "error": "You cannot like your own entries." }
+        default:
+          description: Default error sample response
   /entry/{entryId}/flag:
     summary: POST a flag for review on the entry
     post:
       tags:
         - Entry
       summary: Flag an entry for review
-      description:
-        "Post a flag for review, to be entered into a moderation queue.\
-        \ Must include reason for flagging."
+      description: "Post a flag for review, to be entered into a moderation queue. Must include reason for flagging."
       operationId: flag_entry
       parameters:
         - name: entryId
