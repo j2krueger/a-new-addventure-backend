@@ -23,6 +23,7 @@ router.post('/logout', userControllers.logoutUser);
 router.get('/user', userControllers.getUser);
 router.get('/user/:userId', userControllers.getUserInfoById);
 router.post('/user/:userId/follow', userAuth, userControllers.followUser);
+router.delete('/user/:userId/follow', userAuth, userControllers.unFollowUser);
 router.get('/profile', userAuth, userControllers.getProfile);
 router.put('/profile', userAuth, userControllers.putProfile)
 

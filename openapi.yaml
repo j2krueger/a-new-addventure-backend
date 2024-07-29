@@ -66,7 +66,6 @@ paths:
                   value: { "error": "Email already in use." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: User
   /login:
     summary: GET/POST login
     post:
@@ -114,7 +113,6 @@ paths:
               example: { "error": "Incorrect name or password." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: User
   /logout:
     summary: POST logout
     post:
@@ -137,7 +135,6 @@ paths:
               example: { "message": "Logout successful." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: User
   /profile:
     summary: GET/PUT logged in user's profile
     get:
@@ -234,7 +231,6 @@ paths:
               example: { "error": "No user logged in." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: User
     put:
       tags:
         - User
@@ -302,7 +298,6 @@ paths:
               example: { error: "Invalid request." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: User
   /user:
     summary: GET a list of users
     get:
@@ -367,7 +362,6 @@ paths:
               example: { error: "No matching users found." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: User
   /user/{userId}:
     summary: GET a user's public profile
     get:
@@ -434,7 +428,6 @@ paths:
               example: { "error": "There is no user with that user ID." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: User
   /user/{userId}/follow:
     summary: Allows a logged-in user to follow another author
     post:
@@ -481,7 +474,38 @@ paths:
                     }
         default:
           description: Default error sample response
-      x-swagger-router-controller: User
+    delete:
+      tags:
+        - User
+      summary: Unfollow another user
+      description: "If a user is logged in, deleteing this route causes the logged in user to unfollow the user whose ID is in the path parameter."
+      operationId: unfollow_user
+      parameters:
+        - name: userId
+          in: path
+          description: the ID of the user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: "Successfully unfollowed another user."
+          content:
+            application/json:
+              example: { "message": "Author successfully unfollowed." }
+        "400":
+          description: "Not a valid userId format"
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted userId." }
+        "404":
+          description: "User not found or not followed."
+          content:
+            application/json:
+              example: { "error": "No follow to remove." }
+        default:
+          description: Default error sample response
   /entry:
     summary: GET/POST entries
     get:
@@ -578,7 +602,6 @@ paths:
                 ]
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
     post:
       tags:
         - Entry
@@ -627,7 +650,6 @@ paths:
                   value: { "error": "Missing story text." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
   /entry/{entryId}:
     summary: GET/POST/PUT/DELETE a particular entry
     get:
@@ -699,7 +721,6 @@ paths:
               example: { "error": "There is no user with that userId." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
     put:
       tags:
         - Entry
@@ -717,7 +738,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
     post:
       tags:
         - Entry
@@ -778,7 +798,6 @@ paths:
               example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
     delete:
       tags:
         - Entry
@@ -799,7 +818,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
   /entry/{entryId}/flag:
     summary: POST a flag for review on the entry
     post:
@@ -821,7 +839,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
   /entry/{entryId}/keyword/{keyword}:
     summary: GET/POST/DELETE keywords
     get:
@@ -852,7 +869,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
     post:
       tags:
         - Entry
@@ -881,7 +897,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
     delete:
       tags:
         - Entry
@@ -910,7 +925,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
   /entry/{entryId}/comment:
     summary: GET/POST comments on entry
     get:
@@ -933,7 +947,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
     post:
       tags:
         - Entry
@@ -952,7 +965,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
   /entry/{entryId}/comment/{commentId}:
     summary: PUT/DELETE a comment
     put:
@@ -980,7 +992,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
     delete:
       tags:
         - Entry
@@ -1006,7 +1017,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
   /entry/{entryId}/comment/{commentId}/flag:
     summary: POST a flag for review on a comment
     post:
@@ -1035,7 +1045,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Entry
   /message:
     summary: Post messages to the site admins
     post:
@@ -1240,7 +1249,6 @@ paths:
       responses:
         default:
           description: Default error sample response
-      x-swagger-router-controller: Chain
   /keywords:
     summary: GET a list of defined keywords
     get:
@@ -1270,7 +1278,6 @@ paths:
                   value: { "keywords": [] }
         default:
           description: Default error sample response
-      x-swagger-router-controller: Keyword
 components:
   schemas:
     Register:

@@ -330,7 +330,7 @@ describe('Test the user handling routes', function () {
         });
 
         describe('Sad paths', function () {
-            describe('POST /user/668490250029a28118a8d1be/follow when not logged in', function () {
+            describe('Logout and POST /user/668490250029a28118a8d1be/follow', function () {
                 it('should redirect to /login', async function () {
                     const logoutRes = await agent
                         .post('/logout');
@@ -405,6 +405,95 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(409);
                     expect(res.body).to.deep.equal({ error: "You are already following that user." })
+                });
+            });
+        });
+    });
+
+    describe('Test the DELETE /user/:userId/follow rout', function () {
+        describe('Happy paths', function () {
+            describe('Login, follow a user, and unfollow the user', function () {
+                it('should return a 200 status and return a success message.', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const followRes = await agent
+                        .post('/user/668ee23ce1dcd980cf0739f9/follow');
+
+                    expect(followRes).to.have.status(200);
+
+                    const res = await agent
+                        .delete('/user/668ee23ce1dcd980cf0739f9/follow');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal({ message: "Author successfully unfollowed." });
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Logout and unfollow', function () {
+                it('should redirect to /login', async function () {
+                    const logoutRes = await agent
+                        .post('/logout');
+
+                    expect(logoutRes).to.have.status(200);
+
+                    const res = await agent
+                        .delete('/user/668490250029a28118a8d1be/follow');
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('Login and unfollow someone not followed', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .delete('/user/668ee24be1dcd980cf0739fe/follow');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: 'No follow to remove.' })
+                });
+            });
+
+            describe('Login and unfollow with nonexistant userId', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .delete('/user/000000000000000000000000/follow');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no user with that userId." })
+                });
+            });
+
+            describe('Login and unfollow with bad userId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    const res = await agent
+                        .delete('/user/blarg/follow');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted userId." })
                 });
             });
         });

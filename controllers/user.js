@@ -147,8 +147,8 @@ async function putProfile(req, res, next) {
 }
 
 async function followUser(req, res, next) {
-    const query = { follower: req.session.user._id, following: req.foundUserById._id };
-    if (query.follower == query.following) {
+    const query = { follower: req.authenticatedUser._id, following: req.foundUserById._id };
+    if (query.follower.equals(query.following)) {
         return res.status(409).json({ error: "Following yourself means you're going around in circles." });
     }
     const alreadyFollowed = await Follow.findOne(query);
@@ -164,6 +164,20 @@ async function followUser(req, res, next) {
     }
 }
 
+async function unFollowUser(req, res, next) {
+    try {
+        const query = { follower: req.authenticatedUser._id, following: req.foundUserById._id };
+        const result = await Follow.findOneAndDelete(query);
+        if (result) {
+            return res.status(200).json({ message: 'Author successfully unfollowed.' });
+        } else {
+            return res.status(404).json({ error: 'No follow to remove.' });
+        }
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     paramUserId,
     registerUser,
@@ -174,4 +188,5 @@ module.exports = {
     getProfile,
     putProfile,
     followUser,
+    unFollowUser,
 };
