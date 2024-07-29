@@ -100,6 +100,20 @@ userSchema.statics.findOneAndPopulate = async function findOneAndPopulate(query)
   }
   return result;
 }
+userSchema.statics.findAndPopulate = async function findAndPopulate(query, skip, limit) {
+  const result = await User.find(query)
+    .collation({ locale: "en" })
+    .sort({ userName: 1 })
+    .skip(skip)
+    .limit(limit)
+    .populate({
+      path: 'publishedEntries',
+      limit: constants.entriesPerPage,
+      options: { sort: { createDate: -1 } },
+      transform: entry => entry.summary(),
+    });
+  return result;
+}
 
 userSchema.methods.privateProfile = function privateProfile() {
   return {
