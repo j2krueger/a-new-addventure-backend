@@ -538,6 +538,11 @@ paths:
             \ Fields specified earlier take priority over fields specified later, e.g. if 'order' is 'sE', then entries will be sorted in alphabetical\
             \ order by storyTitle, and entries with the same storyTitle will be sorted in reverse alphabetical order by entryTitle. Text field sorts\
             \ are case insensitive. If 'order' is not specified, it defaults to 'C' (newest first)."
+        - in: query
+          name: storiesOnly
+          schema:
+            type: boolean
+          description: "If true, only returns stories, i.e. entries that have storyId equal to entryId and previousEntry equal to null"
       tags:
         - Entry
       summary: GET a list of recent entries

@@ -93,9 +93,9 @@ async function getEntryList(req, res) {
     C: ['createDate', -1],
     B: ['bodyText', -1],
   }
-  const { page, regex, fields, order } = req.query;
+  const { page, regex, fields, order, storiesOnly } = req.query;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
-  const entryQuery = {};
+  const entryQuery = storiesOnly ? { previousEntry: null } : {};
   if (regex) {
     entryQuery["$or"] = [];
     for (const fieldChar of (fields || "seab")) {

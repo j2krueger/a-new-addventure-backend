@@ -114,6 +114,7 @@ entrySchema.methods.summary = function summary() {
         entryTitle: this.entryTitle,
         authorName: this.authorName,
         authorId: this.authorId,
+        previousEntry: this.previousEntry,
     };
 }
 
