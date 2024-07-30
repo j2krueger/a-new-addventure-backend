@@ -1,8 +1,8 @@
 "use strict";
 
 const { ObjectId } = require('mongodb');
-const mongoose = require('mongoose')
-const { Schema } = mongoose
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const entrySchema = new Schema({
     storyId: {
@@ -37,10 +37,6 @@ const entrySchema = new Schema({
         type: ObjectId,
         default: null,
     },
-    likes: {
-        type: Number,
-        default: 0,
-    }
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -53,15 +49,29 @@ entrySchema.virtual('authorId', {
     justOne: true,
 })
 
-//continuationEntries
 entrySchema.virtual('continuationEntries', {
     ref: 'Entry',
     localField: '_id',
     foreignField: 'previousEntry',
 })
 
-entrySchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) {
+entrySchema.virtual('likes', {
+    ref: 'Like',
+    localField: '_id',
+    foreignField: 'entry',
+    count: true,
+})
+
+entrySchema.methods.setLikedByUser = async function setLikedByUser(userId) {
+    if (userId) {
+        const result = await mongoose.model('Like').findOne({ user: userId, entry: this._id });
+        this.likedByUser = !!result;
+    }
+}
+
+entrySchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id, userId) {
     const result = await Entry.findById(id)
+        .populate('likes')
         .populate({
             path: 'authorId',
             transform: auth => auth._id,
@@ -70,26 +80,32 @@ entrySchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id)
             path: 'continuationEntries',
             transform: entry => entry.summary(),
         });
+    if (result) {
+        await result.setLikedByUser(userId);
+    }
     return result;
 }
 
-entrySchema.statics.findAndPopulate = async function findAndPopulate(entryQuery, sortQuery, skip, limit) {
+entrySchema.statics.findAndPopulate = async function findAndPopulate(entryQuery, sortQuery, skip, limit, userId) {
     const result = await Entry.find(entryQuery, null, {
         collation: { locale: 'en' },
         sort: sortQuery,
         skip: skip,
         limit: limit,
     })
+        .populate('likes')
         .populate({
             path: 'authorId',
             transform: auth => auth._id,
         });
+    await Promise.all(result.map(entry => entry.setLikedByUser(userId)));
     return result;
 }
 
 entrySchema.methods.saveNewStory = async function saveNewStory() {
     this.storyId = this._id;
     await this.save();
+    await this.populate('likes');
     await this.populate({
         path: 'authorId',
         transform: auth => auth._id,
@@ -100,6 +116,7 @@ entrySchema.methods.saveContinuationEntry = async function saveContinuationEntry
     this.storyId = prevEntry.storyId;
     this.storyTitle = prevEntry.storyTitle;
     await this.save();
+    await this.populate('likes');
     await this.populate({
         path: 'authorId',
         transform: auth => auth._id,
@@ -115,6 +132,8 @@ entrySchema.methods.summary = function summary() {
         authorName: this.authorName,
         authorId: this.authorId,
         previousEntry: this.previousEntry,
+        likes: this.likes,
+        likedByUser: this.likedByUser,
     };
 }
 
@@ -130,6 +149,7 @@ entrySchema.methods.fullInfo = async function fullInfo() {
         previousEntry: this.previousEntry,
         flagId: this.flagId,
         likes: this.likes,
+        likedByUser: this.likedByUser,
         createDate: this.createDate,
     };
 }
@@ -145,6 +165,7 @@ entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithConti
         previousEntry: this.previousEntry,
         flagId: this.flagId,
         likes: this.likes,
+        likedByUser: this.likedByUser,
         createDate: this.createDate,
         storyId: this.storyId,
         continuationEntries: this.continuationEntries,

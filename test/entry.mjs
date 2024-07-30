@@ -15,6 +15,7 @@ const {
     newUserPrivateProfile,
     // newUserPublicInfo,
     // newUserBasicInfo,
+    summaryKeys,
     // models
     // User,
     Entry,
@@ -31,15 +32,44 @@ describe('Test the entry handling routes', function () {
 
     describe('Test the GET /entry route', function () {
         describe('Happy paths', function () {
-            describe('GET /entry', function () {
+            describe('Logout and GET /entry', function () {
                 it('should return a 200 OK and a list of entries', async function () {
+                    await agent
+                        .post('/logout');
+
                     const res = await agent
                         .get('/entry');
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
+                        expectMongoObjectId(entry.storyId);
+                        expectMongoObjectId(entry.entryId);
+                        expect(entry.storyTitle).to.be.a('string');
+                        if (entry.storyId == entry.entryId) {
+                            expect(entry.entryTitle).to.be.null;
+                        } else {
+                            expect(entry.entryTitle).to.be.a('string');
+                        }
+                        expect(entry.authorName).to.be.a('string');
+                    }
+                });
+            });
+
+            describe('Login and GET /entry', function () {
+                it('should return a 200 OK and a list of entries', async function () {
+                    await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    const res = await agent
+                        .get('/entry');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                    for (const entry of res.body) {
+                        expect(entry).to.have.all.keys('likedByUser', ...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -55,6 +85,9 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {storiesOnly: true}', function () {
                 it('should return a 200 status and a list of stories', async function () {
+                    await agent
+                        .post('/logout');
+
                     const res = await agent
                         .get('/entry')
                         .query({ storiesOnly: true });
@@ -62,7 +95,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyId).to.deep.equal(entry.entryId);
@@ -83,7 +116,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -106,7 +139,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -125,7 +158,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string').which.matches(/beginning/);
@@ -148,7 +181,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -195,7 +228,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0].authorName;
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -221,7 +254,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0].authorName;
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -247,7 +280,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0].entryTitle;
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -272,7 +305,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0].entryTitle;
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -297,7 +330,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     let previous = res.body[0];
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry');
+                        expect(entry).to.have.all.keys(...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -370,7 +403,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body.bodyText).to.match(/Wakamolensis/);
                     expect(res.body.previousEntry).to.be.null;
                     expect(res.body.flagId).to.be.null;
-                    expect(res.body.likes).to.deep.equal(0);
+                    expect(res.body.likes).to.be.a('number');
                     expect(res.body.createDate).to.be.a('string');
                     expect(res.body.storyId).to.deep.equal('6695b2573550c66db1ab9106');
                     expect(res.body.continuationEntries).to.be.an('array');
@@ -519,7 +552,7 @@ describe('Test the entry handling routes', function () {
                     expect(res.body.bodyText).to.deep.equal("Deterministic text");
                     expect(res.body.previousEntry).to.deep.equal("6695b2573550c66db1ab9106");
                     expect(res.body.flagId).to.be.null;
-                    expect(res.body.likes).to.deep.equal(0);
+                    expect(res.body.likes).to.be.a('number');
                     expect(res.body.createDate).to.be.a('string');
 
                     const updateRes = await agent
@@ -606,6 +639,22 @@ describe('Test the entry handling routes', function () {
                     expect(res.body).to.deep.equal({ message: "Entry liked." });
                     const likeRes = Like.findOne({ user: newUserPrivateProfile().userId, entry: '6695b2573550c66db1ab9106' });
                     expect(likeRes).to.not.be.null;
+
+                    const entryIdRes = await agent
+                        .get('/entry/6695b2573550c66db1ab9106');
+
+                    expect(entryIdRes).to.have.status(200);
+                    expect(entryIdRes.body.likes).to.be.at.least(1);
+                    expect(entryIdRes.body.likedByUser).to.be.true;
+
+                    const entryListRes = await agent
+                        .get('/entry')
+                        .query({ fields: "b", regex: "Wakamolensis" });
+
+                    expect(entryListRes).to.have.status(200);
+                    expect(entryListRes.body).to.be.an('array').with.lengthOf(1);
+                    expect(entryListRes.body[0].likes).to.be.at.least(1);
+                    expect(entryListRes.body[0].likedByUser).to.be.true;
                 });
             });
         });

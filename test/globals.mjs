@@ -21,6 +21,8 @@ let _newUserPrivateProfile;
 let _newUserPublicInfo;
 let _newUserBasicInfo;
 
+const summaryKeys = ['storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry', 'likes']
+
 function populateUserInfo(newUser) {
     _newUserPrivateProfile = JSON.parse(JSON.stringify(newUser));
     const { userId, userName, email, publishEmail, bio, publishedEntries } = newUser;
@@ -58,6 +60,7 @@ export {
     newUserPrivateProfile,
     newUserPublicInfo,
     newUserBasicInfo,
+    summaryKeys,
     // models
     User,
     Entry,

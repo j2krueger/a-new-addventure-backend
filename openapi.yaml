@@ -557,38 +557,14 @@ paths:
                 [
                   {
                     "storyId": "6688142fb004b799a5a29d03",
-                    "entryId": "668d51e61be56166aaaa6cc2",
-                    "storyTitle": "Random Title",
-                    "entryTitle": "Suddenly, a wild accountant appears!",
-                    "authorName": "Freddy",
-                  },
-                  {
-                    "storyId": "6688142fb004b799a5a29d03",
-                    "entryId": "668c47c3e0989ccd9cd6eca8",
-                    "storyTitle": "Random Title",
-                    "entryTitle": "adding another to list of entries",
-                    "authorName": "apmanager",
-                  },
-                  {
-                    "storyId": "6688142fb004b799a5a29d03",
-                    "entryId": "668c4771e0989ccd9cd6ec8a",
-                    "storyTitle": "Random Title",
-                    "entryTitle": "adding to this entries list of sub entries",
-                    "authorName": "apmanager",
-                  },
-                  {
-                    "storyId": "66885d8e6715f290d4ce03a9",
-                    "entryId": "668892f10371e6c253583148",
-                    "storyTitle": "Random Title",
-                    "entryTitle": "dddddddddddd",
-                    "authorName": "apmanager",
-                  },
-                  {
-                    "storyId": "668857a03f120ae7785257d4",
-                    "entryId": "668857a03f120ae7785257d4",
+                    "entryId": "6688142fb004b799a5a29d03",
                     "storyTitle": "Random Title",
                     "entryTitle": null,
                     "authorName": "Freddy",
+                    "authorId": "668490250029a28118a8d1be",
+                    "previousEntry": null,
+                    "likes": 0,
+                    "likedByUser": false,
                   },
                   {
                     "storyId": "6688142fb004b799a5a29d03",
@@ -596,13 +572,21 @@ paths:
                     "storyTitle": "Random Title",
                     "entryTitle": "Chapter the first",
                     "authorName": "Freddy",
+                    "authorId": "668490250029a28118a8d1be",
+                    "previousEntry": "6688142fb004b799a5a29d03",
+                    "likes": 0,
+                    "likedByUser": false,
                   },
                   {
-                    "storyId": "6688142fb004b799a5a29d03",
-                    "entryId": "6688142fb004b799a5a29d03",
-                    "storyTitle": "Random Title",
+                    "storyId": "66a5a2ab375bbb2298ff7420",
+                    "entryId": "66a5a2ab375bbb2298ff7420",
+                    "storyTitle": "7th newest ",
                     "entryTitle": null,
-                    "authorName": "Freddy",
+                    "authorName": "apmanager",
+                    "authorId": "667b294248b8805d71a96a03",
+                    "previousEntry": null,
+                    "likes": 1,
+                    "likedByUser": true,
                   },
                 ]
         default:
@@ -687,6 +671,7 @@ paths:
                   "previousEntry": null,
                   "flagId": null,
                   "likes": 0,
+                  "likedByUser": false,
                   "createDate": "2024-07-05T15:41:35.510Z",
                   "storyId": "6688142fb004b799a5a29d03",
                   "continuationEntries":
@@ -697,6 +682,8 @@ paths:
                         "storyTitle": "Random Title",
                         "entryTitle": "Chapter the first",
                         "authorName": "Freddy",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "likes": 0,
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -704,6 +691,26 @@ paths:
                         "storyTitle": "Random Title",
                         "entryTitle": "adding to this entries list of sub entries",
                         "authorName": "apmanager",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "likes": 0,
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668c47c3e0989ccd9cd6eca8",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "adding another to list of entries",
+                        "authorName": "apmanager",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "likes": 0,
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668c47eae0989ccd9cd6ecc8",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "today is today",
+                        "authorName": "apmanager",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "likes": 0,
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -711,6 +718,17 @@ paths:
                         "storyTitle": "Random Title",
                         "entryTitle": "Suddenly, a wild accountant appears!",
                         "authorName": "Freddy",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "likes": 0,
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "66a5a060375bbb2298ff7353",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "sixth title",
+                        "authorName": "apmanager",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "likes": 0,
                       },
                     ],
                 }
@@ -724,103 +742,6 @@ paths:
           content:
             application/json:
               example: { "error": "There is no user with that userId." }
-        default:
-          description: Default error sample response
-    put:
-      tags:
-        - Entry
-      summary: Edit an entry
-      description: "Edit an entry's entry title, keywords, and entry text. Can only be done by admins, mods, and the user who created the entry."
-      operationId: edit_entry
-      parameters:
-        - name: entryId
-          in: path
-          description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      responses:
-        default:
-          description: Default error sample response
-    post:
-      tags:
-        - Entry
-      summary: "Post a continuation of entry {entryId}"
-      description: "Post a new entry continuing entry {entryId} including entry title, and entry text."
-      operationId: post_entry
-      parameters:
-        - name: entryId
-          in: path
-          description: The ID of the entry being continued.
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      requestBody:
-        description: "Post a new entry continuing entry {entryId} including entry title, and entry text."
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ContinueStory"
-            example:
-              { "entryTitle": "Chapter the first", "bodyText": "Mononoke Hime" }
-      responses:
-        "201":
-          description: "Successfully created entry"
-          content:
-            application/json:
-              example:
-                {
-                  "authorName": "Freddy",
-                  "entryTitle": "Chapter the first",
-                  "bodyText": "Mononoke Hime",
-                  "previousEntry": "6688142fb004b799a5a29d03",
-                  "flagId": null,
-                  "likes": 0,
-                  "_id": "668820191cb99dfdc244c23c",
-                  "createDate": "2024-07-05T16:32:25.490Z",
-                  "storyId": "6688142fb004b799a5a29d03",
-                  "storyTitle": "Random Title",
-                  "__v": 0,
-                }
-        "400":
-          description: "Bad request."
-          content:
-            application/json:
-              examples:
-                missingEntryTitle:
-                  value: { "error": "Missing entry title." }
-                missingStoryText:
-                  value: { "error": "Missing story text." }
-                misformedEntryId:
-                  value:
-                    { "error": "That is not a properly formatted entryId." }
-        "404":
-          description: "entryId not found"
-          content:
-            application/json:
-              example: { "error": "There is no entry with that entryId." }
-        default:
-          description: Default error sample response
-    delete:
-      tags:
-        - Entry
-      summary: Delete an entry
-      description:
-        "Delete an entry entirely if there are no continuations, otherwise\
-        \ deletes entry title, deletable keywords, and entry text. Can\
-        \ only be done by admins, mods, and the creating user."
-      operationId: delete_entry
-      parameters:
-        - name: entryId
-          in: path
-          description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      responses:
         default:
           description: Default error sample response
   /entry/{entryId}/like:
