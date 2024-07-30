@@ -866,6 +866,42 @@ paths:
                   value: { "error": "You cannot like your own entries." }
         default:
           description: Default error sample response
+    delete:
+      tags:
+        - Entry
+      summary: Remove a like from an entry
+      description: "Remove a like from an entry."
+      operationId: unlike_entry
+      parameters:
+        - name: entryId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: Like successfully removed.
+          content:
+            application/json:
+              example: { "message": "Like successfully removed." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted entryId." }
+        "404":
+          description: entryId not found."
+          content:
+            application/json:
+              examples:
+                notLiked:
+                  value: { error: "You have not liked that entry." }
+                entryIdNotFound:
+                  value: { "error": "There is no entry with that entryId." }
+        default:
+          description: Default error sample response
   /entry/{entryId}/flag:
     summary: POST a flag for review on the entry
     post:

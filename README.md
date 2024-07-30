@@ -139,10 +139,40 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 ---
 ## Database schemas:
 created indices:
+collection: entries
 {
-  authorName: "hashed"
+  	authorName: "hashed"
+}
+{
+	storyId: "hashed"
+}
+{
+	previousEntry: "hashed"
 }
 
+collection: users
+{
+	userName: "hashed"
+}
+{
+	email: "hashed"
+}
+
+collection: follows
+{
+	follower: "hashed"
+}
+{
+	following: "hashed"
+}
+
+collection: likes
+{
+	user: "hashed"
+}
+{
+	entry: "hashed"
+}
 
 Table users {
   userId integer [primary key]

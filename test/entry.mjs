@@ -702,4 +702,92 @@ describe('Test the entry handling routes', function () {
         });
     });
 
+    describe('Test the DELETE /entry/:entryId/like route', function () {
+        describe('Happy paths', function () {
+            describe('Login and unlike a liked entry', function () {
+                it('should return a 200 status and return a success message and remove the like from the database', async function () {
+                    const loginRes = await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    expect(loginRes).to.have.status(200);
+
+                    await agent
+                        .post('/entry/6695b2573550c66db1ab9106/like');
+
+                    const res = await agent
+                        .delete('/entry/6695b2573550c66db1ab9106/like');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal({ message: "Like successfully removed." });
+
+                    const foundLike = await Like.findOne({ entry: '6695b2573550c66db1ab9106', user: newUserPrivateProfile().userId });
+
+                    expect(foundLike).to.be.null;
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Logout and unlike a liked entry', function () {
+                it('should redirect to /login', async function () {
+                    await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+                    await agent
+                        .post('/entry/6695b2573550c66db1ab9106/like');
+                    await agent
+                        .post('/logout');
+
+                    const res = await agent
+                        .delete('/entry/6695b2573550c66db1ab9106/like');
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('Login and unlike an entry that isn\'t liked', function () {
+                it('should return a 404 status and an error message', async function () {
+                    await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    const res = await agent
+                        .delete('/entry/66a7fd2095206fecbb52c189/like');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "You have not liked that entry." });
+                });
+            });
+
+            describe('Login and unlike a nonexistant entry', function () {
+                it('should return a 404 status and an error message', async function () {
+                    await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    const res = await agent
+                        .delete('/entry/000000000000000000000000/like');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                });
+            });
+
+            describe('Login and unlike with a bad entryId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    await agent
+                        .post('/login')
+                        .send({ name: newUserName, password: newPassword });
+
+                    const res = await agent
+                        .delete('/entry/blarg/like');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                });
+            });
+        });
+    });
+
 });

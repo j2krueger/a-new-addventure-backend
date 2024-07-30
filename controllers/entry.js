@@ -149,6 +149,20 @@ async function likeEntry(req, res, next) {
   }
 }
 
+async function unLikeEntry(req, res, next) {
+  try {
+    const likeQuery = { user: req.authenticatedUser._id, entry: req.foundEntryById._id };
+    const found = await Like.findOne(likeQuery);
+    if (!found) {
+      return res.status(404).json({ error: "You have not liked that entry." });
+    }
+    await Like.findByIdAndDelete(found._id);
+    res.status(200).json({ message: "Like successfully removed." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   paramEntryId,
   getEntryById,
@@ -156,4 +170,5 @@ module.exports = {
   continueStory,
   getEntryList,
   likeEntry,
+  unLikeEntry,
 }

@@ -36,6 +36,7 @@ router.get('/entry', entryControllers.getEntryList);
 router.post('/entry', userAuth, entryControllers.createStory);
 router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
 router.post('/entry/:entryId/like', userAuth, entryControllers.likeEntry);
+router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
 
 // miscelaneous routes
 router.post('/message', miscControllers.postMessage);
