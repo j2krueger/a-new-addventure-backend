@@ -57,6 +57,12 @@ userSchema.virtual('followedAuthors', {
   foreignField: 'follower',
 })
 
+userSchema.virtual('likedEntries', {
+  ref: 'Like',
+  localField: '_id',
+  foreignField: 'user'
+})
+
 userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) {
   const result = await User.findById(id)
     .populate({
@@ -69,6 +75,11 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
       limit: constants.entriesPerPage,
       options: { sort: { createDate: -1 } },
       transform: entry => entry.summary(),
+    })
+    .populate({
+      path: 'likedEntries',
+      populate: { path: 'entry', populate: { path: 'authorId' } },
+      transform: like => { const summary = like.entry.summary(); summary.authorId = summary.authorId._id; return summary; },
     });
   if (result) {
     result.followedAuthors.sort((a, b) => {
@@ -127,6 +138,7 @@ userSchema.methods.privateProfile = function privateProfile() {
     darkMode: this.darkMode,
     publishedEntries: this.publishedEntries || [],
     followedAuthors: this.followedAuthors || [],
+    likedEntries: this.likedEntries || [],
   };
 }
 

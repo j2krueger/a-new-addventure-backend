@@ -523,8 +523,12 @@ describe('Test the user handling routes', function () {
                         .get('/profile');
 
                     expect(res).to.have.status(200);
+                    expect(res.body.publishedEntries).to.be.an('array').with.lengthOf.at.least(1);
+                    expect(res.body.followedAuthors).to.be.an('array').with.lengthOf.at.least(1);
+                    expect(res.body.likedEntries).to.be.an('array').with.lengthOf.at.least(1);
                     res.body.publishedEntries = [];
                     res.body.followedAuthors = [];
+                    res.body.likedEntries = [];
                     expect(res.body).to.deep.equal(newUserPrivateProfile());
                 });
             });
@@ -550,21 +554,22 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('login and put profile', function () {
                 it('should return 200 OK and logged in users.privateProfile()', async function () {
-                    const res = await agent
+                    const loginRes = await agent
                         .post('/login')
                         .send({ name: newUserName, password: newPassword });
 
-                    expect(res).to.have.status(200);
-                    const res2 = await agent
+                    expect(loginRes).to.have.status(200);
+                    const res = await agent
                         .put('/profile')
                         .send({ darkMode: !newUserPrivateProfile.darkMode });
 
-                    expect(res2).to.have.status(200);
+                    expect(res).to.have.status(200);
                     const tempNewUserPrivateProfile = newUserPrivateProfile();
                     tempNewUserPrivateProfile.darkMode = !tempNewUserPrivateProfile.darkMode;
-                    res2.body.publishedEntries = [];
-                    res2.body.followedAuthors = [];
-                    expect(res2.body).to.deep.equal(tempNewUserPrivateProfile);
+                    res.body.publishedEntries = [];
+                    res.body.followedAuthors = [];
+                    res.body.likedEntries = [];
+                    expect(res.body).to.deep.equal(tempNewUserPrivateProfile);
                     populateUserInfo(tempNewUserPrivateProfile);
                 });
             });

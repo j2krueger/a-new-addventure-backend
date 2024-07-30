@@ -159,31 +159,28 @@ paths:
                   "email": "Freddy@example.com",
                   "admin": true,
                   "moderator": false,
-                  "bio": "I HAVE decided what to put in my bio yet.",
+                  "bio": "I have REALLY decided what to put in my bio yet.",
                   "publishEmail": true,
                   "darkMode": true,
                   "publishedEntries":
                     [
                       {
                         "storyId": "6695b2573550c66db1ab9106",
+                        "entryId": "66a7fd2095206fecbb52c189",
+                        "storyTitle": "In the beginning...",
+                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "authorName": "Freddy",
+                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "likes": 0,
+                      },
+                      {
+                        "storyId": "6695b2573550c66db1ab9106",
                         "entryId": "6695b2573550c66db1ab9106",
                         "storyTitle": "In the beginning...",
                         "entryTitle": null,
                         "authorName": "Freddy",
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668d51e61be56166aaaa6cc2",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "Suddenly, a wild accountant appears!",
-                        "authorName": "Freddy",
-                      },
-                      {
-                        "storyId": "668857a03f120ae7785257d4",
-                        "entryId": "668857a03f120ae7785257d4",
-                        "storyTitle": "Random Title",
-                        "entryTitle": null,
-                        "authorName": "Freddy",
+                        "previousEntry": null,
+                        "likes": 0,
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -191,6 +188,8 @@ paths:
                         "storyTitle": "Random Title",
                         "entryTitle": "Chapter the first",
                         "authorName": "Freddy",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "likes": 0,
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -198,29 +197,44 @@ paths:
                         "storyTitle": "Random Title",
                         "entryTitle": null,
                         "authorName": "Freddy",
+                        "previousEntry": null,
+                        "likes": 0,
                       },
                     ],
                   "followedAuthors":
                     [
                       {
-                        "userId": "667b294248b8805d71a96a03",
                         "userName": "apmanager",
+                        "userId": "667b294248b8805d71a96a03",
                       },
                       {
-                        "userId": "668ee18ae1dcd980cf0739c2",
                         "userName": "BlackLagoon",
+                        "userId": "668ee18ae1dcd980cf0739c2",
                       },
                       {
-                        "userId": "668ee1cfe1dcd980cf0739db",
                         "userName": "FreddyJupiter",
+                        "userId": "668ee1cfe1dcd980cf0739db",
                       },
                       {
-                        "userId": "668ee198e1dcd980cf0739c7",
                         "userName": "FreddyMercury",
+                        "userId": "668ee198e1dcd980cf0739c7",
                       },
                       {
-                        "userId": "668ee23ce1dcd980cf0739f9",
                         "userName": "FreddyQuaoar",
+                        "userId": "668ee23ce1dcd980cf0739f9",
+                      },
+                    ],
+                  "likedEntries":
+                    [
+                      {
+                        "storyId": "66a5a2ab375bbb2298ff7420",
+                        "entryId": "66a5a2ab375bbb2298ff7420",
+                        "storyTitle": "7th newest ",
+                        "entryTitle": null,
+                        "authorName": "apmanager",
+                        "authorId": "667b294248b8805d71a96a03",
+                        "previousEntry": null,
+                        "likes": 0,
                       },
                     ],
                 }
