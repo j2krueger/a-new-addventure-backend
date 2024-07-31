@@ -22,6 +22,7 @@ const {
     // Follow,
     // Message,
     Like,
+    Flag,
     // functions
     populateUserInfo,
     expectMongoObjectId,
@@ -402,7 +403,6 @@ describe('Test the entry handling routes', function () {
                     expect(res.body.storyTitle).to.deep.equal('In the beginning...');
                     expect(res.body.bodyText).to.match(/Wakamolensis/);
                     expect(res.body.previousEntry).to.be.null;
-                    expect(res.body.flagId).to.be.null;
                     expect(res.body.likes).to.be.a('number');
                     expect(res.body.createDate).to.be.a('string');
                     expect(res.body.storyId).to.deep.equal('6695b2573550c66db1ab9106');
@@ -457,7 +457,6 @@ describe('Test the entry handling routes', function () {
                     expectMongoObjectId(res.body.authorId);
                     expect(res.body.bodyText).to.deep.equal("Deterministic text");
                     expect(res.body.previousEntry).to.be.null;
-                    expect(res.body.flagId).to.be.null;
                     expect(res.body.likes).to.deep.equal(0);
                     expect(res.body.createDate).to.be.a('string');
 
@@ -551,7 +550,6 @@ describe('Test the entry handling routes', function () {
                     expectMongoObjectId(res.body.authorId);
                     expect(res.body.bodyText).to.deep.equal("Deterministic text");
                     expect(res.body.previousEntry).to.deep.equal("6695b2573550c66db1ab9106");
-                    expect(res.body.flagId).to.be.null;
                     expect(res.body.likes).to.be.a('number');
                     expect(res.body.createDate).to.be.a('string');
 
@@ -839,4 +837,96 @@ describe('Test the entry handling routes', function () {
         });
     });
 
+    describe('Test the flag handling routes', function () {
+        describe('Happy paths', function () {
+            describe('Logout and flag an entry', function () {
+                it('should return a 200 status and a success message, and put a flag in the database', async function () {
+                    await agent.post('/logout');
+                    const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+
+                    const res = await agent
+                        .post('/entry/' + entry._id + '/flag')
+                        .send({ reason: testString });
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal({ message: "Entry successfully flagged." });
+
+                    const flag = await Flag.findOne({ reason: testString });
+                    expect(flag.entry).to.deep.equal(entry._id);
+                    expect(flag.user).to.be.null;
+                    expect(flag.reason).to.deep.equal(testString);
+                });
+            });
+
+            describe('Login and flag an entry', function () {
+                it('should return a 200 status and a success message, and put a flag in the database', async function () {
+                    await agent.post('/login')
+                        .send({ name: newUserName, password: newPassword });
+                    const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+
+                    const res = await agent
+                        .post('/entry/' + entry._id + '/flag')
+                        .send({ reason: testString + "1" });
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal({ message: "Entry successfully flagged." });
+
+                    const flag = await Flag.findOne({ reason: testString + "1" });
+                    expect(flag.entry.equals(entry._id)).to.be.true;
+                    expect(flag.user.equals(newUserPrivateProfile().userId)).to.be.true;
+                    expect(flag.reason).to.deep.equal(testString + "1");
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Flag with a bad entry id', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const res = await agent
+                        .post('/entry/blech/flag')
+                        .send({ reason: testString });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                });
+            });
+
+            describe('Flag a nonexistant entry', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const res = await agent
+                        .post('/entry/000000000000000000000000/flag')
+                        .send({ reason: testString });
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+
+                });
+            });
+
+            describe('Flag without a reason', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+
+                    const res = await agent
+                        .post('/entry/' + entry._id + '/flag');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
+                });
+            });
+
+            describe('Flag with an empty reason', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+
+                    const res = await agent
+                        .post('/entry/' + entry._id + '/flag')
+                        .send({ reason: "" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
+                });
+            });
+        });
+    });
 });

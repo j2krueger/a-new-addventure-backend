@@ -30,8 +30,9 @@ router.put('/profile', userAuth, userControllers.putProfile)
 
 // entry related routes
 router.param('entryId', entryControllers.paramEntryId);
-router.get('/entry/:entryId', entryControllers.getEntryById);
 router.get('/entry', entryControllers.getEntryList);
+router.get('/entry/:entryId', entryControllers.getEntryById);
+router.post('/entry/:entryId/flag', entryControllers.flagEntry);
 // authorized entry related routes
 router.post('/entry', userAuth, entryControllers.createStory);
 router.post('/entry/:entryId', userAuth, entryControllers.continueStory);

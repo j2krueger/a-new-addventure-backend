@@ -33,10 +33,6 @@ const entrySchema = new Schema({
         type: Date,
         default: Date.now,
     },
-    flagId: {
-        type: ObjectId,
-        default: null,
-    },
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -147,7 +143,6 @@ entrySchema.methods.fullInfo = async function fullInfo() {
         authorId: this.authorId,
         bodyText: this.bodyText,
         previousEntry: this.previousEntry,
-        flagId: this.flagId,
         likes: this.likes,
         likedByUser: this.likedByUser,
         createDate: this.createDate,
@@ -163,7 +158,6 @@ entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithConti
         storyTitle: this.storyTitle,
         bodyText: this.bodyText,
         previousEntry: this.previousEntry,
-        flagId: this.flagId,
         likes: this.likes,
         likedByUser: this.likedByUser,
         createDate: this.createDate,

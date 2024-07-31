@@ -758,6 +758,54 @@ paths:
               example: { "error": "There is no user with that userId." }
         default:
           description: Default error sample response
+    post:
+      tags:
+        - Entry
+        - Story
+      summary: Post a new story
+      description: "Post the entry title and text of an entry to continue a story."
+      operationId: continue_story
+      requestBody:
+        description: "Continue a story."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContinueStory"
+            example:
+              {
+                "entryTitle": "Random Title",
+                "bodyText": "Genji no monogatari",
+              }
+      responses:
+        "201":
+          description: "Successfully created entry."
+          content:
+            application/json:
+              example:
+                {
+                  "authorName": "Freddy",
+                  "entryTitle": "Chapter the zeroeth",
+                  "storyTitle": "Random Title",
+                  "bodyText": "Genji no monogatari",
+                  "previousEntry": null,
+                  "flagId": null,
+                  "likes": 0,
+                  "_id": "6688142fb004b799a5a29d03",
+                  "createDate": "2024-07-05T15:41:35.510Z",
+                  "storyId": "6688142fb004b799a5a29d03",
+                  "__v": 0,
+                }
+        "400":
+          description: "Bad request."
+          content:
+            application/json:
+              examples:
+                missingStoryTitle:
+                  value: { "error": "Missing entry title." }
+                missingBodyText:
+                  value: { "error": "Missing story text." }
+        default:
+          description: Default error sample response
   /entry/{entryId}/like:
     summary: POST or DELETE a like to an entry
     post:
@@ -853,7 +901,34 @@ paths:
           style: simple
           explode: false
           schema: {}
+      requestBody:
+        description: Flag an entry
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Flag"
+            example: { "reason": "Spam" }
       responses:
+        "200":
+          description: Entry successfully flagged.
+          content:
+            application/json:
+              example: { "message": "Entry successfully flagged." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              examples:
+                noReason:
+                  value: { "error": "Flagging an entry needs a reason." }
+                badEntryId:
+                  value:
+                    { "error": "That is not a properly formatted entryId." }
+        "404":
+          description: Entry not found.
+          content:
+            application/json:
+              example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
   /entry/{entryId}/keyword/{keyword}:
@@ -1360,3 +1435,9 @@ components:
       properties:
         read:
           type: boolean
+    Flag:
+      required:
+        - reason
+      properties:
+        reason:
+          type: string

@@ -3,6 +3,7 @@
 const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
 const Like = require('../models/like');
+const Flag = require('../models/flag');
 
 async function paramEntryId(req, res, next, value) {
   if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
@@ -19,57 +20,6 @@ async function paramEntryId(req, res, next, value) {
     return next();
   } catch (err) {
     return next(err)
-  }
-}
-
-const getEntryById = async (req, res) => {
-  res.status(200).json(await req.foundEntryById.fullInfoWithContinuations());
-};
-
-async function createStory(req, res) {
-  const { storyTitle, bodyText, } = req.body;
-
-  if (typeof storyTitle != 'string') {
-    return res.status(400).json({ error: "Missing story title." });
-  } else if (typeof bodyText != 'string') {
-    return res.status(400).json({ error: "Missing story text." });
-  }
-
-  try {
-    const entry = new Entry({
-      storyTitle,
-      bodyText,
-      previousEntry: null,
-      authorName: req.authenticatedUser.userName,
-    });
-    await entry.saveNewStory();
-
-    return res.status(201).json(await entry.fullInfo());
-  } catch (error) {
-    return res.status(500).json(error);
-  }
-};
-
-async function continueStory(req, res) {
-  const { bodyText, entryTitle, } = req.body;
-  if (typeof bodyText != 'string') {
-    return res.status(400).json({ error: "Missing story text." });
-  } else if (typeof entryTitle != 'string') {
-    return res.status(400).json({ error: "Missing entry title." });
-  }
-
-  try {
-    const entry = new Entry({
-      bodyText,
-      entryTitle,
-      authorName: req.authenticatedUser.userName,
-      previousEntry: req.foundEntryById._id,
-    })
-    await entry.saveContinuationEntry(req.foundEntryById);
-
-    return res.status(201).json(await entry.fullInfo());
-  } catch (error) {
-    return res.status(500).json(error);
   }
 }
 
@@ -137,6 +87,74 @@ async function getEntryList(req, res) {
   res.status(200).json(result);
 }
 
+async function getEntryById(req, res) {
+  res.status(200).json(await req.foundEntryById.fullInfoWithContinuations());
+}
+
+async function flagEntry(req, res, next) {
+  try {
+    const user = req?.session?.user;
+    const entry = req.foundEntryById;
+    const reason = req.body?.reason;
+
+    if (!reason || reason == "") {
+      return res.status(400).json({ error: "Flagging an entry needs a reason." });
+    }
+    const flag = new Flag({ user: user?._id, entry: entry._id, reason });
+    await flag.save();
+    return res.status(200).json({ message: "Entry successfully flagged." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function createStory(req, res) {
+  const { storyTitle, bodyText, } = req.body;
+
+  if (typeof storyTitle != 'string') {
+    return res.status(400).json({ error: "Missing story title." });
+  } else if (typeof bodyText != 'string') {
+    return res.status(400).json({ error: "Missing story text." });
+  }
+
+  try {
+    const entry = new Entry({
+      storyTitle,
+      bodyText,
+      previousEntry: null,
+      authorName: req.authenticatedUser.userName,
+    });
+    await entry.saveNewStory();
+
+    return res.status(201).json(await entry.fullInfo());
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+}
+
+async function continueStory(req, res) {
+  const { bodyText, entryTitle, } = req.body;
+  if (typeof bodyText != 'string') {
+    return res.status(400).json({ error: "Missing story text." });
+  } else if (typeof entryTitle != 'string') {
+    return res.status(400).json({ error: "Missing entry title." });
+  }
+
+  try {
+    const entry = new Entry({
+      bodyText,
+      entryTitle,
+      authorName: req.authenticatedUser.userName,
+      previousEntry: req.foundEntryById._id,
+    })
+    await entry.saveContinuationEntry(req.foundEntryById);
+
+    return res.status(201).json(await entry.fullInfo());
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+}
+
 async function likeEntry(req, res, next) {
   try {
     if (req.foundEntryById.authorId.equals(req.authenticatedUser._id)) {
@@ -171,10 +189,11 @@ async function unLikeEntry(req, res, next) {
 
 module.exports = {
   paramEntryId,
+  getEntryList,
   getEntryById,
+  flagEntry,
   createStory,
   continueStory,
-  getEntryList,
   likeEntry,
   unLikeEntry,
 }

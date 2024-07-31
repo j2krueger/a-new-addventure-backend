@@ -22,6 +22,7 @@ const {
     Follow,
     Message,
     Like,
+    Flag,
     // functions
     populateUserInfo,
     expectMongoObjectId,
@@ -62,6 +63,7 @@ export const mochaHooks = {
         await Message.deleteMany({ messageText: { $regex: testString } });
         await Follow.deleteMany({ follower: newUserBasicInfo().userId });
         await Like.deleteMany({ user: newUserBasicInfo().userId });
+        await Flag.deleteMany({ reason: { $regex: testString } });
         mongoose.disconnect();
 
     }
