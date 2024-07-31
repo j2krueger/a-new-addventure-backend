@@ -478,15 +478,13 @@ describe('Test the entry handling routes', function () {
         describe('Sad paths', function () {
             describe('Logout and POST /entry with {storyTitle: "Deterministic story title", bodyText: "Deterministic text"}', function () {
                 it('should redirect to /login', async function () {
-                    const res = await agent
-                        .post('/logout');
+                    await agent.post('/logout');
 
-                    expect(res).to.have.status(200);
-                    const res2 = await agent
+                    const res = await agent
                         .post('/entry')
                         .send({ storyTitle: "Deterministic story title", bodyText: "Deterministic text" });
 
-                    expect(res2).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });
             });
 
@@ -838,93 +836,159 @@ describe('Test the entry handling routes', function () {
     });
 
     describe('Test the flag handling routes', function () {
-        describe('Happy paths', function () {
-            describe('Logout and flag an entry', function () {
-                it('should return a 200 status and a success message, and put a flag in the database', async function () {
-                    await agent.post('/logout');
-                    const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+        describe('Test POST /entry/:entryId/flag', function () {
+            describe('Happy paths', function () {
+                describe('Logout and flag an entry', function () {
+                    it('should return a 200 status and a success message, and put a flag in the database', async function () {
+                        await agent.post('/logout');
+                        const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
 
-                    const res = await agent
-                        .post('/entry/' + entry._id + '/flag')
-                        .send({ reason: testString });
+                        const res = await agent
+                            .post('/entry/' + entry._id + '/flag')
+                            .send({ reason: testString });
 
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.deep.equal({ message: "Entry successfully flagged." });
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Entry successfully flagged." });
 
-                    const flag = await Flag.findOne({ reason: testString });
-                    expect(flag.entry).to.deep.equal(entry._id);
-                    expect(flag.user).to.be.null;
-                    expect(flag.reason).to.deep.equal(testString);
+                        const flag = await Flag.findOne({ reason: testString });
+                        expect(flag.entry).to.deep.equal(entry._id);
+                        expect(flag.user).to.be.null;
+                        expect(flag.reason).to.deep.equal(testString);
+                    });
+                });
+
+                describe('Login and flag an entry', function () {
+                    it('should return a 200 status and a success message, and put a flag in the database', async function () {
+                        await agent.post('/login')
+                            .send({ name: newUserName, password: newPassword });
+                        const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+
+                        const res = await agent
+                            .post('/entry/' + entry._id + '/flag')
+                            .send({ reason: testString + "1" });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Entry successfully flagged." });
+
+                        const flag = await Flag.findOne({ reason: testString + "1" });
+                        expect(flag.entry.equals(entry._id)).to.be.true;
+                        expect(flag.user.equals(newUserPrivateProfile().userId)).to.be.true;
+                        expect(flag.reason).to.deep.equal(testString + "1");
+                    });
                 });
             });
 
-            describe('Login and flag an entry', function () {
-                it('should return a 200 status and a success message, and put a flag in the database', async function () {
-                    await agent.post('/login')
-                        .send({ name: newUserName, password: newPassword });
-                    const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+            describe('Sad paths', function () {
+                describe('Flag with a bad entry id', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        const res = await agent
+                            .post('/entry/blech/flag')
+                            .send({ reason: testString });
 
-                    const res = await agent
-                        .post('/entry/' + entry._id + '/flag')
-                        .send({ reason: testString + "1" });
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                    });
+                });
 
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.deep.equal({ message: "Entry successfully flagged." });
+                describe('Flag a nonexistant entry', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        const res = await agent
+                            .post('/entry/000000000000000000000000/flag')
+                            .send({ reason: testString });
 
-                    const flag = await Flag.findOne({ reason: testString + "1" });
-                    expect(flag.entry.equals(entry._id)).to.be.true;
-                    expect(flag.user.equals(newUserPrivateProfile().userId)).to.be.true;
-                    expect(flag.reason).to.deep.equal(testString + "1");
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+
+                    });
+                });
+
+                describe('Flag without a reason', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+
+                        const res = await agent
+                            .post('/entry/' + entry._id + '/flag');
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
+                    });
+                });
+
+                describe('Flag with an empty reason', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+
+                        const res = await agent
+                            .post('/entry/' + entry._id + '/flag')
+                            .send({ reason: "" });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
+                    });
                 });
             });
         });
 
-        describe('Sad paths', function () {
-            describe('Flag with a bad entry id', function () {
-                it('should return a 400 status and an error message', async function () {
-                    const res = await agent
-                        .post('/entry/blech/flag')
-                        .send({ reason: testString });
+        describe('Test DELETE /admin/flag/:flagId', function () {
+            describe('Happy paths', function () {
+                describe('Login as admin and delete a flag', function () {
+                    it('should return a 200 status and a success message, and delete the flag from the database', async function () {
+                        await agent.post('/login').send({ name: 'Freddy', password: 's33krit!' });
+                        const flag = await Flag.findOne({ reason: testString + "1" });
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                        const res = await agent.delete('/admin/flag/' + flag._id);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Flag successfully defeated." });
+
+                        const checkFlag = await Flag.findById(flag._id);
+                        expect(checkFlag).to.be.null;
+                    });
                 });
             });
 
-            describe('Flag a nonexistant entry', function () {
-                it('should return a 404 status and an error message', async function () {
-                    const res = await agent
-                        .post('/entry/000000000000000000000000/flag')
-                        .send({ reason: testString });
+            describe('Sad paths', function () {
+                describe('Logout and DELETE', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
+                        const flag = await Flag.findOne({ reason: testString });
 
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                        const res = await agent.delete('/admin/flag' + flag._id);
 
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
                 });
-            });
 
-            describe('Flag without a reason', function () {
-                it('should return a 400 status and an error message', async function () {
-                    const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+                describe('Login as non-admin and DELETE', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send({ name: newUserName, password: newPassword });
+                        const flag = await Flag.findOne({ reason: testString });
 
-                    const res = await agent
-                        .post('/entry/' + entry._id + '/flag');
+                        const res = await agent.delete('/admin/flag/' + flag._id);
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
                 });
-            });
 
-            describe('Flag with an empty reason', function () {
-                it('should return a 400 status and an error message', async function () {
-                    const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+                describe('Login as admin and DELETE bad flagId', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send({ name: "Freddy", password: "s33krit!" });
+                        const res = await agent.delete('/admin/flag/bleh');
 
-                    const res = await agent
-                        .post('/entry/' + entry._id + '/flag')
-                        .send({ reason: "" });
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted flagId." });
+                    });
+                });
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
+                describe('Login as admin and DELETE nonexistant flagId', function () {
+                    it('should return a 404 status and an error message', async function () {
+
+                        await agent.post('/login').send({ name: "Freddy", password: "s33krit!" });
+                        const res = await agent.delete('/admin/flag/000000000000000000000000');
+
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "There is no flag with that flagId." });
+                    });
                 });
             });
         });

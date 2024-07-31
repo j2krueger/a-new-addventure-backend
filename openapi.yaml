@@ -890,6 +890,7 @@ paths:
     post:
       tags:
         - Entry
+        - Flag
       summary: Flag an entry for review
       description: "Post a flag for review, to be entered into a moderation queue. Must include reason for flagging."
       operationId: flag_entry
@@ -1320,6 +1321,43 @@ paths:
           content:
             application/json:
               example: { "error": "There is no message with that messageId." }
+        default:
+          description: Default error sample response
+  /admin/flag/{flagId}:
+    summary: Delete a flag
+    delete:
+      tags:
+        - Admin
+        - Flag
+      summary: Delete a flag
+      description: "Delete a flag."
+      operationId: delete_flag
+      parameters:
+        - name: flagId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: Successfully deleted flag.
+          content:
+            application/json:
+              example: { "message": "Flag successfully defeated." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted flagId." }
+        "404":
+          description: Flag not found.
+          content:
+            application/json:
+              example: { "error": "There is no flag with that flagId." }
+        default:
+          description: Default error sample response
   /chain/{entryId}:
     summary: GET the entry chain ending at the specified entry
     get:

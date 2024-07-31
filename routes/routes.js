@@ -15,6 +15,9 @@ router.use(cors({
     credentials: true
 }));
 
+// All routes starting with /admin are restricted to logged in admins
+router.use('/admin', adminAuth);
+
 // user related routes
 router.param('userId', userControllers.paramUserId)
 router.post('/register', userControllers.registerUser);
@@ -38,12 +41,14 @@ router.post('/entry', userAuth, entryControllers.createStory);
 router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
 router.post('/entry/:entryId/like', userAuth, entryControllers.likeEntry);
 router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
+// admin routes
+router.param('flagId', entryControllers.paramFlagId);
+router.delete('/admin/flag/:flagId', entryControllers.deleteFlag);
 
 // miscelaneous routes
 router.post('/message', miscControllers.postMessage);
 router.param('messageId', miscControllers.paramMessageId);
 // admin routes
-router.use('/admin', adminAuth);
 router.get('/admin/message', miscControllers.getMessage);
 router.put('/admin/message/:messageId', miscControllers.putMessage);
 router.delete('/admin/message/:messageId', miscControllers.deleteMessage);

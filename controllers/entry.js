@@ -15,11 +15,29 @@ async function paramEntryId(req, res, next, value) {
     if (result) {
       req.foundEntryById = result;
     } else {
-      return res.status(404).json({ error: "There is no entry with that entryId." })
+      return res.status(404).json({ error: "There is no entry with that entryId." });
     }
     return next();
   } catch (err) {
-    return next(err)
+    return next(err);
+  }
+}
+
+async function paramFlagId(req, res, next, value) {
+  if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
+    return res.status(400).json({ error: "That is not a properly formatted flagId." });
+  }
+  const flagId = value;
+  try {
+    const result = await Flag.findById(flagId, req.session?.user?._id);
+    if (result) {
+      req.foundFlagById = result;
+    } else {
+      return res.status(404).json({ error: "There is no flag with that flagId." });
+    }
+    return next();
+  } catch (err) {
+    return next(err);
   }
 }
 
@@ -108,6 +126,16 @@ async function flagEntry(req, res, next) {
   }
 }
 
+async function deleteFlag(req, res, next) {
+  try {
+    const flag = req.foundFlagById;
+    await Flag.findByIdAndDelete(flag._id);
+    return res.status(200).json({ message: "Flag successfully defeated." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function createStory(req, res) {
   const { storyTitle, bodyText, } = req.body;
 
@@ -189,9 +217,11 @@ async function unLikeEntry(req, res, next) {
 
 module.exports = {
   paramEntryId,
+  paramFlagId,
   getEntryList,
   getEntryById,
   flagEntry,
+  deleteFlag,
   createStory,
   continueStory,
   likeEntry,
