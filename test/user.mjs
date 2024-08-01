@@ -11,6 +11,8 @@ const {
     newUserName,
     newEmail,
     newPassword,
+    testUserLogin,
+    // adminLogin,
     newUserPrivateProfile,
     newUserPublicInfo,
     // newUserBasicInfo,
@@ -115,7 +117,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 200 ok and return a user.privateProfile() with the given userName', async function () {
                     const res = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(res).to.have.status(200);
                     expect(res).to.have.cookie('connect.sid');
@@ -141,7 +143,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 401 unauthorized and an error message', async function () {
                     const res = await agent
                         .post('/login')
-                        .send({ name: 'Fredddy@example.com', password: "s33krit!" });
+                        .send({ name: newEmail + "blahblahblah", password: newPassword });
 
                     expect(res).to.have.status(401);
                     expect(res.body).to.deep.equal({ error: "Incorrect name or password." });
@@ -313,7 +315,7 @@ describe('Test the user handling routes', function () {
                 it('should return 200 ok and a success message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -348,7 +350,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 400 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -364,7 +366,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 404 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -380,7 +382,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 409 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -396,7 +398,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 409 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -416,7 +418,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 200 status and return a success message.', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -453,7 +455,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 404 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -469,7 +471,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 404 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -485,7 +487,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 400 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -515,7 +517,7 @@ describe('Test the user handling routes', function () {
                 it('should return 200 OK and logged in users.privateProfile()', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -556,7 +558,7 @@ describe('Test the user handling routes', function () {
                 it('should return 200 OK and logged in users.privateProfile()', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
                     const res = await agent
@@ -594,7 +596,7 @@ describe('Test the user handling routes', function () {
                 it('should return 400 OK and an error message', async function () {
                     const res = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(res).to.have.status(200);
                     const res2 = await agent

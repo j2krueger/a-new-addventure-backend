@@ -11,7 +11,9 @@ const {
     testString,
     newUserName,
     // newEmail,
-    newPassword,
+    // newPassword,
+    testUserLogin,
+    adminLogin,
     newUserPrivateProfile,
     // newUserPublicInfo,
     // newUserBasicInfo,
@@ -62,7 +64,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 200 OK and a list of entries', async function () {
                     await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     const res = await agent
                         .get('/entry');
@@ -440,7 +442,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 201 CREATED and the entry.fullInfo(), and add entry to the author\'s publishedEntries', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -492,7 +494,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 400 bad request and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -509,7 +511,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 400 bad request and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -531,7 +533,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 201 created and the entry.fullInfo() and add entry to the author\'s publishedEntries', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -585,7 +587,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 400 misformed and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -602,7 +604,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 400 misformed and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -624,7 +626,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 200 status and a success message, and add a like to the database', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -674,7 +676,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 409 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -701,7 +703,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 409 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -717,7 +719,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 404 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -733,7 +735,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 400 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -753,7 +755,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 200 status and return a success message and remove the like from the database', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -778,7 +780,7 @@ describe('Test the entry handling routes', function () {
                 it('should redirect to /login', async function () {
                     await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
                     await agent
                         .post('/entry/6695b2573550c66db1ab9106/like');
                     await agent
@@ -795,7 +797,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 404 status and an error message', async function () {
                     await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     const res = await agent
                         .delete('/entry/66a7fd2095206fecbb52c189/like');
@@ -809,7 +811,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 404 status and an error message', async function () {
                     await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     const res = await agent
                         .delete('/entry/000000000000000000000000/like');
@@ -823,7 +825,7 @@ describe('Test the entry handling routes', function () {
                 it('should return a 400 status and an error message', async function () {
                     await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     const res = await agent
                         .delete('/entry/blarg/like');
@@ -860,7 +862,7 @@ describe('Test the entry handling routes', function () {
                 describe('Login and flag an entry', function () {
                     it('should return a 200 status and a success message, and put a flag in the database', async function () {
                         await agent.post('/login')
-                            .send({ name: newUserName, password: newPassword });
+                            .send(testUserLogin);
                         const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
 
                         const res = await agent
@@ -933,7 +935,7 @@ describe('Test the entry handling routes', function () {
             describe('Happy paths', function () {
                 describe('Login as admin and delete a flag', function () {
                     it('should return a 200 status and a success message, and delete the flag from the database', async function () {
-                        await agent.post('/login').send({ name: 'Freddy', password: 's33krit!' });
+                        await agent.post('/login').send(adminLogin);
                         const flag = await Flag.findOne({ reason: testString + "1" });
 
                         const res = await agent.delete('/admin/flag/' + flag._id);
@@ -961,7 +963,7 @@ describe('Test the entry handling routes', function () {
 
                 describe('Login as non-admin and DELETE', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send({ name: newUserName, password: newPassword });
+                        await agent.post('/login').send(testUserLogin);
                         const flag = await Flag.findOne({ reason: testString });
 
                         const res = await agent.delete('/admin/flag/' + flag._id);
@@ -972,7 +974,7 @@ describe('Test the entry handling routes', function () {
 
                 describe('Login as admin and DELETE bad flagId', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send({ name: "Freddy", password: "s33krit!" });
+                        await agent.post('/login').send(adminLogin);
                         const res = await agent.delete('/admin/flag/bleh');
 
                         expect(res).to.have.status(400);
@@ -983,11 +985,54 @@ describe('Test the entry handling routes', function () {
                 describe('Login as admin and DELETE nonexistant flagId', function () {
                     it('should return a 404 status and an error message', async function () {
 
-                        await agent.post('/login').send({ name: "Freddy", password: "s33krit!" });
+                        await agent.post('/login').send(adminLogin);
                         const res = await agent.delete('/admin/flag/000000000000000000000000');
 
                         expect(res).to.have.status(404);
                         expect(res.body).to.deep.equal({ error: "There is no flag with that flagId." });
+                    });
+                });
+            });
+        });
+
+        describe('Test GET /admin/flag', function () {
+            describe('Happy paths', function () {
+                describe('Login as admin and GET /admin/flag', function () {
+                    it('should return a 200 status and a list of flags', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.get('/admin/flag');
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.least(1);
+                        for (const flag of res.body) {
+                            expect(flag).to.include.all.keys('user', 'entry', 'reason');
+                            expect(flag.entry).to.not.be.null;
+                            expect(flag.reason).to.be.a('string').with.lengthOf.at.least(1);
+                        }
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Logout and get /admin/flag', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent
+                            .get('/admin/flag');
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as non-admin ang GET /admin/flag', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.get('/admin/flag');
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
                 });
             });

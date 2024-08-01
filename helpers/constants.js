@@ -36,4 +36,5 @@ module.exports = {
     testing: process.env.TESTING,
     mochaTestingUrl: process.env.MOCHA_TESTING_URL,
     entriesPerPage: Number(process.env.ENTRIES_PER_PAGE),
+    adminPassword: process.env.ADMIN_PASSWORD,
 }

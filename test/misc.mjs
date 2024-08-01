@@ -11,7 +11,9 @@ const {
     testString,
     newUserName,
     newEmail,
-    newPassword,
+    // newPassword,
+    testUserLogin,
+    adminLogin,
     // newUserPrivateProfile,
     // newUserPublicInfo,
     // newUserBasicInfo,
@@ -72,7 +74,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 200 status code and a success message, and add the message to the database', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -95,7 +97,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 200 status code and a success message, and add the message to the database', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -149,7 +151,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 200 status and an array of messages', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -174,7 +176,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 200 status and an array of messages with read == false', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -202,7 +204,7 @@ describe('Test miscelaneous routes', function () {
                 it('should redirect to /login', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -235,7 +237,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 200 status and mark the message as read in the database', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -259,7 +261,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 200 status and mark the message as read in the database', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -285,7 +287,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 400 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -306,7 +308,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 404 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -323,7 +325,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 400 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -340,7 +342,7 @@ describe('Test miscelaneous routes', function () {
                 it('should redirect to /login', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -384,7 +386,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 204 status and delete the message from the database', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -408,7 +410,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 404 and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -425,7 +427,7 @@ describe('Test miscelaneous routes', function () {
                 it('should return a 400 status and an error message', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: "Freddy", password: "s33krit!" });
+                        .send(adminLogin);
 
                     expect(loginRes).to.have.status(200);
 
@@ -442,7 +444,7 @@ describe('Test miscelaneous routes', function () {
                 it('should redirect to /login', async function () {
                     const loginRes = await agent
                         .post('/login')
-                        .send({ name: newUserName, password: newPassword });
+                        .send(testUserLogin);
 
                     expect(loginRes).to.have.status(200);
 

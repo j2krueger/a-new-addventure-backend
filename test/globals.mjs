@@ -18,6 +18,8 @@ const testString = "testkurmdlqazsvnepyhs";
 const newUserName = testString + Math.random();
 const newEmail = newUserName + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();
+const testUserLogin = { name: newUserName, password: newPassword };
+const adminLogin = { name: "Freddy", password: constants.adminPassword };
 let _newUserPrivateProfile;
 let _newUserPublicInfo;
 let _newUserBasicInfo;
@@ -58,6 +60,8 @@ export {
     newUserName,
     newEmail,
     newPassword,
+    testUserLogin,
+    adminLogin,
     newUserPrivateProfile,
     newUserPublicInfo,
     newUserBasicInfo,

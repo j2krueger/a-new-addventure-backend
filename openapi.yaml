@@ -1323,6 +1323,56 @@ paths:
               example: { "error": "There is no message with that messageId." }
         default:
           description: Default error sample response
+  /admin/flag:
+    summary: Return a list of flags
+    get:
+      tags:
+        - Flag
+        - Admin
+      summary: Get a list of flags
+      description: "Get a list of flags"
+      operationId: get_flags
+      responses:
+        "200":
+          description: Flags successfully returned.
+          content:
+            application/json:
+              example:
+                [
+                  {
+                    "_id": "66aad3654c90731489adad4e",
+                    "user":
+                      {
+                        "_id": "668490250029a28118a8d1be",
+                        "userName": "Freddy",
+                        "email": "Freddy@example.com",
+                        "passwordHash": "$2b$10$UzF100wv.GI8Ba6nEqYvSOSnYW17HyLuLup5uSyg1knoA/aMSADsi",
+                        "admin": true,
+                        "moderator": false,
+                        "bio": "I have REALLY decided what to put in my bio yet.",
+                        "publishEmail": true,
+                        "darkMode": true,
+                        "__v": 0,
+                        "id": "668490250029a28118a8d1be",
+                      },
+                    "entry":
+                      {
+                        "_id": "668892f10371e6c253583148",
+                        "authorName": "apmanager",
+                        "entryTitle": "dddddddddddd",
+                        "bodyText": "dddddddddddddddddd",
+                        "choiceText": "dddddd",
+                        "previousEntry": "66885d8e6715f290d4ce03a9",
+                        "createDate": "2024-07-06T00:42:25.059Z",
+                        "storyId": "66885d8e6715f290d4ce03a9",
+                        "storyTitle": "Random Title",
+                        "__v": 0,
+                        "id": "668892f10371e6c253583148",
+                      },
+                    "reason": "This author has clearly misspelled 'When in the course of human events'",
+                    "__v": 0,
+                  },
+                ]
   /admin/flag/{flagId}:
     summary: Delete a flag
     delete:

@@ -136,6 +136,15 @@ async function deleteFlag(req, res, next) {
   }
 }
 
+async function getFlagList(req, res, next) {
+  try {
+    const flagArray = await Flag.find().populate('user entry');
+    return res.status(200).json(flagArray);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function createStory(req, res) {
   const { storyTitle, bodyText, } = req.body;
 
@@ -222,6 +231,7 @@ module.exports = {
   getEntryById,
   flagEntry,
   deleteFlag,
+  getFlagList,
   createStory,
   continueStory,
   likeEntry,

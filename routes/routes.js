@@ -44,6 +44,7 @@ router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
 // admin routes
 router.param('flagId', entryControllers.paramFlagId);
 router.delete('/admin/flag/:flagId', entryControllers.deleteFlag);
+router.get('/admin/flag', entryControllers.getFlagList);
 
 // miscelaneous routes
 router.post('/message', miscControllers.postMessage);
