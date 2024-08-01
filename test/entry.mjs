@@ -1120,4 +1120,19 @@ describe('Test the entry handling routes', function () {
             });
         });
     });
+
+    describe('Test the bookmark handling routes', function () {
+        describe('Test the POST /entry/:entryId/bookmark', function () {
+            describe('Happy paths', function () {
+                // Login and POST a bookmark
+            });
+
+            describe('Sad paths', function () {
+                // Logout and POST a bookmark
+                // Login and POST a duplicate bookmark
+                // Login and POST a bookmark on a bad entryId
+                // Login an POST a bookmark on a nonexistantId
+            });
+        });
+    });
 });

@@ -21,6 +21,10 @@ const flagSchema = new Schema({
         type: String,
         required: ["Needs a reason"],
     },
+    createDate: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
 const Flag = mongoose.model("Flag", flagSchema);

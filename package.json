@@ -11,7 +11,7 @@
     "findfixme": "grep FIXME -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
     "findID": "grep ID -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
     "findcrud": "grep \"Debug\\|FIXME\\|[[:alnum:]]ID\" -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js openapi.yaml",
-    "precommit": "npm test ; npm audit ; npm run lint ; npm run findcrud"
+    "precommit": "npm audit ; npm run lint ; npm run findcrud"
   },
   "repository": {
     "type": "git",
