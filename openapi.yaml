@@ -1395,7 +1395,7 @@ paths:
           description: Successfully deleted flag.
           content:
             application/json:
-              example: { "message": "Flag successfully defeated." }
+              example: { "message": "Flag successfully deleted." }
         "400":
           description: Bad request.
           content:
@@ -1406,6 +1406,41 @@ paths:
           content:
             application/json:
               example: { "error": "There is no flag with that flagId." }
+        default:
+          description: Default error sample response
+  /admin/entry/{entryId}:
+    summary: Delete an entry
+    delete:
+      tags:
+        - Admin
+        - Entry
+      summary: Delete an entry
+      description: "Delete an entry."
+      operationId: delete_entry
+      parameters:
+        - name: entryId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: Successfully deleted entry.
+          content:
+            application/json:
+              example: { "message": "Entry successfully deleted." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted entryId." }
+        "404":
+          description: Entry not found.
+          content:
+            application/json:
+              example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
   /chain/{entryId}:

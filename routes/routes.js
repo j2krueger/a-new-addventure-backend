@@ -31,8 +31,10 @@ router.delete('/user/:userId/follow', userAuth, userControllers.unFollowUser);
 router.get('/profile', userAuth, userControllers.getProfile);
 router.put('/profile', userAuth, userControllers.putProfile)
 
-// entry related routes
+// entry related param routes
 router.param('entryId', entryControllers.paramEntryId);
+router.param('flagId', entryControllers.paramFlagId);
+// unauthorized entry routes
 router.get('/entry', entryControllers.getEntryList);
 router.get('/entry/:entryId', entryControllers.getEntryById);
 router.post('/entry/:entryId/flag', entryControllers.flagEntry);
@@ -42,7 +44,7 @@ router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
 router.post('/entry/:entryId/like', userAuth, entryControllers.likeEntry);
 router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
 // admin routes
-router.param('flagId', entryControllers.paramFlagId);
+router.delete('/admin/entry/:entryId', entryControllers.deleteEntryById);
 router.delete('/admin/flag/:flagId', entryControllers.deleteFlag);
 router.get('/admin/flag', entryControllers.getFlagList);
 

@@ -620,6 +620,88 @@ describe('Test the entry handling routes', function () {
         });
     });
 
+    describe('Test the DELETE /entry/:entryId route', function () {
+        describe('Happy paths', function () {
+            describe('Login as admin and delete an entry', function () {
+                it('should return a 200 status and a success message and delete the entry from the database', async function () {
+                    await agent.post('/login').send(adminLogin);
+
+                    const entry = await agent
+                        .post('/entry')
+                        .send({ storyTitle: "Test deletion entry.", bodyText: testString });
+
+                    const res = await agent
+                        .delete('/admin/entry/' + entry.body.entryId);
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal({ message: "Entry successfully deleted." });
+
+                    const reEntry = await Entry.findById(entry.body.entryId);
+
+                    expect(reEntry).to.be.null;
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Login as non-admin and delete an entry', function () {
+                it('should redirect to /login', async function () {
+                    await agent.post('/login').send(testUserLogin);
+
+                    const entry = await agent
+                        .post('/entry')
+                        .send({ storyTitle: "Test deletion entry.", bodyText: testString });
+
+                    const res = await agent
+                        .delete('/admin/entry/' + entry.body.entryId);
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                    await Entry.findByIdAndDelete(entry.body.entryId);
+                });
+            });
+
+            describe('Logout and delete an entry', function () {
+                it('should redirect to /login', async function () {
+                    await agent.post('/logout');
+
+                    const entry = await agent
+                        .post('/entry')
+                        .send({ storyTitle: "Test deletion entry.", bodyText: testString });
+
+                    const res = await agent
+                        .delete('/admin/entry/' + entry.body.entryId);
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                    await Entry.findByIdAndDelete(entry.body.entryId);
+                });
+            });
+
+            describe('Login as admin and delete with bad entryId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    await agent.post('/login').send(adminLogin);
+
+                    const res = await agent.delete('/admin/entry/buh');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                });
+            });
+
+            describe('Login as admin and delete with nonexistant entryId', function () {
+                it('should return a 404 status and an error message', async function () {
+                    await agent.post('/login').send(adminLogin);
+
+                    const res = await agent.delete('/admin/entry/000000000000000000000000');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                });
+            });
+        });
+    });
+
     describe('Test the POST /entry/:entryId/like route', function () {
         describe('Happy paths', function () {
             describe('Login and POST /entry/6695b2573550c66db1ab9106/like', function () {

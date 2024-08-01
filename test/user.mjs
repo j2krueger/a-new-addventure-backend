@@ -539,14 +539,12 @@ describe('Test the user handling routes', function () {
         describe('Sad paths', function () {
             describe('logout and get profile', function () {
                 it('should return 200 OK and logged in users.privateProfile()', async function () {
-                    const res = await agent
-                        .post('/logout');
+                    await agent.post('/logout');
 
-                    expect(res).to.have.status(200);
-                    const res2 = await agent
+                    const res = await agent
                         .get('/profile');
 
-                    expect(res2).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });
             });
         });
@@ -580,31 +578,26 @@ describe('Test the user handling routes', function () {
         describe('Sad paths', function () {
             describe('logout and put profile', function () {
                 it('should redirect to /login', async function () {
-                    const res = await agent
-                        .post('/logout');
+                    await agent.post('/logout');
 
-                    expect(res).to.have.status(200);
-                    const res2 = await agent
+                    const res = await agent
                         .put('/profile')
                         .send({ darkMode: true });
 
-                    expect(res2).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });
             });
 
             describe('login and do a bad put on profile', function () {
                 it('should return 400 OK and an error message', async function () {
-                    const res = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    expect(res).to.have.status(200);
-                    const res2 = await agent
+                    const res = await agent
                         .put('/profile')
                         .send({ darkMode: "notAboolean" });
 
-                    expect(res2).to.have.status(400);
-                    expect(res2.body).to.deep.equal({ error: "Invalid request." });
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Invalid request." });
                 });
             });
         });

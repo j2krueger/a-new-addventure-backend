@@ -224,16 +224,26 @@ async function unLikeEntry(req, res, next) {
   }
 }
 
+async function deleteEntryById(req, res, next) {
+  try {
+    await Entry.findByIdAndDelete(req.foundEntryById._id);
+    return res.status(200).json({ message: "Entry successfully deleted." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   paramEntryId,
   paramFlagId,
   getEntryList,
   getEntryById,
   flagEntry,
-  deleteFlag,
-  getFlagList,
   createStory,
   continueStory,
   likeEntry,
   unLikeEntry,
+  deleteEntryById,
+  deleteFlag,
+  getFlagList,
 }
