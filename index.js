@@ -39,7 +39,6 @@ app.use(express.urlencoded({ extended: false }));
 app.disable('x-powered-by');
 app.use(morgan(function (tokens, req, res) {
     return [
-        tokens["remote-addr"](req, res),
         tokens.method(req, res),
         tokens.url(req, res),
         tokens.status(req, res),
