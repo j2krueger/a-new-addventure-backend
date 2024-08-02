@@ -79,7 +79,13 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
     .populate({
       path: 'likedEntries',
       populate: { path: 'entry', populate: { path: 'authorId' } },
-      transform: like => { const summary = like.entry.summary(); summary.authorId = summary.authorId._id; return summary; },
+      transform: like => {
+        if (like?.entry) {
+          const summary = like.entry?.summary(); summary.authorId = summary?.authorId?._id; return summary;
+        } else {
+          return null;
+        }
+      }
     });
   if (result) {
     result.followedAuthors.sort((a, b) => {

@@ -13,6 +13,7 @@ import Follow from '../models/follow.js';
 import Message from '../models/message.js';
 import Like from '../models/like.js';
 import Flag from '../models/flag.js';
+import Bookmark from '../models/bookmark.js';
 
 const testString = "testkurmdlqazsvnepyhs";
 const newUserName = testString + Math.random();
@@ -20,6 +21,7 @@ const newEmail = newUserName + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();
 const testUserLogin = { name: newUserName, password: newPassword };
 const adminLogin = { name: "Freddy", password: constants.adminPassword };
+const testStory = {storyTitle: testString, bodyText: testString};
 let _newUserPrivateProfile;
 let _newUserPublicInfo;
 let _newUserBasicInfo;
@@ -62,6 +64,7 @@ export {
     newPassword,
     testUserLogin,
     adminLogin,
+    testStory,
     newUserPrivateProfile,
     newUserPublicInfo,
     newUserBasicInfo,
@@ -73,6 +76,7 @@ export {
     Message,
     Like,
     Flag,
+    Bookmark,
     // functions
     populateUserInfo,
     expectMongoObjectId,

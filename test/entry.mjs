@@ -14,6 +14,7 @@ const {
     // newPassword,
     testUserLogin,
     adminLogin,
+    testStory,
     newUserPrivateProfile,
     // newUserPublicInfo,
     // newUserBasicInfo,
@@ -25,6 +26,7 @@ const {
     // Message,
     Like,
     Flag,
+    Bookmark,
     // functions
     populateUserInfo,
     expectMongoObjectId,
@@ -1124,14 +1126,77 @@ describe('Test the entry handling routes', function () {
     describe('Test the bookmark handling routes', function () {
         describe('Test the POST /entry/:entryId/bookmark', function () {
             describe('Happy paths', function () {
-                // Login and POST a bookmark
+                describe('Login and POST a bookmark', function () {
+                    it('should return a 200 status and a success message, and add a bookmark to the database', async function () {
+                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+
+                        const res = await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Entry bookmarked." });
+
+                        const bookmark = await Bookmark.findOne({ user: loginRes.body.userId });
+                        expect(bookmark).to.not.be.null;
+                        await Bookmark.findByIdAndDelete(bookmark._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId)
+                    });
+                });
             });
 
             describe('Sad paths', function () {
-                // Logout and POST a bookmark
-                // Login and POST a duplicate bookmark
-                // Login and POST a bookmark on a bad entryId
-                // Login an POST a bookmark on a nonexistantId
+                describe('Logout and POST a bookmark', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const entry = await agent.post('/entry').send(testStory);
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/entry/' + entry.body.entryId + '/bookmark');
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                        await Entry.findByIdAndDelete(entry.body.entryId);
+                    });
+                });
+
+                describe('Login and POST a duplicate bookmark', function () {
+                    it('should return 409 status and an error message', async function () {
+                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const entry = await agent.post('/entry').send(testStory);
+
+                        await agent.post('/entry/' + entry.body.entryId + '/bookmark');
+                        const res = await agent.post('/entry/' + entry.body.entryId + '/bookmark');
+
+                        expect(res).to.have.status(409);
+
+                        await Bookmark.findOneAndDelete({ user: loginRes.body._id });
+                        await Entry.findByIdAndDelete(entry.body.entryId);
+                    });
+                });
+
+                describe('Login and POST a bookmark on a bad entryId', function () {
+                    it('should return 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.post('/entry/d00d/bookmark');
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                    });
+                });
+
+                describe('Login an POST a bookmark on a nonexistantId', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.post('/entry/000000000000000000000000/bookmark');
+
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                    });
+                });
+
+                // FIXME Login, bookmark an entry, then delete the entry, and test bookmarks
             });
         });
     });

@@ -932,6 +932,46 @@ paths:
               example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
+  /entry/{entryId}/bookmark:
+    summary: POST or DELETE bookmarks
+    post:
+      tags:
+        - Entry
+        - bookmark
+      summary: Bookmark a page
+      description: If there is a logged in user, set a bookmark for that user on that entry.
+      operationId: bookmark_entry
+      parameters:
+        - name: entryId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: Successfully created bookmark.
+          content:
+            application/json:
+              example: { "message": "Entry bookmarked." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted entryId." }
+        "404":
+          description: Entry not found
+          content:
+            application/json:
+              example: { "error": "There is no entry with that entryId." }
+        "409":
+          description: User has already bookmarked that entry.
+          content:
+            application/json:
+              example: { "error": "You have already liked that bookmark." }
+        default:
+          description: Default error sample response
   /entry/{entryId}/keyword/{keyword}:
     summary: GET/POST/DELETE keywords
     get:

@@ -4,6 +4,7 @@ const constants = require('../helpers/constants');
 const Entry = require('../models/entry');
 const Like = require('../models/like');
 const Flag = require('../models/flag');
+const Bookmark = require('../models/bookmark');
 
 async function paramEntryId(req, res, next, value) {
   if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
@@ -233,6 +234,21 @@ async function deleteEntryById(req, res, next) {
   }
 }
 
+async function bookmarkEntry(req, res, next) {
+  try {
+    const bookmarkQuery = { user: req.authenticatedUser._id, entry: req.foundEntryById._id };
+    const duplicateBookmark = await Bookmark.findOne(bookmarkQuery);
+    if (duplicateBookmark) {
+      return res.status(409).json({ error: "You have already liked that bookmark." })
+    }
+    const bookmark = new Bookmark(bookmarkQuery);
+    await bookmark.save();
+    return res.status(200).json({ message: "Entry bookmarked." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   paramEntryId,
   paramFlagId,
@@ -243,6 +259,7 @@ module.exports = {
   continueStory,
   likeEntry,
   unLikeEntry,
+  bookmarkEntry,
   deleteEntryById,
   deleteFlag,
   getFlagList,
