@@ -131,7 +131,7 @@ async function deleteFlag(req, res, next) {
   try {
     const flag = req.foundFlagById;
     await Flag.findByIdAndDelete(flag._id);
-    return res.status(200).json({ message: "Flag successfully defeated." });
+    return res.status(200).json({ message: "Flag successfully deleted." });
   } catch (error) {
     return next(error);
   }

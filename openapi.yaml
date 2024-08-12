@@ -630,17 +630,16 @@ paths:
             application/json:
               example:
                 {
+                  "storyId": "66ba234d47197cfda2cca67f",
+                  "entryId": "66ba234d47197cfda2cca67f",
+                  "storyTitle": "In the beginnning...",
+                  "entryTitle": null,
                   "authorName": "Freddy",
-                  "entryTitle": "Chapter the zeroeth",
-                  "storyTitle": "Random Title",
-                  "bodyText": "Genji no monogatari",
+                  "authorId": "668490250029a28118a8d1be",
+                  "bodyText": "testkurmdlqazsvnepyhs",
                   "previousEntry": null,
-                  "flagId": null,
                   "likes": 0,
-                  "_id": "6688142fb004b799a5a29d03",
-                  "createDate": "2024-07-05T15:41:35.510Z",
-                  "storyId": "6688142fb004b799a5a29d03",
-                  "__v": 0,
+                  "createDate": "2024-08-12T14:59:25.128Z",
                 }
         "400":
           description: "Bad request."

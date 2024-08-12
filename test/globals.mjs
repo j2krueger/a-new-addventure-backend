@@ -21,7 +21,8 @@ const newEmail = newUserName + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();
 const testUserLogin = { name: newUserName, password: newPassword };
 const adminLogin = { name: "Freddy", password: constants.adminPassword };
-const testStory = {storyTitle: testString, bodyText: testString};
+const testStory = { storyTitle: testString, bodyText: testString };
+const testEntry = { entryTitle: testString + "1", bodyText: testString + "2" };
 let _newUserPrivateProfile;
 let _newUserPublicInfo;
 let _newUserBasicInfo;
@@ -65,6 +66,7 @@ export {
     testUserLogin,
     adminLogin,
     testStory,
+    testEntry,
     newUserPrivateProfile,
     newUserPublicInfo,
     newUserBasicInfo,

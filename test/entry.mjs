@@ -9,12 +9,13 @@ const {
     // constants
     constants,
     testString,
-    newUserName,
+    // newUserName,
     // newEmail,
     // newPassword,
     testUserLogin,
     adminLogin,
     testStory,
+    testEntry,
     newUserPrivateProfile,
     // newUserPublicInfo,
     // newUserBasicInfo,
@@ -28,7 +29,7 @@ const {
     Flag,
     Bookmark,
     // functions
-    populateUserInfo,
+    // populateUserInfo,
     expectMongoObjectId,
 } = globals;
 
@@ -39,11 +40,9 @@ describe('Test the entry handling routes', function () {
         describe('Happy paths', function () {
             describe('Logout and GET /entry', function () {
                 it('should return a 200 OK and a list of entries', async function () {
-                    await agent
-                        .post('/logout');
+                    await agent.post('/logout');
 
-                    const res = await agent
-                        .get('/entry');
+                    const res = await agent.get('/entry');
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -64,12 +63,9 @@ describe('Test the entry handling routes', function () {
 
             describe('Login and GET /entry', function () {
                 it('should return a 200 OK and a list of entries', async function () {
-                    await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent
-                        .get('/entry');
+                    const res = await agent.get('/entry');
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -90,12 +86,9 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {storiesOnly: true}', function () {
                 it('should return a 200 status and a list of stories', async function () {
-                    await agent
-                        .post('/logout');
+                    await agent.post('/logout');
 
-                    const res = await agent
-                        .get('/entry')
-                        .query({ storiesOnly: true });
+                    const res = await agent.get('/entry').query({ storiesOnly: true });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -114,9 +107,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {regex: "Freddy", fields: "a"} ', function () {
                 it('should return a 200 OK list of entries with authorName matching "Freddy"', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ regex: 'Freddy', fields: 'a' });
+                    const res = await agent.get('/entry').query({ regex: 'Freddy', fields: 'a' });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -137,9 +128,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {regex: "dd", fields: "e"} ', function () {
                 it('should return a 200 OK list of entries with entryTitle matching "dd"', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ regex: 'dd', fields: 'e' });
+                    const res = await agent.get('/entry').query({ regex: 'dd', fields: 'e' });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -156,9 +145,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {regex: "beginning", fields: "s"} ', function () {
                 it('should return a 200 OK list of entries with storyTitle matching "beginning"', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ regex: 'beginning', fields: 's' });
+                    const res = await agent.get('/entry').query({ regex: 'beginning', fields: 's' });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -179,9 +166,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {regex: "dd", fields: "ae"} ', function () {
                 it('should return a 200 OK list of entries with authorName OR entry title matching "dd"', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ regex: 'dd', fields: 'ae' });
+                    const res = await agent.get('/entry').query({ regex: 'dd', fields: 'ae' });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -203,9 +188,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {regexp: "Freddy", fields: "w"}', function () {
                 it('should return a 400 status and an error message.', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ regex: "Freddy", fields: "w" });
+                    const res = await agent.get('/entry').query({ regex: "Freddy", fields: "w" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Misformed query string." })
@@ -214,9 +197,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {regexp: "Freddy", fields: "aea"}', function () {
                 it('should return a 400 status and an error message.', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ regex: "Freddy", fields: "aea" });
+                    const res = await agent.get('/entry').query({ regex: "Freddy", fields: "aea" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Misformed query string." })
@@ -225,9 +206,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {order: "a"}', function () {
                 it('should return a 200 OK list of entries sorted in increasing order by author', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ order: "a" });
+                    const res = await agent.get('/entry').query({ order: "a" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -251,9 +230,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {order: "A"}', function () {
                 it('should return a 200 OK list of entries sorted in decreasing order by author', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ order: "A" });
+                    const res = await agent.get('/entry').query({ order: "A" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -277,9 +254,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {order: "e"}', function () {
                 it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ order: "e" });
+                    const res = await agent.get('/entry').query({ order: "e" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -302,9 +277,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {order: "E"}', function () {
                 it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ order: "E" });
+                    const res = await agent.get('/entry').query({ order: "E" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -327,9 +300,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {order: "sE"}', function () {
                 it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ order: "sE" });
+                    const res = await agent.get('/entry').query({ order: "sE" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -358,9 +329,7 @@ describe('Test the entry handling routes', function () {
         describe('Sad paths', function () {
             describe('GET /entry with search query string {order: "x"}', function () {
                 it('should return a 400 status and an error message.', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ order: "x" });
+                    const res = await agent.get('/entry').query({ order: "x" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Misformed query string." })
@@ -369,9 +338,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {order: "aea"}', function () {
                 it('should return a 400 status and an error message.', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ order: "aea" });
+                    const res = await agent.get('/entry').query({ order: "aea" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Misformed query string." })
@@ -380,9 +347,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry with search query string {order: "aeA"}', function () {
                 it('should return a 400 status and an error message.', async function () {
-                    const res = await agent
-                        .get('/entry')
-                        .query({ order: "aeA" });
+                    const res = await agent.get('/entry').query({ order: "aeA" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Misformed query string." })
@@ -394,23 +359,57 @@ describe('Test the entry handling routes', function () {
 
     describe('Test the GET /entry/:entryId route', function () {
         describe('Happy paths', function () {
-            describe('GET /entry/6695b2573550c66db1ab9106', function () {
-                it('should return a 200 OK and the entry.fullInfoWithContinuations', async function () {
-                    const res = await agent
-                        .get('/entry/6695b2573550c66db1ab9106');
+            describe('GET /entry/:entryId on a new story', function () {
+                it('should return a 200 OK and the entry.fullInfoWithContinuations()', async function () {
+                    const userRes = await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+
+                    const res = await agent.get('/entry/' + storyRes.body.entryId);
 
                     expect(res).to.have.status(200);
-                    expect(res.body.entryId).to.deep.equal('6695b2573550c66db1ab9106');
-                    expect(res.body.authorName).to.deep.equal('Freddy');
+                    expectMongoObjectId(res.body.entryId);
+                    expect(res.body.entryId).to.deep.equal(storyRes.body.entryId);
+                    expect(res.body.authorName).to.deep.equal(testUserLogin.name);
                     expectMongoObjectId(res.body.authorId);
+                    expect(res.body.authorId).to.deep.equal(userRes.body.userId)
                     expect(res.body.entryTitle).to.be.null;
-                    expect(res.body.storyTitle).to.deep.equal('In the beginning...');
-                    expect(res.body.bodyText).to.match(/Wakamolensis/);
+                    expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                    expect(res.body.bodyText).to.deep.equal(testStory.bodyText);
                     expect(res.body.previousEntry).to.be.null;
-                    expect(res.body.likes).to.be.a('number');
+                    expect(res.body.likes).to.deep.equal(0);
                     expect(res.body.createDate).to.be.a('string');
-                    expect(res.body.storyId).to.deep.equal('6695b2573550c66db1ab9106');
-                    expect(res.body.continuationEntries).to.be.an('array');
+                    expect(res.body.storyId).to.deep.equal(storyRes.body.entryId);
+                    expect(res.body.continuationEntries).to.be.an('array').with.lengthOf(0);
+
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                });
+            });
+
+            describe('GET /entry/:entryId on a new entry', function () {
+                it('should return a 200 OK and the entry.fullInfoWithContinuations()', async function () {
+                    const userRes = await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+
+                    const res = await agent.get('/entry/' + entryRes.body.entryId);
+
+                    expect(res).to.have.status(200);
+                    expectMongoObjectId(res.body.entryId);
+                    expect(res.body.entryId).to.deep.equal(entryRes.body.entryId);
+                    expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                    expectMongoObjectId(res.body.authorId);
+                    expect(res.body.authorId).to.deep.equal(userRes.body.userId)
+                    expect(res.body.entryTitle).to.deep.equal(testEntry.entryTitle);
+                    expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                    expect(res.body.bodyText).to.deep.equal(testEntry.bodyText);
+                    expect(res.body.previousEntry).to.deep.equal(storyRes.body.entryId);
+                    expect(res.body.likes).to.deep.equal(0);
+                    expect(res.body.createDate).to.be.a('string');
+                    expect(res.body.storyId).to.deep.equal(storyRes.body.entryId);
+                    expect(res.body.continuationEntries).to.be.an('array').with.lengthOf(0);
+
+                    await Entry.findByIdAndDelete(entryRes.body.entryId);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
         });
@@ -418,8 +417,7 @@ describe('Test the entry handling routes', function () {
         describe('Sad paths', function () {
             describe('GET /entry/notAnEntryId', function () {
                 it('should return a 400 status and an error message', async function () {
-                    const res = await agent
-                        .get('/entry/notAnEntryId');
+                    const res = await agent.get('/entry/notAnEntryId');
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
@@ -428,8 +426,7 @@ describe('Test the entry handling routes', function () {
 
             describe('GET /entry/000000000000000000000000', function () {
                 it('should return a 404 status and an error message', async function () {
-                    const res = await agent
-                        .get('/entry/000000000000000000000000');
+                    const res = await agent.get('/entry/000000000000000000000000');
 
                     expect(res).to.have.status(404);
                     expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
@@ -440,90 +437,92 @@ describe('Test the entry handling routes', function () {
 
     describe('Test the POST /entry route', function () {
         describe('Happy paths', function () {
-            describe('POST /entry with {storyTitle: "Deterministic story title", bodyText: "Deterministic text"}', function () {
-                it('should return a 201 CREATED and the entry.fullInfo(), and add entry to the author\'s publishedEntries', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+            describe('POST /entry with testStory', function () {
+                it('should return a 201 CREATED and the entry.fullInfo()', async function () {
+                    await agent.post('/login').send(testUserLogin);
 
-                    expect(loginRes).to.have.status(200);
+                    const entryRes = await agent.post('/entry').send(testStory);
 
-                    const res = await agent
-                        .post('/entry')
-                        .send({ storyTitle: "Deterministic story title", bodyText: "Deterministic text" });
+                    expect(entryRes).to.have.status(201);
+                    expectMongoObjectId(entryRes.body.storyId);
+                    expect(entryRes.body.entryId).to.deep.equal(entryRes.body.storyId);
+                    expect(entryRes.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                    expect(entryRes.body.entryTitle).to.be.null;
+                    expect(entryRes.body.authorName).to.deep.equal(testUserLogin.name);
+                    expectMongoObjectId(entryRes.body.authorId);
+                    expect(entryRes.body.bodyText).to.deep.equal(testStory.bodyText);
+                    expect(entryRes.body.previousEntry).to.be.null;
+                    expect(entryRes.body.likes).to.deep.equal(0);
+                    expect(entryRes.body.createDate).to.be.a('string');
 
-                    expect(res).to.have.status(201);
-                    expectMongoObjectId(res.body.storyId);
-                    expect(res.body.entryId).to.deep.equal(res.body.storyId);
-                    expect(res.body.storyTitle).to.deep.equal("Deterministic story title");
-                    expect(res.body.entryTitle).to.be.null;
-                    expect(res.body.authorName).to.deep.equal(newUserName);
-                    expectMongoObjectId(res.body.authorId);
-                    expect(res.body.bodyText).to.deep.equal("Deterministic text");
-                    expect(res.body.previousEntry).to.be.null;
-                    expect(res.body.likes).to.deep.equal(0);
-                    expect(res.body.createDate).to.be.a('string');
+                    await Entry.findByIdAndDelete(entryRes.body.entryId);
+                });
+            });
 
-                    const updateRes = await agent
-                        .get('/profile');
+            describe('POST /entry with testStory and GET /profile', function () {
+                it('should return testStory from GET /profile in the publishedEntries field', async function () {
+                    await agent.post('/login').send(testUserLogin);
+                    const entryRes = await agent.post('/entry').send(testStory);
 
-                    expect(updateRes).to.have.status(200);
-                    expect(updateRes.body.publishedEntries).to.be.an('array').with.lengthOf(1);
+                    const res = await agent.get('/profile');
 
-                    const { storyId, entryId, storyTitle, entryTitle, authorName, previousEntry } = res.body;
-                    const entrySummary = { storyId, entryId, storyTitle, entryTitle, authorName, previousEntry };
-                    expect(entrySummary).to.deep.equal(updateRes.body.publishedEntries[0]);
+                    expect(res.body.publishedEntries[0].storyId).to.deep.equal(entryRes.body.storyId);
+                    expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
+                    expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
+                    expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+                    expect(res.body.publishedEntries[0].authorName).to.deep.equal(entryRes.body.authorName);
+                    expect(res.body.publishedEntries[0].previousEntry).to.deep.equal(entryRes.body.previousEntry);
 
-                    populateUserInfo(updateRes.body);
+                    await Entry.findByIdAndDelete(entryRes.body.entryId);
+                });
+            });
+
+            describe('POST /entry with testStory and GET /user/:userId', function () {
+                it('should return testStory from GET /user/:userId in the publishedEntries field', async function () {
+                    const loginRes = await agent.post('/login').send(testUserLogin);
+                    const entryRes = await agent.post('/entry').send(testStory);
+
+                    const res = await agent.get("/user/" + loginRes.body.userId);
+
+                    expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
+                    expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
+                    expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+
+                    await Entry.findByIdAndDelete(entryRes.body.entryId);
                 });
             });
         });
 
         describe('Sad paths', function () {
-            describe('Logout and POST /entry with {storyTitle: "Deterministic story title", bodyText: "Deterministic text"}', function () {
+            describe('Logout and POST /entry with testStory', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/logout');
 
-                    const res = await agent
-                        .post('/entry')
-                        .send({ storyTitle: "Deterministic story title", bodyText: "Deterministic text" });
+                    const res = await agent.post('/entry').send(testStory);
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });
             });
 
-            describe('POST /entry with {storyTitle: "Deterministic story title"}', function () {
+            describe('POST /entry with missing story text', function () {
                 it('should return a 400 bad request and an error message', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry')
-                        .send({ storyTitle: "Deterministic story title" });
+                    const res = await agent.post('/entry').send({ storyTitle: "Deterministic story title" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Missing story text." })
                 });
             });
 
-            describe('Post /entry with {bodyText: "Deterministic text"}', function () {
+            describe('Post /entry with missing story title', function () {
                 it('should return a 400 bad request and an error message', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry')
-                        .send({ bodyText: "Deterministic text" });
+                    const res = await agent.post('/entry').send({ bodyText: "Deterministic text" });
 
                     expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Missing story title." })
-                        ;
+                    expect(res.body).to.deep.equal({ error: "Missing story title." });
                 });
             });
         });
@@ -531,94 +530,110 @@ describe('Test the entry handling routes', function () {
 
     describe('Test the POST /entry/:entryId route', function () {
         describe('Happy paths', function () {
-            describe('POST /entry/6695b2573550c66db1ab9106 with {entryTitle: "Deterministic entry title", bodyText: "Deterministic text"}', function () {
-                it('should return a 201 created and the entry.fullInfo() and add entry to the author\'s publishedEntries', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+            describe('POST /entry/:entryId with testEntry', function () {
+                it('should return a 201 status and the entry.fullInfo()', async function () {
+                    const loginRes = await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry/6695b2573550c66db1ab9106')
-                        .send({ entryTitle: "Deterministic entry title", bodyText: "Deterministic text" });
+                    const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
 
                     expect(res).to.have.status(201);
                     expectMongoObjectId(res.body.entryId);
-                    expect(res.body.storyId).to.deep.equal("6695b2573550c66db1ab9106");
-                    expect(res.body.storyTitle).to.deep.equal("In the beginning...");
-                    expect(res.body.entryTitle).to.deep.equal("Deterministic entry title");
-                    expect(res.body.authorName).to.deep.equal(newUserName);
-                    expectMongoObjectId(res.body.authorId);
-                    expect(res.body.bodyText).to.deep.equal("Deterministic text");
-                    expect(res.body.previousEntry).to.deep.equal("6695b2573550c66db1ab9106");
-                    expect(res.body.likes).to.be.a('number');
+                    expect(res.body.storyId).to.deep.equal(storyRes.body.storyId);
+                    expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                    expect(res.body.entryTitle).to.deep.equal(testEntry.entryTitle);
+                    expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                    expect(res.body.authorId).to.deep.equal(loginRes.body.userId);
+                    expect(res.body.bodyText).to.deep.equal(testEntry.bodyText);
+                    expect(res.body.previousEntry).to.deep.equal(storyRes.body.entryId);
+                    expect(res.body.likes).to.deep.equal(0);
                     expect(res.body.createDate).to.be.a('string');
 
-                    const updateRes = await agent
-                        .get('/profile');
+                    await Entry.findByIdAndDelete(res.body.entryId);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                });
+            });
 
-                    expect(updateRes).to.have.status(200);
-                    expect(updateRes.body.publishedEntries).to.be.an('array').with.lengthOf(2);
+            describe('POST /entry/:entryId with testEntry and check GET /profile', function () {
+                it('should return the entry in the publishedEntries field', async function () {
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
 
-                    const { storyId, entryId, storyTitle, entryTitle, authorName, previousEntry, } = res.body;
-                    const entrySummary = { storyId, entryId, storyTitle, entryTitle, authorName, previousEntry, };
-                    expect(entrySummary).to.deep.equal(updateRes.body.publishedEntries[0]);
+                    const res = await agent.get('/profile');
 
-                    populateUserInfo(updateRes.body);
+                    expect(res.body.publishedEntries[0].storyId).to.deep.equal(entryRes.body.storyId);
+                    expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
+                    expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
+                    expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+                    expect(res.body.publishedEntries[0].authorName).to.deep.equal(entryRes.body.authorName);
+                    expect(res.body.publishedEntries[0].previouEntry).to.deep.equal(entryRes.body.previouEntry);
+
+                    await Entry.findByIdAndDelete(entryRes.body.entryId);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                });
+            });
+
+            describe('POST /entry/:entryId with testEntry and check GET /user/:userId', function () {
+                it('should return the entry in the publishedEntries field', async function () {
+                    const userRes = await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+
+                    const res = await agent.get('/user/' + userRes.body.userId);
+
+                    expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
+                    expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
+                    expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+
+                    await Entry.findByIdAndDelete(entryRes.body.entryId);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
         });
 
         describe('Sad paths', function () {
-            describe('Logout and POST /entry/6695b2573550c66db1ab9106 with {entryTitle: "Deterministic entry title", bodyText: "Deterministic text', function () {
+            describe('Logout and POST /entry/:entryId with testEntry', function () {
                 it('should redirect to /login', async function () {
-                    const logoutRes = await agent
-                        .post('/logout');
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/logout');
 
-                    expect(logoutRes).to.have.status(200);
-                    const res = await agent
-                        .post('/entry/6695b2573550c66db1ab9106')
-                        .send({ entryTitle: "Deterministic entry title", bodyText: "Deterministic text" });
+                    const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
 
-            describe('POST /entry/6695b2573550c66db1ab9106 with {entryTitle: "Deterministic entry title"}', function () {
-                it('should return a 400 misformed and an error message', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+            describe('POST /entry/:entryId with missing story text', function () {
+                it('should return a 400 status and an error message', async function () {
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry/6695b2573550c66db1ab9106')
-                        .send({ entryTitle: "Deterministic entry title" });
+                    const res = await agent.post('/entry/' + storyRes.body.entryId).send({ entryTitle: "Deterministic entry title" });
 
                     expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Missing story text." })
+                    expect(res.body).to.deep.equal({ error: "Missing story text." });
+
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
 
-            describe('POST /entry/6695b2573550c66db1ab9106 with {bodyText: "Deterministic text"}', function () {
+            describe('POST /entry/:entryId with missing entryTitle', function () {
                 it('should return a 400 misformed and an error message', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry/6695b2573550c66db1ab9106')
-                        .send({ bodyText: "Deterministic text" });
+                    const res = await agent.post('/entry/' + storyRes.body.entryId).send({ bodyText: "Deterministic text" });
 
                     expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Missing entry title." })
+                    expect(res.body).to.deep.equal({ error: "Missing entry title." });
+
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
-
         });
     });
 
@@ -626,20 +641,15 @@ describe('Test the entry handling routes', function () {
         describe('Happy paths', function () {
             describe('Login as admin and delete an entry', function () {
                 it('should return a 200 status and a success message and delete the entry from the database', async function () {
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
                     await agent.post('/login').send(adminLogin);
 
-                    const entry = await agent
-                        .post('/entry')
-                        .send({ storyTitle: "Test deletion entry.", bodyText: testString });
-
-                    const res = await agent
-                        .delete('/admin/entry/' + entry.body.entryId);
+                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
+                    const reEntry = await Entry.findById(storyRes.body.entryId);
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Entry successfully deleted." });
-
-                    const reEntry = await Entry.findById(entry.body.entryId);
-
                     expect(reEntry).to.be.null;
                 });
             });
@@ -649,34 +659,27 @@ describe('Test the entry handling routes', function () {
             describe('Login as non-admin and delete an entry', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
 
-                    const entry = await agent
-                        .post('/entry')
-                        .send({ storyTitle: "Test deletion entry.", bodyText: testString });
-
-                    const res = await agent
-                        .delete('/admin/entry/' + entry.body.entryId);
+                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
-                    await Entry.findByIdAndDelete(entry.body.entryId);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
 
             describe('Logout and delete an entry', function () {
                 it('should redirect to /login', async function () {
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
                     await agent.post('/logout');
 
-                    const entry = await agent
-                        .post('/entry')
-                        .send({ storyTitle: "Test deletion entry.", bodyText: testString });
-
-                    const res = await agent
-                        .delete('/admin/entry/' + entry.body.entryId);
+                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
-                    await Entry.findByIdAndDelete(entry.body.entryId);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
 
@@ -706,37 +709,39 @@ describe('Test the entry handling routes', function () {
 
     describe('Test the POST /entry/:entryId/like route', function () {
         describe('Happy paths', function () {
-            describe('Login and POST /entry/6695b2573550c66db1ab9106/like', function () {
+            describe('Login and POST /entry/:entryId/like', function () {
                 it('should return a 200 status and a success message, and add a like to the database', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    const loginRes = await agent.post('/login').send(testUserLogin);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry/6695b2573550c66db1ab9106/like');
+                    const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                    const likeRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Entry liked." });
-                    const likeRes = Like.findOne({ user: newUserPrivateProfile().userId, entry: '6695b2573550c66db1ab9106' });
                     expect(likeRes).to.not.be.null;
 
-                    const entryIdRes = await agent
-                        .get('/entry/6695b2573550c66db1ab9106');
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    await Like.findByIdAndDelete(likeRes._id);
+                });
+            });
 
-                    expect(entryIdRes).to.have.status(200);
-                    expect(entryIdRes.body.likes).to.be.at.least(1);
+            describe('Login and like an entry and check GET /entry/:entryId', function () {
+                it('should count the like in the likes field and the likedByUser field', async function () {
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    const loginRes = await agent.post('/login').send(testUserLogin);
+
+                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                    const entryIdRes = await agent.get('/entry/' + storyRes.body.entryId);
+
+                    expect(entryIdRes.body.likes).to.deep.equal(1);
                     expect(entryIdRes.body.likedByUser).to.be.true;
 
-                    const entryListRes = await agent
-                        .get('/entry')
-                        .query({ fields: "b", regex: "Wakamolensis" });
-
-                    expect(entryListRes).to.have.status(200);
-                    expect(entryListRes.body).to.be.an('array').with.lengthOf(1);
-                    expect(entryListRes.body[0].likes).to.be.at.least(1);
-                    expect(entryListRes.body[0].likedByUser).to.be.true;
+                    const likeIdRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId })
+                    await Like.findByIdAndDelete(likeIdRes._id);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
         });
@@ -744,71 +749,54 @@ describe('Test the entry handling routes', function () {
         describe('Sad paths', function () {
             describe('Logout and POST a like to a story', function () {
                 it('should redirect to /login', async function () {
-                    const logoutRes = await agent
-                        .post('/logout');
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/logout');
 
-                    expect(logoutRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry/6695b2573550c66db1ab9106/like');
+                    const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
 
             describe('Login, post an entry, and like the entry', function () {
                 it('should return a 409 status and an error message', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
+                    const entryRes = await agent.post('/entry').send(testStory);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const entryRes = await agent
-                        .post('/entry')
-                        .send({ storyTitle: "Title", bodyText: testString });
-
-                    expect(entryRes).to.have.status(201);
-
-                    const res = await agent
-                        .post('/entry/' + entryRes.body.entryId + '/like');
+                    const res = await agent.post('/entry/' + entryRes.body.entryId + '/like');
 
                     expect(res).to.have.status(409);
-
                     expect(res.body).to.deep.equal({ error: "You cannot like your own entries." });
 
-                    const delRes = await Entry.findByIdAndDelete(entryRes.body.entryId);
-
-                    expect(delRes).to.not.be.null;
+                    await Entry.findByIdAndDelete(entryRes.body.entryId);
                 });
             });
 
             describe('Login and POST a like to an already liked story', function () {
                 it('should return a 409 status and an error message', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/login').send(testUserLogin);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry/6695b2573550c66db1ab9106/like');
+                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                    const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
 
                     expect(res).to.have.status(409);
                     expect(res.body).to.deep.equal({ error: "You have already liked that entry." });
+
+                    await agent.delete('/entry/' + storyRes.body.entryId + '/like');
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
 
             describe('Login and POST a like to a nonexistant story', function () {
                 it('should return a 404 status and an error message', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry/000000000000000000000000/like');
+                    const res = await agent.post('/entry/000000000000000000000000/like');
 
                     expect(res).to.have.status(404);
                     expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
@@ -817,17 +805,30 @@ describe('Test the entry handling routes', function () {
 
             describe('Login and POST a like to a misformed storyId', function () {
                 it('should return a 400 status and an error message', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    expect(loginRes).to.have.status(200);
-
-                    const res = await agent
-                        .post('/entry/blarg/like');
+                    const res = await agent.post('/entry/blarg/like');
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                });
+            });
+
+            describe('Login and like an entry, delete the entry directly from the database, and check GET /profile', function () {
+                it('should remove that like from the user\'s likes list and not crash the backend', async function () {
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                    const like = await Like.findOne({ entry: storyRes.body.entryId });
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+
+                    const res = await agent.get('/profile');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body.likedEntries).to.be.an('array').with.lengthOf(0);
+
+                    await Like.findByIdAndDelete(like._id);
                 });
             });
         });
@@ -837,24 +838,19 @@ describe('Test the entry handling routes', function () {
         describe('Happy paths', function () {
             describe('Login and unlike a liked entry', function () {
                 it('should return a 200 status and return a success message and remove the like from the database', async function () {
-                    const loginRes = await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
 
-                    expect(loginRes).to.have.status(200);
-
-                    await agent
-                        .post('/entry/6695b2573550c66db1ab9106/like');
-
-                    const res = await agent
-                        .delete('/entry/6695b2573550c66db1ab9106/like');
+                    const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
+                    const foundLike = await Like.findOne({ entry: storyRes.body.entryId });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Like successfully removed." });
-
-                    const foundLike = await Like.findOne({ entry: '6695b2573550c66db1ab9106', user: newUserPrivateProfile().userId });
-
                     expect(foundLike).to.be.null;
+
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
         });
@@ -862,43 +858,39 @@ describe('Test the entry handling routes', function () {
         describe('Sad paths', function () {
             describe('Logout and unlike a liked entry', function () {
                 it('should redirect to /login', async function () {
-                    await agent
-                        .post('/login')
-                        .send(testUserLogin);
-                    await agent
-                        .post('/entry/6695b2573550c66db1ab9106/like');
-                    await agent
-                        .post('/logout');
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                    await agent.post('/logout');
 
-                    const res = await agent
-                        .delete('/entry/6695b2573550c66db1ab9106/like');
+                    const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
 
             describe('Login and unlike an entry that isn\'t liked', function () {
                 it('should return a 404 status and an error message', async function () {
-                    await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent
-                        .delete('/entry/66a7fd2095206fecbb52c189/like');
+                    const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
 
                     expect(res).to.have.status(404);
                     expect(res.body).to.deep.equal({ error: "You have not liked that entry." });
+
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
 
             describe('Login and unlike a nonexistant entry', function () {
                 it('should return a 404 status and an error message', async function () {
-                    await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent
-                        .delete('/entry/000000000000000000000000/like');
+                    const res = await agent.delete('/entry/000000000000000000000000/like');
 
                     expect(res).to.have.status(404);
                     expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
@@ -907,12 +899,9 @@ describe('Test the entry handling routes', function () {
 
             describe('Login and unlike with a bad entryId', function () {
                 it('should return a 400 status and an error message', async function () {
-                    await agent
-                        .post('/login')
-                        .send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent
-                        .delete('/entry/blarg/like');
+                    const res = await agent.delete('/entry/blarg/like');
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
@@ -926,40 +915,41 @@ describe('Test the entry handling routes', function () {
             describe('Happy paths', function () {
                 describe('Logout and flag an entry', function () {
                     it('should return a 200 status and a success message, and put a flag in the database', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
                         await agent.post('/logout');
-                        const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
 
-                        const res = await agent
-                            .post('/entry/' + entry._id + '/flag')
-                            .send({ reason: testString });
+                        const res = await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
+                        const flag = await Flag.findOne({ reason: testString });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.deep.equal({ message: "Entry successfully flagged." });
-
-                        const flag = await Flag.findOne({ reason: testString });
-                        expect(flag.entry).to.deep.equal(entry._id);
+                        expect(flag.entry.toString()).to.deep.equal(storyRes.body.entryId);
                         expect(flag.user).to.be.null;
                         expect(flag.reason).to.deep.equal(testString);
+
+                        await Flag.findByIdAndDelete(flag._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
 
                 describe('Login and flag an entry', function () {
                     it('should return a 200 status and a success message, and put a flag in the database', async function () {
-                        await agent.post('/login')
-                            .send(testUserLogin);
-                        const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
 
-                        const res = await agent
-                            .post('/entry/' + entry._id + '/flag')
-                            .send({ reason: testString + "1" });
+
+                        const res = await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString + "1" });
+                        const flag = await Flag.findOne({ reason: testString + "1" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.deep.equal({ message: "Entry successfully flagged." });
-
-                        const flag = await Flag.findOne({ reason: testString + "1" });
-                        expect(flag.entry.equals(entry._id)).to.be.true;
+                        expect(flag.entry.toString()).to.deep.equal(storyRes.body.entryId);
                         expect(flag.user.equals(newUserPrivateProfile().userId)).to.be.true;
                         expect(flag.reason).to.deep.equal(testString + "1");
+
+                        await Flag.findByIdAndDelete(flag._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
             });
@@ -967,9 +957,7 @@ describe('Test the entry handling routes', function () {
             describe('Sad paths', function () {
                 describe('Flag with a bad entry id', function () {
                     it('should return a 400 status and an error message', async function () {
-                        const res = await agent
-                            .post('/entry/blech/flag')
-                            .send({ reason: testString });
+                        const res = await agent.post('/entry/blech/flag').send({ reason: testString });
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
@@ -978,9 +966,7 @@ describe('Test the entry handling routes', function () {
 
                 describe('Flag a nonexistant entry', function () {
                     it('should return a 404 status and an error message', async function () {
-                        const res = await agent
-                            .post('/entry/000000000000000000000000/flag')
-                            .send({ reason: testString });
+                        const res = await agent.post('/entry/000000000000000000000000/flag').send({ reason: testString });
 
                         expect(res).to.have.status(404);
                         expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
@@ -990,26 +976,29 @@ describe('Test the entry handling routes', function () {
 
                 describe('Flag without a reason', function () {
                     it('should return a 400 status and an error message', async function () {
-                        const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
 
-                        const res = await agent
-                            .post('/entry/' + entry._id + '/flag');
+                        const res = await agent.post('/entry/' + storyRes.body.entryId + '/flag');
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
 
                 describe('Flag with an empty reason', function () {
                     it('should return a 400 status and an error message', async function () {
-                        const entry = await Entry.findOne({ entryTitle: "Deterministic entry title" });
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
 
-                        const res = await agent
-                            .post('/entry/' + entry._id + '/flag')
-                            .send({ reason: "" });
+                        const res = await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: "" });
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
             });
@@ -1020,15 +1009,18 @@ describe('Test the entry handling routes', function () {
                 describe('Login as admin and delete a flag', function () {
                     it('should return a 200 status and a success message, and delete the flag from the database', async function () {
                         await agent.post('/login').send(adminLogin);
-                        const flag = await Flag.findOne({ reason: testString + "1" });
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
+                        const flag = await Flag.findOne({ entry: storyRes.body.entryId });
 
                         const res = await agent.delete('/admin/flag/' + flag._id);
+                        const checkFlag = await Flag.findById(flag._id);
 
                         expect(res).to.have.status(200);
-                        expect(res.body).to.deep.equal({ message: "Flag successfully defeated." });
-
-                        const checkFlag = await Flag.findById(flag._id);
+                        expect(res.body).to.deep.equal({ message: "Flag successfully deleted." });
                         expect(checkFlag).to.be.null;
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
             });
@@ -1036,23 +1028,35 @@ describe('Test the entry handling routes', function () {
             describe('Sad paths', function () {
                 describe('Logout and DELETE', function () {
                     it('should redirect to /login', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
+                        const flag = await Flag.findOne({ entry: storyRes.body.entryId });
                         await agent.post('/logout');
-                        const flag = await Flag.findOne({ reason: testString });
 
-                        const res = await agent.delete('/admin/flag' + flag._id);
+                        const res = await agent.delete('/admin/flag/' + flag._id);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                        await Flag.findByIdAndDelete(flag._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
 
                 describe('Login as non-admin and DELETE', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/login').send(testUserLogin);
-                        const flag = await Flag.findOne({ reason: testString });
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
+                        const flag = await Flag.findOne({ entry: storyRes.body.entryId });
+                        await agent.post('/login').send(testUserLogin);
 
                         const res = await agent.delete('/admin/flag/' + flag._id);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        await Flag.findByIdAndDelete(flag._id);
                     });
                 });
 
@@ -1068,7 +1072,6 @@ describe('Test the entry handling routes', function () {
 
                 describe('Login as admin and DELETE nonexistant flagId', function () {
                     it('should return a 404 status and an error message', async function () {
-
                         await agent.post('/login').send(adminLogin);
                         const res = await agent.delete('/admin/flag/000000000000000000000000');
 
@@ -1084,16 +1087,23 @@ describe('Test the entry handling routes', function () {
                 describe('Login as admin and GET /admin/flag', function () {
                     it('should return a 200 status and a list of flags', async function () {
                         await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
+                        const flag = await Flag.findOne({ entry: storyRes.body.entryId });
 
                         const res = await agent.get('/admin/flag');
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.least(1);
-                        for (const flag of res.body) {
-                            expect(flag).to.include.all.keys('user', 'entry', 'reason');
-                            expect(flag.entry).to.not.be.null;
-                            expect(flag.reason).to.be.a('string').with.lengthOf.at.least(1);
+                        for (const currentFlag of res.body) {
+                            expect(currentFlag).to.include.all.keys('user', 'entry', 'reason');
+                            expect(currentFlag.entry).to.not.be.null;
+                            expect(currentFlag.reason).to.be.a('string').with.lengthOf.at.least(1);
                         }
+                        expect(res.body.some(f => (f._id == flag._id))).to.be.true;
+
+                        await Flag.findByIdAndDelete(flag._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
             });
@@ -1103,8 +1113,7 @@ describe('Test the entry handling routes', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/logout');
 
-                        const res = await agent
-                            .get('/admin/flag');
+                        const res = await agent.get('/admin/flag');
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
@@ -1132,12 +1141,12 @@ describe('Test the entry handling routes', function () {
                         const storyRes = await agent.post('/entry').send(testStory);
 
                         const res = await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+                        const bookmark = await Bookmark.findOne({ user: loginRes.body.userId });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.deep.equal({ message: "Entry bookmarked." });
-
-                        const bookmark = await Bookmark.findOne({ user: loginRes.body.userId });
                         expect(bookmark).to.not.be.null;
+
                         await Bookmark.findByIdAndDelete(bookmark._id);
                         await Entry.findByIdAndDelete(storyRes.body.entryId)
                     });
