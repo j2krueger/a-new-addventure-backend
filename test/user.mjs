@@ -115,8 +115,7 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res).to.have.cookie('connect.sid');
                     expect(res).to.have.cookie('token');
-                    
-                    console.log('\n   Debug: ', newUserPrivateProfile());
+
                     expect(res.body).to.deep.equal(newUserPrivateProfile());
                 })
             })
@@ -356,6 +355,23 @@ describe('Test the user handling routes', function () {
                     expect(res.body).to.deep.equal({ error: "You are already following that user." });
 
                     await Follow.findOneAndDelete({ follower: loginRes.body.userId });
+                });
+            });
+
+            describe('Login, follow a user, then delete the user from the database, then GET /profile', function () {
+                it('should remove the broken follow from followedAuthors', async function () {
+                    const userRes = await agent.post('/register').send({ userName: newUserName + '1', email: '1' + newEmail, password: 'password' });
+                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/user/' + userRes.body.userId + '/follow');
+                    const follow = await Follow.findOne({ following: userRes.body.userId });
+                    await User.findByIdAndDelete(userRes.body.userId);
+
+                    const res = await agent.get('/profile');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body.followedAuthors).to.be.an('array').with.lengthOf(0);
+
+                    await Follow.findByIdAndDelete(follow._id);
                 });
             });
         });

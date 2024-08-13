@@ -68,7 +68,13 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
     .populate({
       path: 'followedAuthors',
       populate: { path: 'following' },
-      transform: follow => { return { userName: follow.following.userName, userId: follow.following._id } },
+      transform: follow => {
+        if (follow?.following?.userName) {
+          return { userName: follow.following.userName, userId: follow.following._id };
+        } else {
+          return null;
+        }
+      },
     })
     .populate({
       path: 'publishedEntries',

@@ -139,8 +139,21 @@ async function deleteFlag(req, res, next) {
 
 async function getFlagList(req, res, next) {
   try {
-    const flagArray = await Flag.find().populate('user entry');
-    return res.status(200).json(flagArray);
+    const flagArray = await Flag
+      .find()
+      .populate('user')
+      .populate({
+        path: 'entry',
+        transform: entry => {
+          if (entry?._id) {
+            return entry;
+          } else {
+            return null;
+          }
+        }
+      });
+    const filteredFlagArray = flagArray.filter(e => e.entry);
+    return res.status(200).json(filteredFlagArray);
   } catch (error) {
     return next(error);
   }
@@ -227,6 +240,9 @@ async function unLikeEntry(req, res, next) {
 
 async function deleteEntryById(req, res, next) {
   try {
+    await Bookmark.deleteMany({ entry: req.foundEntryById._id });
+    await Flag.deleteMany({ entry: req.foundEntryById._id });
+    await Like.deleteMany({ entry: req.foundEntryById._id });
     await Entry.findByIdAndDelete(req.foundEntryById._id);
     return res.status(200).json({ message: "Entry successfully deleted." });
   } catch (error) {

@@ -637,7 +637,7 @@ describe('Test the entry handling routes', function () {
         });
     });
 
-    describe('Test the DELETE /entry/:entryId route', function () {
+    describe('Test the DELETE /admin/entry/:entryId route', function () {
         describe('Happy paths', function () {
             describe('Login as admin and delete an entry', function () {
                 it('should return a 200 status and a success message and delete the entry from the database', async function () {
@@ -653,6 +653,10 @@ describe('Test the entry handling routes', function () {
                     expect(reEntry).to.be.null;
                 });
             });
+
+            // FIXME Like an entry, then DELETE /admin/entry/:entryId
+            // FIXME Bookmark an entry, then DELETE /admin/entry/:entryId
+            // FIXME Flag an entry, then DELETE /admin/entry/:entryId
         });
 
         describe('Sad paths', function () {
@@ -815,7 +819,7 @@ describe('Test the entry handling routes', function () {
             });
 
             describe('Login and like an entry, delete the entry directly from the database, and check GET /profile', function () {
-                it('should remove that like from the user\'s likes list and not crash the backend', async function () {
+                it('should remove that like from the user\'s likedEntries list and not crash the backend', async function () {
                     await agent.post('/login').send(adminLogin);
                     const storyRes = await agent.post('/entry').send(testStory);
                     await agent.post('/login').send(testUserLogin);
@@ -999,6 +1003,23 @@ describe('Test the entry handling routes', function () {
                         expect(res.body).to.deep.equal({ error: "Flagging an entry needs a reason." });
 
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Flag an entry, then delete the entry from the database and GET /admin/flag', function () {
+                    it('should remove the flag from the list of returned flags and not crash the back end', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
+                        const flag = await Flag.findOne({ entry: storyRes.body.entryId });
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+
+                        const res = await agent.get('/admin/flag');
+
+                        expect(res).to.have.status(200);
+                        expect(res.body.some(f => f.entry == storyRes.body.entryId)).to.be.false;
+
+                        await Flag.findByIdAndDelete(flag._id);
                     });
                 });
             });
@@ -1194,7 +1215,7 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('Login an POST a bookmark on a nonexistantId', function () {
+                describe('Login and POST a bookmark on a nonexistantId', function () {
                     it('should return a 404 status and an error message', async function () {
                         await agent.post('/login').send(testUserLogin);
 
@@ -1205,7 +1226,8 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                // FIXME Login, bookmark an entry, then delete the entry, and test bookmarks
+                // FIXME When bookmarks are added to GET /profile
+                // Login, bookmark an entry, then delete the entry, and GET /profile and check buookmarks
             });
         });
     });
