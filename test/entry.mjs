@@ -654,9 +654,48 @@ describe('Test the entry handling routes', function () {
                 });
             });
 
-            // FIXME Like an entry, then DELETE /admin/entry/:entryId
-            // FIXME Bookmark an entry, then DELETE /admin/entry/:entryId
-            // FIXME Flag an entry, then DELETE /admin/entry/:entryId
+            describe('Like an entry, then DELETE /admin/entry/:entryId', function () {
+                it('should delete the like from the database', async function () {
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/login').send(adminLogin);
+                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
+
+                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
+                    const like = await Like.findOne({ entry: storyRes.body.entryId });
+
+                    expect(res).to.have.status(200);
+                    expect(like).to.be.null;
+                });
+            });
+
+            describe('Bookmark an entry, then DELETE /admin/entry/:entryId', function () {
+                it('should delete the bookmark from the database', async function () {
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+
+                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
+                    const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+
+                    expect(res).to.have.status(200);
+                    expect(bookmark).to.be.null;
+                });
+            });
+
+            describe('Flag an entry, then DELETE /admin/entry/:entryId', function () {
+                it('should delete the flag from the database', async function () {
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
+
+                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
+                    const flag = await Flag.findOne({ entry: storyRes.body.entryId });
+
+                    expect(res).to.have.status(200);
+                    expect(flag).to.be.null;
+                });
+            });
         });
 
         describe('Sad paths', function () {
