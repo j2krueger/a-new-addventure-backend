@@ -44,6 +44,7 @@ router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
 router.post('/entry/:entryId/like', userAuth, entryControllers.likeEntry);
 router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
 router.post('/entry/:entryId/bookmark', userAuth, entryControllers.bookmarkEntry);
+router.delete('/entry/:entryId/bookmark', userAuth, entryControllers.unBookmarkEntry);
 // admin routes
 router.delete('/admin/entry/:entryId', entryControllers.deleteEntryById);
 router.delete('/admin/flag/:flagId', entryControllers.deleteFlag);

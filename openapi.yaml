@@ -936,7 +936,7 @@ paths:
     post:
       tags:
         - Entry
-        - bookmark
+        - Bookmark
       summary: Bookmark a page
       description: If there is a logged in user, set a bookmark for that user on that entry.
       operationId: bookmark_entry
@@ -969,6 +969,43 @@ paths:
           content:
             application/json:
               example: { "error": "You have already liked that bookmark." }
+        default:
+          description: Default error sample response
+    delete:
+      tags:
+        - Entry
+        - Bookmark
+      summary: Unbookmark a page
+      description: If there is a logged in user that has bookmarked the given entry, remove the bookmark.
+      operationId: unbookmark_entry
+      parameters:
+        - name: entryId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: Successfully deleted bookmark.
+          content:
+            application/json:
+              example: { message: "Bookmark successfully deleted." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted entryId." }
+        "404":
+          description: Entry not found
+          content:
+            application/json:
+              examples:
+                notBookmarked:
+                  value: { "error": "You don't have that entry bookmarked." }
+                missingEntry:
+                  value: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
   /entry/{entryId}/keyword/{keyword}:

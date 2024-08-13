@@ -1193,7 +1193,7 @@ describe('Test the entry handling routes', function () {
     });
 
     describe('Test the bookmark handling routes', function () {
-        describe('Test the POST /entry/:entryId/bookmark', function () {
+        describe('Test the POST /entry/:entryId/bookmark route', function () {
             describe('Happy paths', function () {
                 describe('Login and POST a bookmark', function () {
                     it('should return a 200 status and a success message, and add a bookmark to the database', async function () {
@@ -1267,6 +1267,85 @@ describe('Test the entry handling routes', function () {
 
                 // FIXME When bookmarks are added to GET /profile
                 // Login, bookmark an entry, then delete the entry, and GET /profile and check buookmarks
+            });
+        });
+
+        describe('Test the DELETE /entry/:entryId/bookmark route', function () {
+            describe('Happy paths', function () {
+                describe('Login and delete a bookmark', function () {
+                    it('should return a 200 status and a success message, and remove the bookmark from the database', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+
+                        const res = await agent.delete('/entry/' + storyRes.body.entryId + '/bookmark');
+                        const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Bookmark successfully deleted." });
+                        expect(bookmark).to.be.null;
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Login and delete a nonexistant bookmark', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.delete('/entry/' + storyRes.body.entryId + '/bookmark');
+
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "You don't have that entry bookmarked." });
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Logout and delete a bookmark', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+                        const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+                        await agent.post('/logout');
+
+                        const res = await agent.delete('/entry/' + storyRes.body.entryId + '/bookmark');
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                        await Bookmark.findByIdAndDelete(bookmark._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Login and delete a bookmark from a nonexistant entry', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.delete('/entry/000000000000000000000000/bookmark');
+
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                    });
+                });
+
+                describe('Login and delete a bookmark from a bad entryId', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.delete('/entry/buh/bookmark');
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                    });
+                });
             });
         });
     });

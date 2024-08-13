@@ -265,6 +265,19 @@ async function bookmarkEntry(req, res, next) {
   }
 }
 
+async function unBookmarkEntry(req, res, next) {
+  try {
+    const result = await Bookmark.findOne({ user: req.authenticatedUser._id, entry: req.foundEntryById._id });
+    if (result) {
+      await Bookmark.findByIdAndDelete(result._id);
+      return res.status(200).json({ message: "Bookmark successfully deleted." });
+    }
+    return res.status(404).json({ error: "You don't have that entry bookmarked." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   paramEntryId,
   paramFlagId,
@@ -276,6 +289,7 @@ module.exports = {
   likeEntry,
   unLikeEntry,
   bookmarkEntry,
+  unBookmarkEntry,
   deleteEntryById,
   deleteFlag,
   getFlagList,
