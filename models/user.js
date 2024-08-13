@@ -63,6 +63,12 @@ userSchema.virtual('likedEntries', {
   foreignField: 'user'
 })
 
+userSchema.virtual('bookmarkedEntries', {
+  ref: 'Bookmark',
+  localField: '_id',
+  foreignField: 'user'
+})
+
 userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) {
   const result = await User.findById(id)
     .populate({
@@ -92,6 +98,17 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
           return null;
         }
       }
+    })
+    .populate({
+      path: 'bookmarkedEntries',
+      populate: { path: 'entry', populate: { path: 'authorId' } },
+      transform: bookmark => {
+        if (bookmark?.entry) {
+          const summary = bookmark.entry.summary(); summary.authorId = summary.authorId._id; return summary;
+        } else {
+          return null;
+        }
+      }
     });
   if (result) {
     result.followedAuthors.sort((a, b) => {
@@ -102,27 +119,6 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
   return result;
 }
 
-userSchema.statics.findOneAndPopulate = async function findOneAndPopulate(query) {
-  const result = await User.findOne(query)
-    .populate({
-      path: 'followedAuthors',
-      populate: { path: 'following' },
-      transform: follow => { return { userName: follow.following.userName, userId: follow.following._id } },
-    })
-    .populate({
-      path: 'publishedEntries',
-      limit: constants.entriesPerPage,
-      options: { sort: { createDate: -1 } },
-      transform: entry => entry.summary(),
-    });
-  if (result) {
-    result.followedAuthors.sort((a, b) => {
-      const al = a.userName.toLowerCase(), bl = b.userName.toLowerCase();
-      return (al < bl) ? -1 : (al > bl) ? 1 : 0;
-    })
-  }
-  return result;
-}
 userSchema.statics.findAndPopulate = async function findAndPopulate(query, skip, limit) {
   const result = await User.find(query)
     .collation({ locale: "en" })
@@ -151,6 +147,7 @@ userSchema.methods.privateProfile = function privateProfile() {
     publishedEntries: this.publishedEntries || [],
     followedAuthors: this.followedAuthors || [],
     likedEntries: this.likedEntries || [],
+    bookmarkedEntries: this.bookmarkedEntries || [],
   };
 }
 

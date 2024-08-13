@@ -459,9 +459,7 @@ describe('Test the user handling routes', function () {
                     expect(res.body.publishedEntries).to.be.an('array');
                     expect(res.body.followedAuthors).to.be.an('array');
                     expect(res.body.likedEntries).to.be.an('array');
-                    res.body.publishedEntries = [];
-                    res.body.followedAuthors = [];
-                    res.body.likedEntries = [];
+                    expect(res.body.bookmarkedEntries).to.be.an('array');
                     expect(res.body).to.deep.equal(newUserPrivateProfile());
                 });
             });

@@ -1210,6 +1210,23 @@ describe('Test the entry handling routes', function () {
                         await Bookmark.findByIdAndDelete(bookmark._id);
                         await Entry.findByIdAndDelete(storyRes.body.entryId)
                     });
+
+                    describe('Login, post a bookmark, and GET /profile', function () {
+                        it('should return the bookmarked entry in bookmarkedEntries', async function () {
+                            await agent.post('/login').send(testUserLogin);
+                            const storyRes = await agent.post('/entry').send(testStory);
+                            await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+                            const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+
+                            const res = await agent.get('/profile');
+
+                            expect(res.body.bookmarkedEntries).to.be.an('array').with.lengthOf(1);
+                            expect(res.body.bookmarkedEntries[0].storyId).to.deep.equal(storyRes.body.entryId);
+
+                            await Bookmark.findByIdAndDelete(bookmark._id);
+                            await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        });
+                    });
                 });
             });
 
@@ -1238,7 +1255,7 @@ describe('Test the entry handling routes', function () {
 
                         expect(res).to.have.status(409);
 
-                        await Bookmark.findOneAndDelete({ user: loginRes.body._id });
+                        await Bookmark.findOneAndDelete({ user: loginRes.body.userId });
                         await Entry.findByIdAndDelete(entry.body.entryId);
                     });
                 });
@@ -1265,8 +1282,23 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                // FIXME When bookmarks are added to GET /profile
-                // Login, bookmark an entry, then delete the entry, and GET /profile and check buookmarks
+                describe('Login, bookmark an entry, then delete the entry from the database, and GET /profile and check bookmarkedEntries', function () {
+                    it('should not include the bookmark for the deleted entry, and should not crash the backend', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+                        const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+
+                        const res = await agent.get('/profile');
+
+                        expect(res).to.have.status(200);
+                        expect(res.body.bookmarkedEntries).to.deep.equal([]);
+
+                        await Bookmark.findByIdAndDelete(bookmark._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
             });
         });
 

@@ -62,7 +62,7 @@ async function loginUser(req, res, next) {
     } else if (!password) {
         return res.status(400).json({ error: "Missing password." });
     } else {
-        const user = await User.findOneAndPopulate({ userName: name }) || await User.findOneAndPopulate({ email: name });
+        const user = await User.findOne({ userName: name }) || await User.findOne({ email: name });
         if (!user || !await bcrypt.compare(password, user.passwordHash)) {
             return res.status(401).json({ error: "Incorrect name or password." });
         } else {

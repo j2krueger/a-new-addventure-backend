@@ -237,6 +237,18 @@ paths:
                         "likes": 0,
                       },
                     ],
+                  "bookmarkedEntries":
+                    [
+                      {
+                        "storyId": "6695b2573550c66db1ab9106",
+                        "entryId": "66a7fd2095206fecbb52c189",
+                        "storyTitle": "In the beginning...",
+                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "authorName": "Freddy",
+                        "authorId": "668490250029a28118a8d1be",
+                        "previousEntry": "6695b2573550c66db1ab9106",
+                      },
+                    ],
                 }
         "401":
           description: "If no user is logged in, return an error"
