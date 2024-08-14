@@ -65,6 +65,13 @@ entrySchema.methods.setLikedByUser = async function setLikedByUser(userId) {
     }
 }
 
+entrySchema.methods.setBookmarkedByUser = async function setBookmarkedByUser(userId) {
+    if (userId) {
+        const result = await mongoose.model('Bookmark').findOne({ user: userId, entry: this._id });
+        this.bookmarkedByUser = !!result;
+    }
+}
+
 entrySchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id, userId) {
     const result = await Entry.findById(id)
         .populate('likes')
@@ -78,6 +85,7 @@ entrySchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id,
         });
     if (result) {
         await result.setLikedByUser(userId);
+        await result.setBookmarkedByUser(userId);
     }
     return result;
 }
@@ -95,6 +103,7 @@ entrySchema.statics.findAndPopulate = async function findAndPopulate(entryQuery,
             transform: auth => auth._id,
         });
     await Promise.all(result.map(entry => entry.setLikedByUser(userId)));
+    await Promise.all(result.map(entry => entry.setBookmarkedByUser(userId)));
     return result;
 }
 
@@ -130,6 +139,7 @@ entrySchema.methods.summary = function summary() {
         previousEntry: this.previousEntry,
         likes: this.likes,
         likedByUser: this.likedByUser,
+        bookmarkedByUser: this.bookmarkedByUser,
     };
 }
 
@@ -145,6 +155,7 @@ entrySchema.methods.fullInfo = async function fullInfo() {
         previousEntry: this.previousEntry,
         likes: this.likes,
         likedByUser: this.likedByUser,
+        bookmarkedByUser: this.bookmarkedByUser,
         createDate: this.createDate,
     };
 }
@@ -160,6 +171,7 @@ entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithConti
         previousEntry: this.previousEntry,
         likes: this.likes,
         likedByUser: this.likedByUser,
+        bookmarkedByUser: this.bookmarkedByUser,
         createDate: this.createDate,
         storyId: this.storyId,
         continuationEntries: this.continuationEntries,

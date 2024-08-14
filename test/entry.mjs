@@ -70,7 +70,7 @@ describe('Test the entry handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
                     for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('likedByUser', ...summaryKeys);
+                        expect(entry).to.have.all.keys('likedByUser', 'bookmarkedByUser', ...summaryKeys);
                         expectMongoObjectId(entry.storyId);
                         expectMongoObjectId(entry.entryId);
                         expect(entry.storyTitle).to.be.a('string');
@@ -787,6 +787,43 @@ describe('Test the entry handling routes', function () {
                     await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
+
+            describe('Login and like an entry and check GET /entry?regex=<testString>', function () {
+                it('should return bookmarkedByUser is true in the entry', async function () {
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    const loginRes = await agent.post('/login').send(testUserLogin);
+                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
+
+                    const entryIdRes = await agent.get('/entry').query({ regex: testString });
+
+                    expect(entryIdRes.body).to.be.an('array').with.lengthOf(1);
+                    expect(entryIdRes.body[0].likedByUser).to.be.true;
+
+                    const likeIdRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId })
+                    await Like.findByIdAndDelete(likeIdRes._id);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                });
+            });
+
+            describe('Login and like an entry and check GET /profile', function () {
+                it('should have the liked entry in the likedEntries field', async function () {
+                    await agent.post('/login').send(adminLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                    const like = await Like.findOne({ entry: storyRes.body.entryId });
+
+                    const res = await agent.get('/profile');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body.likedEntries).to.be.an('array').with.lengthOf(1);
+                    expect(res.body.likedEntries[0].entryId).to.deep.equal(storyRes.body.entryId);
+
+                    await Like.findByIdAndDelete(like._id);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                });
+            });
         });
 
         describe('Sad paths', function () {
@@ -1211,21 +1248,58 @@ describe('Test the entry handling routes', function () {
                         await Entry.findByIdAndDelete(storyRes.body.entryId)
                     });
 
-                    describe('Login, post a bookmark, and GET /profile', function () {
-                        it('should return the bookmarked entry in bookmarkedEntries', async function () {
-                            await agent.post('/login').send(testUserLogin);
-                            const storyRes = await agent.post('/entry').send(testStory);
-                            await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
-                            const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+                });
 
-                            const res = await agent.get('/profile');
+                describe('Login, post a bookmark, and GET /profile', function () {
+                    it('should return the bookmarked entry in bookmarkedEntries', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+                        const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
 
-                            expect(res.body.bookmarkedEntries).to.be.an('array').with.lengthOf(1);
-                            expect(res.body.bookmarkedEntries[0].storyId).to.deep.equal(storyRes.body.entryId);
+                        const res = await agent.get('/profile');
 
-                            await Bookmark.findByIdAndDelete(bookmark._id);
-                            await Entry.findByIdAndDelete(storyRes.body.entryId);
-                        });
+                        expect(res.body.bookmarkedEntries).to.be.an('array').with.lengthOf(1);
+                        expect(res.body.bookmarkedEntries[0].storyId).to.deep.equal(storyRes.body.entryId);
+
+                        await Bookmark.findByIdAndDelete(bookmark._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Login, post a bookmark, and GET /entry/:entryId', function () {
+                    it('should return bookmarkedByUser is true in the entry', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+                        const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+
+                        const res = await agent.get('/entry/' + storyRes.body.entryId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body.bookmarkedByUser).to.be.true;
+
+                        await Bookmark.findByIdAndDelete(bookmark._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Login, post a bookmark, and GET /entry?regex=<testString>', function () {
+                    it('should return bookmarkedByUser is true in the entry', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+                        const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+
+                        const res = await agent.get('/entry').query({ regex: testString, });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf(1);
+                        expect(res.body[0].bookmarkedByUser).to.be.true;
+
+                        await Bookmark.findByIdAndDelete(bookmark._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+
                     });
                 });
             });
