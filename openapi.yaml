@@ -1539,8 +1539,8 @@ paths:
         - Chain
       summary: Get the entry chain ending at the specified entry.
       description:
-        "Get the entry chain starting with the first entry of the story and ending at the specified entry. Show the Story title, then for each entry\
-        \ show the entry title, the author, the keywords, the story text, and the entry title for the next entry in the chain if applicable."
+        "Returns an array of entries with the last one being the entry with the given entryId, and every other entry in the array having the\
+        \ entryId equal to previousEntry of the next array entry, and the first array entry being the beginning of the story."
       operationId: get_chain
       parameters:
         - name: entryId
@@ -1551,6 +1551,113 @@ paths:
           explode: false
           schema: {}
       responses:
+        "200":
+          description: "Chain successfully returned."
+          content:
+            application/json:
+              examples:
+                fullChain:
+                  value:
+                    [
+                      {
+                        "entryId": "6688142fb004b799a5a29d03",
+                        "authorName": "Freddy",
+                        "authorId": "668490250029a28118a8d1be",
+                        "entryTitle": null,
+                        "storyTitle": "Random Title",
+                        "bodyText": "Genji no monogatari",
+                        "previousEntry": null,
+                        "likes": 0,
+                        "likedByUser": false,
+                        "bookmarkedByUser": false,
+                        "createDate": "2024-07-05T15:41:35.510Z",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "continuationEntries":
+                          [
+                            {
+                              "storyId": "6688142fb004b799a5a29d03",
+                              "entryId": "668820191cb99dfdc244c23c",
+                              "storyTitle": "Random Title",
+                              "entryTitle": "Chapter the first",
+                              "authorName": "Freddy",
+                              "previousEntry": "6688142fb004b799a5a29d03",
+                            },
+                            {
+                              "storyId": "6688142fb004b799a5a29d03",
+                              "entryId": "668c4771e0989ccd9cd6ec8a",
+                              "storyTitle": "Random Title",
+                              "entryTitle": "adding to this entries list of sub entries",
+                              "authorName": "apmanager",
+                              "previousEntry": "6688142fb004b799a5a29d03",
+                            },
+                          ],
+                      },
+                      {
+                        "entryId": "668d51e61be56166aaaa6cc2",
+                        "authorName": "Freddy",
+                        "authorId": "668490250029a28118a8d1be",
+                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "storyTitle": "Random Title",
+                        "bodyText": "It throws a bundle of tax forms at our hero, Bob, stunning him! The existential dread is almost enough to keep him from dodging the subsequent thrown calculator, but he manages to roll out of the way in time, and retaliate with a well-swung Swingline stapler!",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "likes": 0,
+                        "likedByUser": false,
+                        "bookmarkedByUser": false,
+                        "createDate": "2024-07-09T15:06:14.267Z",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "continuationEntries": [],
+                      },
+                    ]
+                brokenChain:
+                  value:
+                    [
+                      {
+                        "entryId": "66bd0378fd83fe5734584651",
+                        "authorName": "testkurmdlqazsvnepyhs0.7645244396758495",
+                        "authorId": "66bd0374fd83fe5734584612",
+                        "entryTitle": "testkurmdlqazsvnepyhs1",
+                        "storyTitle": "testkurmdlqazsvnepyhs",
+                        "bodyText": "testkurmdlqazsvnepyhs2",
+                        "previousEntry": "66bd0377fd83fe5734584642",
+                        "likes": 0,
+                        "createDate": "2024-08-14T19:20:24.445Z",
+                        "storyId": "66bd0377fd83fe5734584642",
+                        "continuationEntries":
+                          [
+                            {
+                              "storyId": "66bd0377fd83fe5734584642",
+                              "entryId": "66bd0379fd83fe5734584660",
+                              "storyTitle": "testkurmdlqazsvnepyhs",
+                              "entryTitle": "testkurmdlqazsvnepyhs1",
+                              "authorName": "testkurmdlqazsvnepyhs0.7645244396758495",
+                              "previousEntry": "66bd0378fd83fe5734584651",
+                            },
+                          ],
+                      },
+                      {
+                        "entryId": "66bd0379fd83fe5734584660",
+                        "authorName": "testkurmdlqazsvnepyhs0.7645244396758495",
+                        "authorId": "66bd0374fd83fe5734584612",
+                        "entryTitle": "testkurmdlqazsvnepyhs1",
+                        "storyTitle": "testkurmdlqazsvnepyhs",
+                        "bodyText": "testkurmdlqazsvnepyhs2",
+                        "previousEntry": "66bd0378fd83fe5734584651",
+                        "likes": 0,
+                        "createDate": "2024-08-14T19:20:25.135Z",
+                        "storyId": "66bd0377fd83fe5734584642",
+                        "continuationEntries": [],
+                      },
+                    ]
+        "400":
+          description: "malformed request."
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted entryId." }
+        "404":
+          description: "entryId does not exist."
+          content:
+            application/json:
+              example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
   /keywords:

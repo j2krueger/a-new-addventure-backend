@@ -1455,4 +1455,110 @@ describe('Test the entry handling routes', function () {
             });
         });
     });
+
+    describe('Test the GET /chain/:entryId route', function () {
+        let entryId1, entryId2, entryId3;
+
+        before('Set up chain', async function () {
+            await agent.post('/login').send(testUserLogin);
+            const storyRes1 = await agent.post('/entry').send(testStory);
+            entryId1 = storyRes1.body.entryId;
+            const storyRes2 = await agent.post('/entry/' + entryId1).send(testEntry);
+            entryId2 = storyRes2.body.entryId;
+            const storyRes3 = await agent.post('/entry/' + entryId2).send(testEntry);
+            entryId3 = storyRes3.body.entryId;
+        })
+
+        after('Tear down chain', async function () {
+            await Entry.findByIdAndDelete(entryId3);
+            await Entry.findByIdAndDelete(entryId2);
+            await Entry.findByIdAndDelete(entryId1);
+        })
+
+        describe('Happy paths', function () {
+            describe('Logout and get a chain of length 1', function () {
+                it('should return a 200 status and an array containing 1 entry', async function () {
+                    await agent.post('/logout');
+
+                    const res = await agent.get('/chain/' + entryId1);
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.an('array').with.lengthOf(1);
+                    expect(res.body[0].entryId).to.deep.equal(entryId1);
+                });
+            });
+
+            describe('Logout and get a chain of length 2', function () {
+                it('should return a 200 status and an array containing 2 entries', async function () {
+                    await agent.post('/logout');
+
+                    const res = await agent.get('/chain/' + entryId2);
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.an('array').with.lengthOf(2);
+                    expect(res.body[0].entryId).to.deep.equal(entryId1);
+                    expect(res.body[1].entryId).to.deep.equal(entryId2);
+                });
+            });
+
+            describe('Logout and get a chain of length 3', function () {
+                it('should return a 200 status and an array containing 3 entries', async function () {
+                    await agent.post('/logout');
+
+                    const res = await agent.get('/chain/' + entryId3);
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.an('array').with.lengthOf(3);
+                    expect(res.body[0].entryId).to.deep.equal(entryId1);
+                    expect(res.body[1].entryId).to.deep.equal(entryId2);
+                    expect(res.body[2].entryId).to.deep.equal(entryId3);
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('Logout and get a chain ending in a nonexistant entryId', function () {
+                it('should return a 404 status and an error message', async function () {
+                    await agent.post('/logout');
+
+                    const res = await agent.get('/chain/000000000000000000000000');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                });
+            });
+
+            describe('Logout and get a chain with a malformed entryId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    await agent.post('/logout');
+
+                    const res = await agent.get('/chain/foo');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                });
+            });
+
+            describe('Logout and get a broken chain', function () {
+                it('should return as much of the chain as it can', async function () {
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes1 = await agent.post('/entry').send(testStory);
+                    const storyRes2 = await agent.post('/entry/' + storyRes1.body.entryId).send(testEntry);
+                    const storyRes3 = await agent.post('/entry/' + storyRes2.body.entryId).send(testEntry);
+                    await Entry.findByIdAndDelete(storyRes1.body.entryId);
+                    await agent.post('/logout');
+
+                    const res = await agent.get('/chain/' + storyRes3.body.entryId);
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.an('array').with.lengthOf(2);
+                    expect(res.body[0].entryId).to.deep.equal(storyRes2.body.entryId);
+                    expect(res.body[1].entryId).to.deep.equal(storyRes3.body.entryId);
+
+                    await Entry.findByIdAndDelete(storyRes3.body.entryId);
+                    await Entry.findByIdAndDelete(storyRes2.body.entryId);
+                });
+            });
+        });
+    });
 });

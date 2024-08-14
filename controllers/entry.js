@@ -110,6 +110,27 @@ async function getEntryById(req, res) {
   res.status(200).json(await req.foundEntryById.fullInfoWithContinuations());
 }
 
+// Potential approach for speed improvement:
+// grab all entries with the same storyId all in one query, and chain them together locally
+// Since this is one big query, it may be considerably faster than repeated queries for one
+// entry at a time, but at the cost of more memory usage. Don't implement until the version
+// implemented here becomes problematic.
+async function getChainById(req, res, next) {
+  try {
+    const results = [await req.foundEntryById.fullInfoWithContinuations()];
+    while (results[0].previousEntry) {
+      const nextPreviousEntry = await Entry.findByIdAndPopulate(results[0].previousEntry, req?.session?.user?.id);
+      if (!nextPreviousEntry) {
+        break;
+      }
+      results.unshift(await nextPreviousEntry.fullInfoWithContinuations());
+    }
+    return res.status(200).json(results);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function flagEntry(req, res, next) {
   try {
     const user = req?.session?.user;
@@ -283,6 +304,7 @@ module.exports = {
   paramFlagId,
   getEntryList,
   getEntryById,
+  getChainById,
   flagEntry,
   createStory,
   continueStory,

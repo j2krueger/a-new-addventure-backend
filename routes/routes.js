@@ -38,6 +38,7 @@ router.param('flagId', entryControllers.paramFlagId);
 router.get('/entry', entryControllers.getEntryList);
 router.get('/entry/:entryId', entryControllers.getEntryById);
 router.post('/entry/:entryId/flag', entryControllers.flagEntry);
+router.get('/chain/:entryId', entryControllers.getChainById);
 // authorized entry related routes
 router.post('/entry', userAuth, entryControllers.createStory);
 router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
