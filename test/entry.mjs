@@ -696,6 +696,24 @@ describe('Test the entry handling routes', function () {
                     expect(flag).to.be.null;
                 });
             });
+
+            describe('Continue an entry, then delete the entry', function () {
+                it('should also delete the continuation entry', async function () {
+                    await agent.post('/login').send(testUserLogin);
+                    const storyRes = await agent.post('/entry').send(testStory);
+                    const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+                    await agent.post('/login').send(adminLogin);
+
+                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
+                    const entry = await Entry.findById(entryRes.body.entryId);
+
+                    expect(res).to.have.status(200);
+                    expect(entry).to.be.null;
+
+                    await Entry.findByIdAndDelete(entryRes.body.entryId);
+                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                });
+            });
         });
 
         describe('Sad paths', function () {

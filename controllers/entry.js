@@ -259,12 +259,18 @@ async function unLikeEntry(req, res, next) {
   }
 }
 
+async function recursiveDeleteEntryById(id) {
+  const continuations = await Entry.find({ previousEntry: id });
+  continuations.forEach(entry => recursiveDeleteEntryById(entry._id));
+  await Bookmark.deleteMany({ entry: id });
+  await Flag.deleteMany({ entry: id });
+  await Like.deleteMany({ entry: id });
+  await Entry.findByIdAndDelete(id);
+}
+
 async function deleteEntryById(req, res, next) {
   try {
-    await Bookmark.deleteMany({ entry: req.foundEntryById._id });
-    await Flag.deleteMany({ entry: req.foundEntryById._id });
-    await Like.deleteMany({ entry: req.foundEntryById._id });
-    await Entry.findByIdAndDelete(req.foundEntryById._id);
+    await recursiveDeleteEntryById(req.foundEntryById._id);
     return res.status(200).json({ message: "Entry successfully deleted." });
   } catch (error) {
     return next(error);
