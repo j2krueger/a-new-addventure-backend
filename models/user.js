@@ -28,6 +28,10 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  locked: {
+    type: Boolean,
+    default: false,
+  },
   bio: {
     type: String,
     default: "I haven't decided what to put in my bio yet.",
@@ -144,6 +148,7 @@ userSchema.methods.privateProfile = function privateProfile() {
     bio: this.bio,
     publishEmail: this.publishEmail,
     darkMode: this.darkMode,
+    locked: this.locked,
     publishedEntries: this.publishedEntries || [],
     followedAuthors: this.followedAuthors || [],
     likedEntries: this.likedEntries || [],

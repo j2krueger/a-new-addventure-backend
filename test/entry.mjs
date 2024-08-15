@@ -358,6 +358,43 @@ describe('Test the entry handling routes', function () {
             });
         });
 
+        describe('Test the :entryId param middleware', function () {
+            describe('Happy paths', function () {
+                describe('GET /entry/:entryId with an existing entryId', function () {
+                    it('should return a 200 status', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+
+                        const res = await agent.get('/entry/' + storyRes.body.entryId);
+
+                        expect(res).to.have.status(200);
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('GET /entry/:entryId with a nonexistant entryId', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        const res = await agent.get('/entry/000000000000000000000000');
+
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                    });
+                });
+            });
+
+            describe('GET /entry/:entryId with a misformed entryId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const res = await agent.get('/entry/0');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                });
+            });
+        });
+
         describe('Test the GET /entry/:entryId route', function () {
             describe('Happy paths', function () {
                 describe('GET /entry/:entryId on a new story', function () {
@@ -411,26 +448,6 @@ describe('Test the entry handling routes', function () {
 
                         await Entry.findByIdAndDelete(entryRes.body.entryId);
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
-                    });
-                });
-            });
-
-            describe('Sad paths', function () {
-                describe('GET /entry/notAnEntryId', function () {
-                    it('should return a 400 status and an error message', async function () {
-                        const res = await agent.get('/entry/notAnEntryId');
-
-                        expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                    });
-                });
-
-                describe('GET /entry/000000000000000000000000', function () {
-                    it('should return a 404 status and an error message', async function () {
-                        const res = await agent.get('/entry/000000000000000000000000');
-
-                        expect(res).to.have.status(404);
-                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
                     });
                 });
             });
@@ -766,28 +783,6 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('Login and POST a like to a nonexistant story', function () {
-                    it('should return a 404 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.post('/entry/000000000000000000000000/like');
-
-                        expect(res).to.have.status(404);
-                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-                    });
-                });
-
-                describe('Login and POST a like to a misformed storyId', function () {
-                    it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.post('/entry/blarg/like');
-
-                        expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                    });
-                });
-
                 describe('Login and like an entry, delete the entry directly from the database, and check GET /profile', function () {
                     it('should remove that like from the user\'s likedEntries list and not crash the backend', async function () {
                         await agent.post('/login').send(adminLogin);
@@ -859,28 +854,6 @@ describe('Test the entry handling routes', function () {
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
-
-                describe('Login and unlike a nonexistant entry', function () {
-                    it('should return a 404 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.delete('/entry/000000000000000000000000/like');
-
-                        expect(res).to.have.status(404);
-                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-                    });
-                });
-
-                describe('Login and unlike with a bad entryId', function () {
-                    it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.delete('/entry/blarg/like');
-
-                        expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                    });
-                });
             });
         });
     });
@@ -931,25 +904,6 @@ describe('Test the entry handling routes', function () {
             });
 
             describe('Sad paths', function () {
-                describe('Flag with a bad entry id', function () {
-                    it('should return a 400 status and an error message', async function () {
-                        const res = await agent.post('/entry/blech/flag').send({ reason: testString });
-
-                        expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                    });
-                });
-
-                describe('Flag a nonexistant entry', function () {
-                    it('should return a 404 status and an error message', async function () {
-                        const res = await agent.post('/entry/000000000000000000000000/flag').send({ reason: testString });
-
-                        expect(res).to.have.status(404);
-                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-
-                    });
-                });
-
                 describe('Flag without a reason', function () {
                     it('should return a 400 status and an error message', async function () {
                         await agent.post('/login').send(testUserLogin);
@@ -1104,28 +1058,6 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('Login and POST a bookmark on a bad entryId', function () {
-                    it('should return 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.post('/entry/d00d/bookmark');
-
-                        expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                    });
-                });
-
-                describe('Login and POST a bookmark on a nonexistantId', function () {
-                    it('should return a 404 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.post('/entry/000000000000000000000000/bookmark');
-
-                        expect(res).to.have.status(404);
-                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-                    });
-                });
-
                 describe('Login, bookmark an entry, then delete the entry from the database, and GET /profile and check bookmarkedEntries', function () {
                     it('should not include the bookmark for the deleted entry, and should not crash the backend', async function () {
                         await agent.post('/login').send(testUserLogin);
@@ -1200,28 +1132,6 @@ describe('Test the entry handling routes', function () {
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
                 });
-
-                describe('Login and delete a bookmark from a nonexistant entry', function () {
-                    it('should return a 404 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.delete('/entry/000000000000000000000000/bookmark');
-
-                        expect(res).to.have.status(404);
-                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-                    });
-                });
-
-                describe('Login and delete a bookmark from a bad entryId', function () {
-                    it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.delete('/entry/buh/bookmark');
-
-                        expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                    });
-                });
             });
         });
     });
@@ -1287,28 +1197,6 @@ describe('Test the entry handling routes', function () {
         });
 
         describe('Sad paths', function () {
-            describe('Logout and get a chain ending in a nonexistant entryId', function () {
-                it('should return a 404 status and an error message', async function () {
-                    await agent.post('/logout');
-
-                    const res = await agent.get('/chain/000000000000000000000000');
-
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-                });
-            });
-
-            describe('Logout and get a chain with a malformed entryId', function () {
-                it('should return a 400 status and an error message', async function () {
-                    await agent.post('/logout');
-
-                    const res = await agent.get('/chain/foo');
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                });
-            });
-
             describe('Logout and get a broken chain', function () {
                 it('should return as much of the chain as it can', async function () {
                     await agent.post('/login').send(testUserLogin);

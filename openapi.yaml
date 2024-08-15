@@ -1532,6 +1532,41 @@ paths:
               example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
+  /admin/user/{userId}/lock:
+    summary: Lock a user
+    delete:
+      tags:
+        - Admin
+        - User
+      summary: Lock a user
+      description: Lock a user
+      operationId: lock_user
+      parameters:
+        - name: userId
+          in: path
+          description: the ID of the user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: Successfully locked user.
+          content:
+            application/json:
+              example: { "message": "User successfully locked." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted userId." }
+        "404":
+          description: Entry not found.
+          content:
+            application/json:
+              example: { "error": "There is no user with that userId." }
+        default:
+          description: Default error sample response
   /chain/{entryId}:
     summary: GET the entry chain ending at the specified entry
     get:

@@ -9,9 +9,9 @@ const {
     // constants
     constants,
     testString,
-    // newUserName,
-    // newEmail,
-    // newPassword,
+    newUserName,
+    newEmail,
+    newPassword,
     testUserLogin,
     adminLogin,
     testStory,
@@ -21,7 +21,7 @@ const {
     // newUserBasicInfo,
     // summaryKeys,
     // models
-    // User,
+    User,
     Entry,
     // Follow,
     Message,
@@ -140,28 +140,6 @@ describe('Test the admin routes', function () {
                     await Entry.findByIdAndDelete(storyRes.body.entryId);
                 });
             });
-
-            describe('Login as admin and delete with bad entryId', function () {
-                it('should return a 400 status and an error message', async function () {
-                    await agent.post('/login').send(adminLogin);
-
-                    const res = await agent.delete('/admin/entry/buh');
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                });
-            });
-
-            describe('Login as admin and delete with nonexistant entryId', function () {
-                it('should return a 404 status and an error message', async function () {
-                    await agent.post('/login').send(adminLogin);
-
-                    const res = await agent.delete('/admin/entry/000000000000000000000000');
-
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-                });
-            });
         });
     });
 
@@ -224,7 +202,7 @@ describe('Test the admin routes', function () {
             describe('Login as admin and DELETE bad flagId', function () {
                 it('should return a 400 status and an error message', async function () {
                     await agent.post('/login').send(adminLogin);
-                    const res = await agent.delete('/admin/flag/bleh');
+                    const res = await agent.delete('/admin/flag/0');
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "That is not a properly formatted flagId." });
@@ -442,7 +420,7 @@ describe('Test the admin routes', function () {
                 it('should return a 400 status and an error message', async function () {
                     await agent.post('/login').send(adminLogin);
 
-                    const res = await agent.put('/admin/message/notAmessageId').send({ read: true });
+                    const res = await agent.put('/admin/message/0').send({ read: true });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "That is not a properly formatted messageId." })
@@ -501,28 +479,6 @@ describe('Test the admin routes', function () {
         });
 
         describe('Sad paths', function () {
-            describe('Login as admin and delete a nonexistant message', function () {
-                it('should return a 404 and an error message', async function () {
-                    await agent.post('/login').send(adminLogin);
-
-                    const res = await agent.delete('/admin/message/000000000000000000000000');
-
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no message with that messageId." });
-                });
-            });
-
-            describe('Login as admin and delete a misformed messageId', function () {
-                it('should return a 400 status and an error message', async function () {
-                    await agent.post('/login').send(adminLogin);
-
-                    const res = await agent.delete('/admin/message/notAmessageId');
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted messageId." });
-                });
-            });
-
             describe('Login as non admin and try to delete a message', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/login').send(testUserLogin);
@@ -548,6 +504,111 @@ describe('Test the admin routes', function () {
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
                     await Message.findByIdAndDelete(message._id);
+                });
+            });
+        });
+    });
+
+    describe('Test the user modification routes', function () {
+        describe('Test the POST /admin/user/:userId/lock', function () {
+            let lockedUserId, unlockedUserId;
+
+            before('Set up users for lock testing', async function () {
+                const res = await agent.post('/register')
+                    .send({ userName: 'unlocked' + newUserName, email: 'unlocked' + newEmail, password: newPassword });
+                unlockedUserId = res.body.userId;
+                const res2 = await agent.post('/register')
+                    .send({ userName: 'locked' + newUserName, email: 'locked' + newEmail, password: newPassword });
+                lockedUserId = res2.body.userId;
+            });
+
+            beforeEach('Make sure each user is in the correct state before each test', async function () {
+                const unlockedUser = await User.findById(unlockedUserId);
+                unlockedUser.locked = false;
+                unlockedUser.save();
+                const lockedUser = await User.findById(lockedUserId);
+                lockedUser.locked = true;
+                lockedUser.save();
+            });
+
+            describe('Happy paths', function () {
+                describe('Login as admin and lock an unlocked user', function () {
+                    it('should return a 200 status and a success message and set the field locked to true in the user\'s database entry', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.post('/admin/user/' + unlockedUserId + '/lock');
+                        const user = await User.findById(unlockedUserId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "User successfully locked." });
+                        expect(user.locked).to.be.true;
+                    });
+                });
+
+                describe('Login as locked user', function () {
+                    it('should return a 200 status and the users user.privateProfile()', async function () {
+                        const res = await agent.post('/login').send({ name: 'locked' + newUserName, password: newPassword });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body.userName).to.deep.equal('locked' + newUserName);
+                        expect(res.body.locked).to.be.true;
+                    });
+                });
+
+                describe('Login as locked user and POST /entry', function () {
+                    it('should redirect to login', async function () {
+                        await agent.post('/login').send({ name: 'locked' + newUserName, password: newPassword });
+
+                        const res = await agent.post('/entry').send(testEntry);
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as unlocked user, lock user, and POST /entry', function () {
+                    it('should redirect to login', async function () {
+                        const loginRes = await agent.post('/login').send({ name: 'unlocked' + newUserName, password: newPassword });
+                        const user = await User.findById(loginRes.body.userId);
+                        user.locked = true;
+                        user.save();
+
+                        const res = await agent.post('/entry').send(testEntry);
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Logout and lock an unlocked user', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/admin/user/' + unlockedUserId + '/lock');
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as non-admin and lock an unlocked user', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.post('/admin/user/' + unlockedUserId + '/lock');
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as admin and lock an already locked user', function () {
+                    it('should return a 409 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.post('/admin/user/' + lockedUserId + '/lock');
+
+                        expect(res).to.have.status(409);
+                        expect(res.body).to.deep.equal({ error: "That user is already locked." });
+                    });
                 });
             });
         });

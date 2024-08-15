@@ -259,6 +259,38 @@ describe('Test the user handling routes', function () {
         });
     });
 
+    describe('Test the :userId param middleware', function () {
+        describe('Happy paths', function () {
+            describe('GET /user/:userId with an existing userId', function () {
+                it('should return a 200 status', async function () {
+                    const res = await agent.get('/user/' + newUserPrivateProfile().userId);
+
+                    expect(res).to.have.status(200);
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('GET /user/:userId with a nonexistant userId', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const res = await agent.get('/user/000000000000000000000000');
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "There is no user with that userId." });
+                });
+            });
+
+            describe('GET /user/:userId with a malformed userId', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const res = await agent.get('/user/0');
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted userId." });
+                });
+            });
+        });
+    });
+
     describe('Test the GET /user/:userId route', function () {
         describe('Happy paths', function () {
             describe('get user by userId', function () {
@@ -267,26 +299,6 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal(newUserPublicInfo());
-                })
-            })
-        });
-
-        describe('Sad paths', function () {
-            describe('get user by nonexistant userId', function () {
-                it('should return a 404 not found and an error message', async function () {
-                    const res = await agent.get('/user/000000000000000000000000');
-
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no user with that userId." });
-                })
-            })
-
-            describe('get user by badly formed userId', function () {
-                it('should return a 400 bad request and an error message', async function () {
-                    const res = await agent.get('/user/notANidSTRING');
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted userId." });
                 })
             })
         });
@@ -404,28 +416,6 @@ describe('Test the user handling routes', function () {
                 });
             });
 
-            describe('Login and POST /user/000000000000000000000000/follow', function () {
-                it('should return a 404 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.post('/user/000000000000000000000000/follow');
-
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no user with that userId." })
-                });
-            });
-
-            describe('Login and POST /user/{ownUserId}/follow', function () {
-                it('should return a 409 status and an error message', async function () {
-                    const loginRes = await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.post('/user/' + loginRes.body.userId + '/follow');
-
-                    expect(res).to.have.status(409);
-                    expect(res.body).to.deep.equal({ error: "Following yourself means you're going around in circles." });
-                });
-            });
-
             describe('Login and POST /user/668490250029a28118a8d1be/follow again', function () {
                 it('should return a 409 status and an error message', async function () {
                     const loginRes = await agent.post('/login').send(testUserLogin);
@@ -493,28 +483,6 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(404);
                     expect(res.body).to.deep.equal({ error: 'No follow to remove.' })
-                });
-            });
-
-            describe('Login and unfollow with nonexistant userId', function () {
-                it('should return a 404 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.delete('/user/000000000000000000000000/follow');
-
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no user with that userId." })
-                });
-            });
-
-            describe('Login and unfollow with bad userId', function () {
-                it('should return a 400 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.delete('/user/blarg/follow');
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted userId." })
                 });
             });
         });

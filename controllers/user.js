@@ -86,7 +86,8 @@ async function loginUser(req, res, next) {
                         secure: true,
                         sameSite: 'none',
                     });
-                    return res.status(200).json(user.privateProfile());
+                    const fullUser = await User.findByIdAndPopulate(user._id);
+                    return res.status(200).json(fullUser.privateProfile());
                 });
             })
         }
@@ -174,6 +175,20 @@ async function unFollowUser(req, res, next) {
     }
 }
 
+async function lockUser(req, res, next) {
+    try {
+        const user = await User.findById(req.foundUserById);
+        if (user.locked) {
+            return res.status(409).json({ error: "That user is already locked." });
+        }
+        user.locked = true;
+        user.save();
+        return res.status(200).json({ message: "User successfully locked." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     paramUserId,
     registerUser,
@@ -185,4 +200,5 @@ module.exports = {
     putProfile,
     followUser,
     unFollowUser,
+    lockUser,
 };

@@ -1,7 +1,7 @@
 "use strict";
 
 const constants = require('../helpers/constants');
-const { userAuth, adminAuth } = require('../helpers/auth');
+const { lockedUserAuth, userAuth, adminAuth } = require('../helpers/auth');
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
@@ -15,25 +15,36 @@ router.use(cors({
     credentials: true
 }));
 
+// All param middleware goes here
+router.param('userId', userControllers.paramUserId);
+router.param('entryId', entryControllers.paramEntryId);
+router.param('flagId', entryControllers.paramFlagId);
+router.param('messageId', miscControllers.paramMessageId);
+
 // All routes starting with /admin are restricted to logged in admins
 router.use('/admin', adminAuth);
 
+// All admin routes go here
+router.delete('/admin/entry/:entryId', entryControllers.deleteEntryById);
+router.delete('/admin/flag/:flagId', entryControllers.deleteFlag);
+router.get('/admin/flag', entryControllers.getFlagList);
+router.get('/admin/message', miscControllers.getMessage);
+router.put('/admin/message/:messageId', miscControllers.putMessage);
+router.delete('/admin/message/:messageId', miscControllers.deleteMessage);
+router.post('/admin/user/:userId/lock', userControllers.lockUser);
+
 // user related routes
-router.param('userId', userControllers.paramUserId)
 router.post('/register', userControllers.registerUser);
 router.post('/login', userControllers.loginUser);
 router.post('/logout', userControllers.logoutUser);
 router.get('/user', userControllers.getUser);
 router.get('/user/:userId', userControllers.getUserInfoById);
 // authorized user related routes
-router.post('/user/:userId/follow', userAuth, userControllers.followUser);
-router.delete('/user/:userId/follow', userAuth, userControllers.unFollowUser);
-router.get('/profile', userAuth, userControllers.getProfile);
-router.put('/profile', userAuth, userControllers.putProfile)
+router.post('/user/:userId/follow', lockedUserAuth, userControllers.followUser);
+router.delete('/user/:userId/follow', lockedUserAuth, userControllers.unFollowUser);
+router.get('/profile', lockedUserAuth, userControllers.getProfile);
+router.put('/profile', lockedUserAuth, userControllers.putProfile)
 
-// entry related param routes
-router.param('entryId', entryControllers.paramEntryId);
-router.param('flagId', entryControllers.paramFlagId);
 // unauthorized entry routes
 router.get('/entry', entryControllers.getEntryList);
 router.get('/entry/:entryId', entryControllers.getEntryById);
@@ -42,22 +53,13 @@ router.get('/chain/:entryId', entryControllers.getChainById);
 // authorized entry related routes
 router.post('/entry', userAuth, entryControllers.createStory);
 router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
-router.post('/entry/:entryId/like', userAuth, entryControllers.likeEntry);
-router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
-router.post('/entry/:entryId/bookmark', userAuth, entryControllers.bookmarkEntry);
-router.delete('/entry/:entryId/bookmark', userAuth, entryControllers.unBookmarkEntry);
-// admin routes
-router.delete('/admin/entry/:entryId', entryControllers.deleteEntryById);
-router.delete('/admin/flag/:flagId', entryControllers.deleteFlag);
-router.get('/admin/flag', entryControllers.getFlagList);
+router.post('/entry/:entryId/like', lockedUserAuth, entryControllers.likeEntry);
+router.delete('/entry/:entryId/like', lockedUserAuth, entryControllers.unLikeEntry);
+router.post('/entry/:entryId/bookmark', lockedUserAuth, entryControllers.bookmarkEntry);
+router.delete('/entry/:entryId/bookmark', lockedUserAuth, entryControllers.unBookmarkEntry);
 
 // miscelaneous routes
 router.post('/message', miscControllers.postMessage);
-router.param('messageId', miscControllers.paramMessageId);
-// admin routes
-router.get('/admin/message', miscControllers.getMessage);
-router.put('/admin/message/:messageId', miscControllers.putMessage);
-router.delete('/admin/message/:messageId', miscControllers.deleteMessage);
 
 if (constants.localDeploy && constants.testing) { // use on loca
     router.get('/sessioncheck', function (req, res) {
