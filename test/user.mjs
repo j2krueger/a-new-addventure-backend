@@ -171,6 +171,15 @@ describe('Test the user handling routes', function () {
         });
     });
 
+    describe('Test POST /logout path', function () {
+        it('should return a 200 ok and a response message', async function () {
+            const res = await agent.post('/logout');
+
+            expect(res).to.have.status(200);
+            expect(res.body).to.deep.equal({ message: "Logout successful." });
+        })
+    });
+
     describe('Test the GET /users route', function () {
         describe('Happy paths', function () {
             describe('get users', function () {
@@ -280,6 +289,79 @@ describe('Test the user handling routes', function () {
                     expect(res.body).to.deep.equal({ error: "That is not a properly formatted userId." });
                 })
             })
+        });
+    });
+
+    describe('Test GET /profile path', function () {
+        describe('Happy paths', function () {
+            describe('login and get profile', function () {
+                it('should return 200 OK and logged in users.privateProfile()', async function () {
+                    await agent.post('/login').send(testUserLogin);
+
+                    const res = await agent.get('/profile');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body.publishedEntries).to.be.an('array');
+                    expect(res.body.followedAuthors).to.be.an('array');
+                    expect(res.body.likedEntries).to.be.an('array');
+                    expect(res.body.bookmarkedEntries).to.be.an('array');
+                    expect(res.body).to.deep.equal(newUserPrivateProfile());
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('logout and get profile', function () {
+                it('should return 200 OK and logged in users.privateProfile()', async function () {
+                    await agent.post('/logout');
+
+                    const res = await agent.get('/profile');
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+        });
+    });
+
+    describe('Test PUT /profile path', function () {
+        describe('Happy paths', function () {
+            describe('login and put profile', function () {
+                it('should return 200 OK and logged in users.privateProfile()', async function () {
+                    await agent.post('/login').send(testUserLogin);
+
+                    const res = await agent.put('/profile').send({ darkMode: true });
+                    const tempNewUserPrivateProfile = newUserPrivateProfile();
+                    tempNewUserPrivateProfile.darkMode = !tempNewUserPrivateProfile.darkMode;
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal(tempNewUserPrivateProfile);
+
+                    await agent.put('/profile').send({ darkMode: false });
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('logout and put profile', function () {
+                it('should redirect to /login', async function () {
+                    await agent.post('/logout');
+
+                    const res = await agent.put('/profile').send({ darkMode: true });
+
+                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                });
+            });
+
+            describe('login and do a bad put on profile', function () {
+                it('should return 400 OK and an error message', async function () {
+                    await agent.post('/login').send(testUserLogin);
+
+                    const res = await agent.put('/profile').send({ darkMode: "notAboolean" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Invalid request." });
+                });
+            });
         });
     });
 
@@ -433,88 +515,6 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "That is not a properly formatted userId." })
-                });
-            });
-        });
-    });
-
-    describe('Test POST /logout path', function () {
-        it('should return a 200 ok and a response message', async function () {
-            const res = await agent.post('/logout');
-
-            expect(res).to.have.status(200);
-            expect(res.body).to.deep.equal({ message: "Logout successful." });
-        })
-    })
-
-    describe('Test GET /profile path', function () {
-        describe('Happy paths', function () {
-            describe('login and get profile', function () {
-                it('should return 200 OK and logged in users.privateProfile()', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.get('/profile');
-
-                    expect(res).to.have.status(200);
-                    expect(res.body.publishedEntries).to.be.an('array');
-                    expect(res.body.followedAuthors).to.be.an('array');
-                    expect(res.body.likedEntries).to.be.an('array');
-                    expect(res.body.bookmarkedEntries).to.be.an('array');
-                    expect(res.body).to.deep.equal(newUserPrivateProfile());
-                });
-            });
-        });
-
-        describe('Sad paths', function () {
-            describe('logout and get profile', function () {
-                it('should return 200 OK and logged in users.privateProfile()', async function () {
-                    await agent.post('/logout');
-
-                    const res = await agent.get('/profile');
-
-                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
-                });
-            });
-        });
-    });
-
-    describe('Test PUT /profile path', function () {
-        describe('Happy paths', function () {
-            describe('login and put profile', function () {
-                it('should return 200 OK and logged in users.privateProfile()', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.put('/profile').send({ darkMode: true });
-                    const tempNewUserPrivateProfile = newUserPrivateProfile();
-                    tempNewUserPrivateProfile.darkMode = !tempNewUserPrivateProfile.darkMode;
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.deep.equal(tempNewUserPrivateProfile);
-
-                    await agent.put('/profile').send({ darkMode: false });
-                });
-            });
-        });
-
-        describe('Sad paths', function () {
-            describe('logout and put profile', function () {
-                it('should redirect to /login', async function () {
-                    await agent.post('/logout');
-
-                    const res = await agent.put('/profile').send({ darkMode: true });
-
-                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
-                });
-            });
-
-            describe('login and do a bad put on profile', function () {
-                it('should return 400 OK and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.put('/profile').send({ darkMode: "notAboolean" });
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Invalid request." });
                 });
             });
         });

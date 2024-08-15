@@ -36,846 +36,855 @@ const {
 describe('Test the entry handling routes', function () {
     this.slow(1000);
 
-    describe('Test the GET /entry route', function () {
-        describe('Happy paths', function () {
-            describe('Logout and GET /entry', function () {
-                it('should return a 200 OK and a list of entries', async function () {
-                    await agent.post('/logout');
+    describe('Test the entry retrieval routes', function () {
+        describe('Test the GET /entry route', function () {
+            describe('Happy paths', function () {
+                describe('Logout and GET /entry', function () {
+                    it('should return a 200 OK and a list of entries', async function () {
+                        await agent.post('/logout');
 
-                    const res = await agent.get('/entry');
+                        const res = await agent.get('/entry');
 
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                            }
+                            expect(entry.authorName).to.be.a('string');
+                        }
+                    });
+                });
+
+                describe('Login and GET /entry', function () {
+                    it('should return a 200 OK and a list of entries', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.get('/entry');
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys('likedByUser', 'bookmarkedByUser', ...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                            }
+                            expect(entry.authorName).to.be.a('string');
+                        }
+                    });
+                });
+
+                describe('GET /entry with search query string {storiesOnly: true}', function () {
+                    it('should return a 200 status and a list of stories', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.get('/entry').query({ storiesOnly: true });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyId).to.deep.equal(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
                             expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
+                            expect(entry.previousEntry).to.be.null;
+                            expect(entry.authorName).to.be.a('string');
                         }
-                        expect(entry.authorName).to.be.a('string');
-                    }
+                    });
                 });
-            });
 
-            describe('Login and GET /entry', function () {
-                it('should return a 200 OK and a list of entries', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                describe('GET /entry with search query string {regex: "Freddy", fields: "a"} ', function () {
+                    it('should return a 200 OK list of entries with authorName matching "Freddy"', async function () {
+                        const res = await agent.get('/entry').query({ regex: 'Freddy', fields: 'a' });
 
-                    const res = await agent.get('/entry');
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys('likedByUser', 'bookmarkedByUser', ...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                            }
+                            expect(entry.authorName).to.be.a('string').which.matches(/Freddy/);
                         }
-                        expect(entry.authorName).to.be.a('string');
-                    }
+                    });
                 });
-            });
 
-            describe('GET /entry with search query string {storiesOnly: true}', function () {
-                it('should return a 200 status and a list of stories', async function () {
-                    await agent.post('/logout');
+                describe('GET /entry with search query string {regex: "dd", fields: "e"} ', function () {
+                    it('should return a 200 OK list of entries with entryTitle matching "dd"', async function () {
+                        const res = await agent.get('/entry').query({ regex: 'dd', fields: 'e' });
 
-                    const res = await agent.get('/entry').query({ storiesOnly: true });
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyId).to.deep.equal(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        expect(entry.entryTitle).to.be.null;
-                        expect(entry.previousEntry).to.be.null;
-                        expect(entry.authorName).to.be.a('string');
-                    }
-                });
-            });
-
-            describe('GET /entry with search query string {regex: "Freddy", fields: "a"} ', function () {
-                it('should return a 200 OK list of entries with authorName matching "Freddy"', async function () {
-                    const res = await agent.get('/entry').query({ regex: 'Freddy', fields: 'a' });
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            expect(entry.entryTitle).to.be.a('string').which.matches(/dd/);
+                            expect(entry.authorName).to.be.a('string');
                         }
-                        expect(entry.authorName).to.be.a('string').which.matches(/Freddy/);
-                    }
+                    });
                 });
-            });
 
-            describe('GET /entry with search query string {regex: "dd", fields: "e"} ', function () {
-                it('should return a 200 OK list of entries with entryTitle matching "dd"', async function () {
-                    const res = await agent.get('/entry').query({ regex: 'dd', fields: 'e' });
+                describe('GET /entry with search query string {regex: "beginning", fields: "s"} ', function () {
+                    it('should return a 200 OK list of entries with storyTitle matching "beginning"', async function () {
+                        const res = await agent.get('/entry').query({ regex: 'beginning', fields: 's' });
 
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        expect(entry.entryTitle).to.be.a('string').which.matches(/dd/);
-                        expect(entry.authorName).to.be.a('string');
-                    }
-                });
-            });
-
-            describe('GET /entry with search query string {regex: "beginning", fields: "s"} ', function () {
-                it('should return a 200 OK list of entries with storyTitle matching "beginning"', async function () {
-                    const res = await agent.get('/entry').query({ regex: 'beginning', fields: 's' });
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string').which.matches(/beginning/);
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string').which.matches(/beginning/);
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                            }
+                            expect(entry.authorName).to.be.a('string');
                         }
-                        expect(entry.authorName).to.be.a('string');
-                    }
+                    });
+                });
+
+                describe('GET /entry with search query string {regex: "dd", fields: "ae"} ', function () {
+                    it('should return a 200 OK list of entries with authorName OR entry title matching "dd"', async function () {
+                        const res = await agent.get('/entry').query({ regex: 'dd', fields: 'ae' });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                            }
+                            expect(entry.authorName).to.be.a('string');
+                            expect(entry.authorName + ' ' + entry.entryTitle).to.be.a('string').which.matches(/dd/);
+                        }
+                    });
+                });
+
+                describe('GET /entry with search query string {regexp: "Freddy", fields: "w"}', function () {
+                    it('should return a 400 status and an error message.', async function () {
+                        const res = await agent.get('/entry').query({ regex: "Freddy", fields: "w" });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                    });;
+                });
+
+                describe('GET /entry with search query string {regexp: "Freddy", fields: "aea"}', function () {
+                    it('should return a 400 status and an error message.', async function () {
+                        const res = await agent.get('/entry').query({ regex: "Freddy", fields: "aea" });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                    });;
+                });
+
+                describe('GET /entry with search query string {order: "a"}', function () {
+                    it('should return a 200 OK list of entries sorted in increasing order by author', async function () {
+                        const res = await agent.get('/entry').query({ order: "a" });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        let previous = res.body[0].authorName;
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                            }
+                            expect(entry.authorName).to.be.a('string');
+                            expect(previous.toLowerCase() <= entry.authorName.toLowerCase()).to.be.true;
+                            previous = entry.authorName;
+                        }
+                    });
+                });
+
+                describe('GET /entry with search query string {order: "A"}', function () {
+                    it('should return a 200 OK list of entries sorted in decreasing order by author', async function () {
+                        const res = await agent.get('/entry').query({ order: "A" });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        let previous = res.body[0].authorName;
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                            }
+                            expect(entry.authorName).to.be.a('string');
+                            expect(previous.toLowerCase() >= entry.authorName.toLowerCase()).to.be.true;
+                            previous = entry.authorName;
+                        }
+                    });
+                });
+
+                describe('GET /entry with search query string {order: "e"}', function () {
+                    it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
+                        const res = await agent.get('/entry').query({ order: "e" });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        let previous = res.body[0].entryTitle;
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                                expect(previous == null || previous.toLowerCase() <= entry.entryTitle.toLowerCase()).to.be.true;
+                                previous = entry.entryTitle;
+                            }
+                        }
+                    });
+                });
+
+                describe('GET /entry with search query string {order: "E"}', function () {
+                    it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
+                        const res = await agent.get('/entry').query({ order: "E" });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        let previous = res.body[0].entryTitle;
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                                expect(entry.entryTitle == null || previous.toLowerCase() >= entry.entryTitle.toLowerCase()).to.be.true;
+                                previous = entry.entryTitle;
+                            }
+                        }
+                    });
+                });
+
+                describe('GET /entry with search query string {order: "sE"}', function () {
+                    it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
+                        const res = await agent.get('/entry').query({ order: "sE" });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                        let previous = res.body[0];
+                        for (const entry of res.body) {
+                            expect(entry).to.have.all.keys(...summaryKeys);
+                            expectMongoObjectId(entry.storyId);
+                            expectMongoObjectId(entry.entryId);
+                            expect(entry.storyTitle).to.be.a('string');
+                            if (entry.storyId == entry.entryId) {
+                                expect(entry.entryTitle).to.be.null;
+                            } else {
+                                expect(entry.entryTitle).to.be.a('string');
+                            }
+                            if (previous.storyTitle.toLowerCase() == entry.storyTitle.toLowerCase()) {
+                                expect(entry.entryTitle == null || previous.entryTitle.toLowerCase() >= entry.entryTitle.toLowerCase()).to.be.true;
+                            } else {
+                                expect(previous.storyTitle.toLowerCase() < entry.storyTitle.toLowerCase())
+                            }
+                            previous = entry;
+                        }
+                    });
                 });
             });
 
-            describe('GET /entry with search query string {regex: "dd", fields: "ae"} ', function () {
-                it('should return a 200 OK list of entries with authorName OR entry title matching "dd"', async function () {
-                    const res = await agent.get('/entry').query({ regex: 'dd', fields: 'ae' });
+            describe('Sad paths', function () {
+                describe('GET /entry with search query string {order: "x"}', function () {
+                    it('should return a 400 status and an error message.', async function () {
+                        const res = await agent.get('/entry').query({ order: "x" });
 
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
-                        }
-                        expect(entry.authorName).to.be.a('string');
-                        expect(entry.authorName + ' ' + entry.entryTitle).to.be.a('string').which.matches(/dd/);
-                    }
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                    });;
                 });
-            });
 
-            describe('GET /entry with search query string {regexp: "Freddy", fields: "w"}', function () {
-                it('should return a 400 status and an error message.', async function () {
-                    const res = await agent.get('/entry').query({ regex: "Freddy", fields: "w" });
+                describe('GET /entry with search query string {order: "aea"}', function () {
+                    it('should return a 400 status and an error message.', async function () {
+                        const res = await agent.get('/entry').query({ order: "aea" });
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Misformed query string." })
-                });;
-            });
-
-            describe('GET /entry with search query string {regexp: "Freddy", fields: "aea"}', function () {
-                it('should return a 400 status and an error message.', async function () {
-                    const res = await agent.get('/entry').query({ regex: "Freddy", fields: "aea" });
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Misformed query string." })
-                });;
-            });
-
-            describe('GET /entry with search query string {order: "a"}', function () {
-                it('should return a 200 OK list of entries sorted in increasing order by author', async function () {
-                    const res = await agent.get('/entry').query({ order: "a" });
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    let previous = res.body[0].authorName;
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
-                        }
-                        expect(entry.authorName).to.be.a('string');
-                        expect(previous.toLowerCase() <= entry.authorName.toLowerCase()).to.be.true;
-                        previous = entry.authorName;
-                    }
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                    });;
                 });
-            });
 
-            describe('GET /entry with search query string {order: "A"}', function () {
-                it('should return a 200 OK list of entries sorted in decreasing order by author', async function () {
-                    const res = await agent.get('/entry').query({ order: "A" });
+                describe('GET /entry with search query string {order: "aeA"}', function () {
+                    it('should return a 400 status and an error message.', async function () {
+                        const res = await agent.get('/entry').query({ order: "aeA" });
 
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    let previous = res.body[0].authorName;
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
-                        }
-                        expect(entry.authorName).to.be.a('string');
-                        expect(previous.toLowerCase() >= entry.authorName.toLowerCase()).to.be.true;
-                        previous = entry.authorName;
-                    }
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                    });;
                 });
-            });
 
-            describe('GET /entry with search query string {order: "e"}', function () {
-                it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                    const res = await agent.get('/entry').query({ order: "e" });
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    let previous = res.body[0].entryTitle;
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
-                            expect(previous == null || previous.toLowerCase() <= entry.entryTitle.toLowerCase()).to.be.true;
-                            previous = entry.entryTitle;
-                        }
-                    }
-                });
-            });
-
-            describe('GET /entry with search query string {order: "E"}', function () {
-                it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                    const res = await agent.get('/entry').query({ order: "E" });
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    let previous = res.body[0].entryTitle;
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
-                            expect(entry.entryTitle == null || previous.toLowerCase() >= entry.entryTitle.toLowerCase()).to.be.true;
-                            previous = entry.entryTitle;
-                        }
-                    }
-                });
-            });
-
-            describe('GET /entry with search query string {order: "sE"}', function () {
-                it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                    const res = await agent.get('/entry').query({ order: "sE" });
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
-                    let previous = res.body[0];
-                    for (const entry of res.body) {
-                        expect(entry).to.have.all.keys(...summaryKeys);
-                        expectMongoObjectId(entry.storyId);
-                        expectMongoObjectId(entry.entryId);
-                        expect(entry.storyTitle).to.be.a('string');
-                        if (entry.storyId == entry.entryId) {
-                            expect(entry.entryTitle).to.be.null;
-                        } else {
-                            expect(entry.entryTitle).to.be.a('string');
-                        }
-                        if (previous.storyTitle.toLowerCase() == entry.storyTitle.toLowerCase()) {
-                            expect(entry.entryTitle == null || previous.entryTitle.toLowerCase() >= entry.entryTitle.toLowerCase()).to.be.true;
-                        } else {
-                            expect(previous.storyTitle.toLowerCase() < entry.storyTitle.toLowerCase())
-                        }
-                        previous = entry;
-                    }
-                });
             });
         });
 
-        describe('Sad paths', function () {
-            describe('GET /entry with search query string {order: "x"}', function () {
-                it('should return a 400 status and an error message.', async function () {
-                    const res = await agent.get('/entry').query({ order: "x" });
+        describe('Test the GET /entry/:entryId route', function () {
+            describe('Happy paths', function () {
+                describe('GET /entry/:entryId on a new story', function () {
+                    it('should return a 200 OK and the entry.fullInfoWithContinuations()', async function () {
+                        const userRes = await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Misformed query string." })
-                });;
-            });
+                        const res = await agent.get('/entry/' + storyRes.body.entryId);
 
-            describe('GET /entry with search query string {order: "aea"}', function () {
-                it('should return a 400 status and an error message.', async function () {
-                    const res = await agent.get('/entry').query({ order: "aea" });
+                        expect(res).to.have.status(200);
+                        expectMongoObjectId(res.body.entryId);
+                        expect(res.body.entryId).to.deep.equal(storyRes.body.entryId);
+                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expectMongoObjectId(res.body.authorId);
+                        expect(res.body.authorId).to.deep.equal(userRes.body.userId)
+                        expect(res.body.entryTitle).to.be.null;
+                        expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                        expect(res.body.bodyText).to.deep.equal(testStory.bodyText);
+                        expect(res.body.previousEntry).to.be.null;
+                        expect(res.body.likes).to.deep.equal(0);
+                        expect(res.body.createDate).to.be.a('string');
+                        expect(res.body.storyId).to.deep.equal(storyRes.body.entryId);
+                        expect(res.body.continuationEntries).to.be.an('array').with.lengthOf(0);
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Misformed query string." })
-                });;
-            });
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
 
-            describe('GET /entry with search query string {order: "aeA"}', function () {
-                it('should return a 400 status and an error message.', async function () {
-                    const res = await agent.get('/entry').query({ order: "aeA" });
+                describe('GET /entry/:entryId on a new entry', function () {
+                    it('should return a 200 OK and the entry.fullInfoWithContinuations()', async function () {
+                        const userRes = await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Misformed query string." })
-                });;
-            });
+                        const res = await agent.get('/entry/' + entryRes.body.entryId);
 
-        });
-    });
+                        expect(res).to.have.status(200);
+                        expectMongoObjectId(res.body.entryId);
+                        expect(res.body.entryId).to.deep.equal(entryRes.body.entryId);
+                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expectMongoObjectId(res.body.authorId);
+                        expect(res.body.authorId).to.deep.equal(userRes.body.userId)
+                        expect(res.body.entryTitle).to.deep.equal(testEntry.entryTitle);
+                        expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                        expect(res.body.bodyText).to.deep.equal(testEntry.bodyText);
+                        expect(res.body.previousEntry).to.deep.equal(storyRes.body.entryId);
+                        expect(res.body.likes).to.deep.equal(0);
+                        expect(res.body.createDate).to.be.a('string');
+                        expect(res.body.storyId).to.deep.equal(storyRes.body.entryId);
+                        expect(res.body.continuationEntries).to.be.an('array').with.lengthOf(0);
 
-    describe('Test the GET /entry/:entryId route', function () {
-        describe('Happy paths', function () {
-            describe('GET /entry/:entryId on a new story', function () {
-                it('should return a 200 OK and the entry.fullInfoWithContinuations()', async function () {
-                    const userRes = await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-
-                    const res = await agent.get('/entry/' + storyRes.body.entryId);
-
-                    expect(res).to.have.status(200);
-                    expectMongoObjectId(res.body.entryId);
-                    expect(res.body.entryId).to.deep.equal(storyRes.body.entryId);
-                    expect(res.body.authorName).to.deep.equal(testUserLogin.name);
-                    expectMongoObjectId(res.body.authorId);
-                    expect(res.body.authorId).to.deep.equal(userRes.body.userId)
-                    expect(res.body.entryTitle).to.be.null;
-                    expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
-                    expect(res.body.bodyText).to.deep.equal(testStory.bodyText);
-                    expect(res.body.previousEntry).to.be.null;
-                    expect(res.body.likes).to.deep.equal(0);
-                    expect(res.body.createDate).to.be.a('string');
-                    expect(res.body.storyId).to.deep.equal(storyRes.body.entryId);
-                    expect(res.body.continuationEntries).to.be.an('array').with.lengthOf(0);
-
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        await Entry.findByIdAndDelete(entryRes.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
                 });
             });
 
-            describe('GET /entry/:entryId on a new entry', function () {
-                it('should return a 200 OK and the entry.fullInfoWithContinuations()', async function () {
-                    const userRes = await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+            describe('Sad paths', function () {
+                describe('GET /entry/notAnEntryId', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        const res = await agent.get('/entry/notAnEntryId');
 
-                    const res = await agent.get('/entry/' + entryRes.body.entryId);
-
-                    expect(res).to.have.status(200);
-                    expectMongoObjectId(res.body.entryId);
-                    expect(res.body.entryId).to.deep.equal(entryRes.body.entryId);
-                    expect(res.body.authorName).to.deep.equal(testUserLogin.name);
-                    expectMongoObjectId(res.body.authorId);
-                    expect(res.body.authorId).to.deep.equal(userRes.body.userId)
-                    expect(res.body.entryTitle).to.deep.equal(testEntry.entryTitle);
-                    expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
-                    expect(res.body.bodyText).to.deep.equal(testEntry.bodyText);
-                    expect(res.body.previousEntry).to.deep.equal(storyRes.body.entryId);
-                    expect(res.body.likes).to.deep.equal(0);
-                    expect(res.body.createDate).to.be.a('string');
-                    expect(res.body.storyId).to.deep.equal(storyRes.body.entryId);
-                    expect(res.body.continuationEntries).to.be.an('array').with.lengthOf(0);
-
-                    await Entry.findByIdAndDelete(entryRes.body.entryId);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                    });
                 });
-            });
-        });
 
-        describe('Sad paths', function () {
-            describe('GET /entry/notAnEntryId', function () {
-                it('should return a 400 status and an error message', async function () {
-                    const res = await agent.get('/entry/notAnEntryId');
+                describe('GET /entry/000000000000000000000000', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        const res = await agent.get('/entry/000000000000000000000000');
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                });
-            });
-
-            describe('GET /entry/000000000000000000000000', function () {
-                it('should return a 404 status and an error message', async function () {
-                    const res = await agent.get('/entry/000000000000000000000000');
-
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-                });
-            });
-        });
-    });
-
-    describe('Test the POST /entry route', function () {
-        describe('Happy paths', function () {
-            describe('POST /entry with testStory', function () {
-                it('should return a 201 CREATED and the entry.fullInfo()', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const entryRes = await agent.post('/entry').send(testStory);
-
-                    expect(entryRes).to.have.status(201);
-                    expectMongoObjectId(entryRes.body.storyId);
-                    expect(entryRes.body.entryId).to.deep.equal(entryRes.body.storyId);
-                    expect(entryRes.body.storyTitle).to.deep.equal(testStory.storyTitle);
-                    expect(entryRes.body.entryTitle).to.be.null;
-                    expect(entryRes.body.authorName).to.deep.equal(testUserLogin.name);
-                    expectMongoObjectId(entryRes.body.authorId);
-                    expect(entryRes.body.bodyText).to.deep.equal(testStory.bodyText);
-                    expect(entryRes.body.previousEntry).to.be.null;
-                    expect(entryRes.body.likes).to.deep.equal(0);
-                    expect(entryRes.body.createDate).to.be.a('string');
-
-                    await Entry.findByIdAndDelete(entryRes.body.entryId);
-                });
-            });
-
-            describe('POST /entry with testStory and GET /profile', function () {
-                it('should return testStory from GET /profile in the publishedEntries field', async function () {
-                    await agent.post('/login').send(testUserLogin);
-                    const entryRes = await agent.post('/entry').send(testStory);
-
-                    const res = await agent.get('/profile');
-
-                    expect(res.body.publishedEntries[0].storyId).to.deep.equal(entryRes.body.storyId);
-                    expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
-                    expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
-                    expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
-                    expect(res.body.publishedEntries[0].authorName).to.deep.equal(entryRes.body.authorName);
-                    expect(res.body.publishedEntries[0].previousEntry).to.deep.equal(entryRes.body.previousEntry);
-
-                    await Entry.findByIdAndDelete(entryRes.body.entryId);
-                });
-            });
-
-            describe('POST /entry with testStory and GET /user/:userId', function () {
-                it('should return testStory from GET /user/:userId in the publishedEntries field', async function () {
-                    const loginRes = await agent.post('/login').send(testUserLogin);
-                    const entryRes = await agent.post('/entry').send(testStory);
-
-                    const res = await agent.get("/user/" + loginRes.body.userId);
-
-                    expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
-                    expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
-                    expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
-
-                    await Entry.findByIdAndDelete(entryRes.body.entryId);
-                });
-            });
-        });
-
-        describe('Sad paths', function () {
-            describe('Logout and POST /entry with testStory', function () {
-                it('should redirect to /login', async function () {
-                    await agent.post('/logout');
-
-                    const res = await agent.post('/entry').send(testStory);
-
-                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
-                });
-            });
-
-            describe('POST /entry with missing story text', function () {
-                it('should return a 400 bad request and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.post('/entry').send({ storyTitle: "Deterministic story title" });
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Missing story text." })
-                });
-            });
-
-            describe('Post /entry with missing story title', function () {
-                it('should return a 400 bad request and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.post('/entry').send({ bodyText: "Deterministic text" });
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Missing story title." });
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                    });
                 });
             });
         });
     });
 
-    describe('Test the POST /entry/:entryId route', function () {
-        describe('Happy paths', function () {
-            describe('POST /entry/:entryId with testEntry', function () {
-                it('should return a 201 status and the entry.fullInfo()', async function () {
-                    const loginRes = await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
+    describe('Test the entry posting routes', function () {
+        describe('Test the POST /entry route', function () {
+            describe('Happy paths', function () {
+                describe('POST /entry with testStory', function () {
+                    it('should return a 201 CREATED and the entry.fullInfo()', async function () {
+                        await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+                        const entryRes = await agent.post('/entry').send(testStory);
 
-                    expect(res).to.have.status(201);
-                    expectMongoObjectId(res.body.entryId);
-                    expect(res.body.storyId).to.deep.equal(storyRes.body.storyId);
-                    expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
-                    expect(res.body.entryTitle).to.deep.equal(testEntry.entryTitle);
-                    expect(res.body.authorName).to.deep.equal(testUserLogin.name);
-                    expect(res.body.authorId).to.deep.equal(loginRes.body.userId);
-                    expect(res.body.bodyText).to.deep.equal(testEntry.bodyText);
-                    expect(res.body.previousEntry).to.deep.equal(storyRes.body.entryId);
-                    expect(res.body.likes).to.deep.equal(0);
-                    expect(res.body.createDate).to.be.a('string');
+                        expect(entryRes).to.have.status(201);
+                        expectMongoObjectId(entryRes.body.storyId);
+                        expect(entryRes.body.entryId).to.deep.equal(entryRes.body.storyId);
+                        expect(entryRes.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                        expect(entryRes.body.entryTitle).to.be.null;
+                        expect(entryRes.body.authorName).to.deep.equal(testUserLogin.name);
+                        expectMongoObjectId(entryRes.body.authorId);
+                        expect(entryRes.body.bodyText).to.deep.equal(testStory.bodyText);
+                        expect(entryRes.body.previousEntry).to.be.null;
+                        expect(entryRes.body.likes).to.deep.equal(0);
+                        expect(entryRes.body.createDate).to.be.a('string');
 
-                    await Entry.findByIdAndDelete(res.body.entryId);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        await Entry.findByIdAndDelete(entryRes.body.entryId);
+                    });
+                });
+
+                describe('POST /entry with testStory and GET /profile', function () {
+                    it('should return testStory from GET /profile in the publishedEntries field', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const entryRes = await agent.post('/entry').send(testStory);
+
+                        const res = await agent.get('/profile');
+
+                        expect(res.body.publishedEntries[0].storyId).to.deep.equal(entryRes.body.storyId);
+                        expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
+                        expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
+                        expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+                        expect(res.body.publishedEntries[0].authorName).to.deep.equal(entryRes.body.authorName);
+                        expect(res.body.publishedEntries[0].previousEntry).to.deep.equal(entryRes.body.previousEntry);
+
+                        await Entry.findByIdAndDelete(entryRes.body.entryId);
+                    });
+                });
+
+                describe('POST /entry with testStory and GET /user/:userId', function () {
+                    it('should return testStory from GET /user/:userId in the publishedEntries field', async function () {
+                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const entryRes = await agent.post('/entry').send(testStory);
+
+                        const res = await agent.get("/user/" + loginRes.body.userId);
+
+                        expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
+                        expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
+                        expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+
+                        await Entry.findByIdAndDelete(entryRes.body.entryId);
+                    });
                 });
             });
 
-            describe('POST /entry/:entryId with testEntry and check GET /profile', function () {
-                it('should return the entry in the publishedEntries field', async function () {
-                    await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+            describe('Sad paths', function () {
+                describe('Logout and POST /entry with testStory', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
 
-                    const res = await agent.get('/profile');
+                        const res = await agent.post('/entry').send(testStory);
 
-                    expect(res.body.publishedEntries[0].storyId).to.deep.equal(entryRes.body.storyId);
-                    expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
-                    expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
-                    expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
-                    expect(res.body.publishedEntries[0].authorName).to.deep.equal(entryRes.body.authorName);
-                    expect(res.body.publishedEntries[0].previouEntry).to.deep.equal(entryRes.body.previouEntry);
-
-                    await Entry.findByIdAndDelete(entryRes.body.entryId);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
                 });
-            });
 
-            describe('POST /entry/:entryId with testEntry and check GET /user/:userId', function () {
-                it('should return the entry in the publishedEntries field', async function () {
-                    const userRes = await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+                describe('POST /entry with missing story text', function () {
+                    it('should return a 400 bad request and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent.get('/user/' + userRes.body.userId);
+                        const res = await agent.post('/entry').send({ storyTitle: "Deterministic story title" });
 
-                    expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
-                    expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
-                    expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
-
-                    await Entry.findByIdAndDelete(entryRes.body.entryId);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Missing story text." })
+                    });
                 });
-            });
-        });
 
-        describe('Sad paths', function () {
-            describe('Logout and POST /entry/:entryId with testEntry', function () {
-                it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/logout');
+                describe('Post /entry with missing story title', function () {
+                    it('should return a 400 bad request and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+                        const res = await agent.post('/entry').send({ bodyText: "Deterministic text" });
 
-                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
-
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
-                });
-            });
-
-            describe('POST /entry/:entryId with missing story text', function () {
-                it('should return a 400 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-
-                    const res = await agent.post('/entry/' + storyRes.body.entryId).send({ entryTitle: "Deterministic entry title" });
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Missing story text." });
-
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
-                });
-            });
-
-            describe('POST /entry/:entryId with missing entryTitle', function () {
-                it('should return a 400 misformed and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-
-                    const res = await agent.post('/entry/' + storyRes.body.entryId).send({ bodyText: "Deterministic text" });
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Missing entry title." });
-
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
-                });
-            });
-        });
-    });
-
-    describe('Test the POST /entry/:entryId/like route', function () {
-        describe('Happy paths', function () {
-            describe('Login and POST /entry/:entryId/like', function () {
-                it('should return a 200 status and a success message, and add a like to the database', async function () {
-                    await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    const loginRes = await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
-                    const likeRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId });
-
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.deep.equal({ message: "Entry liked." });
-                    expect(likeRes).to.not.be.null;
-
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
-                    await Like.findByIdAndDelete(likeRes._id);
-                });
-            });
-
-            describe('Login and like an entry and check GET /entry/:entryId', function () {
-                it('should count the like in the likes field and the likedByUser field', async function () {
-                    await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    const loginRes = await agent.post('/login').send(testUserLogin);
-
-                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
-                    const entryIdRes = await agent.get('/entry/' + storyRes.body.entryId);
-
-                    expect(entryIdRes.body.likes).to.deep.equal(1);
-                    expect(entryIdRes.body.likedByUser).to.be.true;
-
-                    const likeIdRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId })
-                    await Like.findByIdAndDelete(likeIdRes._id);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
-                });
-            });
-
-            describe('Login and like an entry and check GET /entry?regex=<testString>', function () {
-                it('should return bookmarkedByUser is true in the entry', async function () {
-                    await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    const loginRes = await agent.post('/login').send(testUserLogin);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
-
-                    const entryIdRes = await agent.get('/entry').query({ regex: testString });
-
-                    expect(entryIdRes.body).to.be.an('array').with.lengthOf(1);
-                    expect(entryIdRes.body[0].likedByUser).to.be.true;
-
-                    const likeIdRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId })
-                    await Like.findByIdAndDelete(likeIdRes._id);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
-                });
-            });
-
-            describe('Login and like an entry and check GET /profile', function () {
-                it('should have the liked entry in the likedEntries field', async function () {
-                    await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/login').send(testUserLogin);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
-                    const like = await Like.findOne({ entry: storyRes.body.entryId });
-
-                    const res = await agent.get('/profile');
-
-                    expect(res).to.have.status(200);
-                    expect(res.body.likedEntries).to.be.an('array').with.lengthOf(1);
-                    expect(res.body.likedEntries[0].entryId).to.deep.equal(storyRes.body.entryId);
-
-                    await Like.findByIdAndDelete(like._id);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Missing story title." });
+                    });
                 });
             });
         });
 
-        describe('Sad paths', function () {
-            describe('Logout and POST a like to a story', function () {
-                it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/logout');
+        describe('Test the POST /entry/:entryId route', function () {
+            describe('Happy paths', function () {
+                describe('POST /entry/:entryId with testEntry', function () {
+                    it('should return a 201 status and the entry.fullInfo()', async function () {
+                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
 
-                    const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                        const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
 
-                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                        expect(res).to.have.status(201);
+                        expectMongoObjectId(res.body.entryId);
+                        expect(res.body.storyId).to.deep.equal(storyRes.body.storyId);
+                        expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                        expect(res.body.entryTitle).to.deep.equal(testEntry.entryTitle);
+                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expect(res.body.authorId).to.deep.equal(loginRes.body.userId);
+                        expect(res.body.bodyText).to.deep.equal(testEntry.bodyText);
+                        expect(res.body.previousEntry).to.deep.equal(storyRes.body.entryId);
+                        expect(res.body.likes).to.deep.equal(0);
+                        expect(res.body.createDate).to.be.a('string');
 
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        await Entry.findByIdAndDelete(res.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('POST /entry/:entryId with testEntry and check GET /profile', function () {
+                    it('should return the entry in the publishedEntries field', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+
+                        const res = await agent.get('/profile');
+
+                        expect(res.body.publishedEntries[0].storyId).to.deep.equal(entryRes.body.storyId);
+                        expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
+                        expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
+                        expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+                        expect(res.body.publishedEntries[0].authorName).to.deep.equal(entryRes.body.authorName);
+                        expect(res.body.publishedEntries[0].previouEntry).to.deep.equal(entryRes.body.previouEntry);
+
+                        await Entry.findByIdAndDelete(entryRes.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('POST /entry/:entryId with testEntry and check GET /user/:userId', function () {
+                    it('should return the entry in the publishedEntries field', async function () {
+                        const userRes = await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+
+                        const res = await agent.get('/user/' + userRes.body.userId);
+
+                        expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
+                        expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
+                        expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+
+                        await Entry.findByIdAndDelete(entryRes.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
                 });
             });
 
-            describe('Login, post an entry, and like the entry', function () {
-                it('should return a 409 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-                    const entryRes = await agent.post('/entry').send(testStory);
+            describe('Sad paths', function () {
+                describe('Logout and POST /entry/:entryId with testEntry', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/logout');
 
-                    const res = await agent.post('/entry/' + entryRes.body.entryId + '/like');
+                        const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
 
-                    expect(res).to.have.status(409);
-                    expect(res.body).to.deep.equal({ error: "You cannot like your own entries." });
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
-                    await Entry.findByIdAndDelete(entryRes.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
                 });
-            });
 
-            describe('Login and POST a like to an already liked story', function () {
-                it('should return a 409 status and an error message', async function () {
-                    await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/login').send(testUserLogin);
+                describe('POST /entry/:entryId with missing story text', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
 
-                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
-                    const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                        const res = await agent.post('/entry/' + storyRes.body.entryId).send({ entryTitle: "Deterministic entry title" });
 
-                    expect(res).to.have.status(409);
-                    expect(res.body).to.deep.equal({ error: "You have already liked that entry." });
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Missing story text." });
 
-                    await agent.delete('/entry/' + storyRes.body.entryId + '/like');
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
                 });
-            });
 
-            describe('Login and POST a like to a nonexistant story', function () {
-                it('should return a 404 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                describe('POST /entry/:entryId with missing entryTitle', function () {
+                    it('should return a 400 misformed and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
 
-                    const res = await agent.post('/entry/000000000000000000000000/like');
+                        const res = await agent.post('/entry/' + storyRes.body.entryId).send({ bodyText: "Deterministic text" });
 
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
-                });
-            });
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Missing entry title." });
 
-            describe('Login and POST a like to a misformed storyId', function () {
-                it('should return a 400 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
-
-                    const res = await agent.post('/entry/blarg/like');
-
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
-                });
-            });
-
-            describe('Login and like an entry, delete the entry directly from the database, and check GET /profile', function () {
-                it('should remove that like from the user\'s likedEntries list and not crash the backend', async function () {
-                    await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/login').send(testUserLogin);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
-                    const like = await Like.findOne({ entry: storyRes.body.entryId });
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
-
-                    const res = await agent.get('/profile');
-
-                    expect(res).to.have.status(200);
-                    expect(res.body.likedEntries).to.be.an('array').with.lengthOf(0);
-
-                    await Like.findByIdAndDelete(like._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
                 });
             });
         });
     });
 
-    describe('Test the DELETE /entry/:entryId/like route', function () {
-        describe('Happy paths', function () {
-            describe('Login and unlike a liked entry', function () {
-                it('should return a 200 status and return a success message and remove the like from the database', async function () {
-                    await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/login').send(testUserLogin);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
 
-                    const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
-                    const foundLike = await Like.findOne({ entry: storyRes.body.entryId });
 
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.deep.equal({ message: "Like successfully removed." });
-                    expect(foundLike).to.be.null;
+    describe('Test the like handling routes', function () {
+        describe('Test the POST /entry/:entryId/like route', function () {
+            describe('Happy paths', function () {
+                describe('Login and POST /entry/:entryId/like', function () {
+                    it('should return a 200 status and a success message, and add a like to the database', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const loginRes = await agent.post('/login').send(testUserLogin);
 
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                        const likeRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Entry liked." });
+                        expect(likeRes).to.not.be.null;
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        await Like.findByIdAndDelete(likeRes._id);
+                    });
+                });
+
+                describe('Login and like an entry and check GET /entry/:entryId', function () {
+                    it('should count the like in the likes field and the likedByUser field', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const loginRes = await agent.post('/login').send(testUserLogin);
+
+                        await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                        const entryIdRes = await agent.get('/entry/' + storyRes.body.entryId);
+
+                        expect(entryIdRes.body.likes).to.deep.equal(1);
+                        expect(entryIdRes.body.likedByUser).to.be.true;
+
+                        const likeIdRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId })
+                        await Like.findByIdAndDelete(likeIdRes._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Login and like an entry and check GET /entry?regex=<testString>', function () {
+                    it('should return bookmarkedByUser is true in the entry', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/like');
+
+                        const entryIdRes = await agent.get('/entry').query({ regex: testString });
+
+                        expect(entryIdRes.body).to.be.an('array').with.lengthOf(1);
+                        expect(entryIdRes.body[0].likedByUser).to.be.true;
+
+                        const likeIdRes = await Like.findOne({ user: loginRes.body.userId, entry: storyRes.body.entryId })
+                        await Like.findByIdAndDelete(likeIdRes._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Login and like an entry and check GET /profile', function () {
+                    it('should have the liked entry in the likedEntries field', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                        const like = await Like.findOne({ entry: storyRes.body.entryId });
+
+                        const res = await agent.get('/profile');
+
+                        expect(res).to.have.status(200);
+                        expect(res.body.likedEntries).to.be.an('array').with.lengthOf(1);
+                        expect(res.body.likedEntries[0].entryId).to.deep.equal(storyRes.body.entryId);
+
+                        await Like.findByIdAndDelete(like._id);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Logout and POST a like to a story', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Login, post an entry, and like the entry', function () {
+                    it('should return a 409 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const entryRes = await agent.post('/entry').send(testStory);
+
+                        const res = await agent.post('/entry/' + entryRes.body.entryId + '/like');
+
+                        expect(res).to.have.status(409);
+                        expect(res.body).to.deep.equal({ error: "You cannot like your own entries." });
+
+                        await Entry.findByIdAndDelete(entryRes.body.entryId);
+                    });
+                });
+
+                describe('Login and POST a like to an already liked story', function () {
+                    it('should return a 409 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/login').send(testUserLogin);
+
+                        await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                        const res = await agent.post('/entry/' + storyRes.body.entryId + '/like');
+
+                        expect(res).to.have.status(409);
+                        expect(res.body).to.deep.equal({ error: "You have already liked that entry." });
+
+                        await agent.delete('/entry/' + storyRes.body.entryId + '/like');
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('Login and POST a like to a nonexistant story', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.post('/entry/000000000000000000000000/like');
+
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                    });
+                });
+
+                describe('Login and POST a like to a misformed storyId', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.post('/entry/blarg/like');
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                    });
+                });
+
+                describe('Login and like an entry, delete the entry directly from the database, and check GET /profile', function () {
+                    it('should remove that like from the user\'s likedEntries list and not crash the backend', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                        const like = await Like.findOne({ entry: storyRes.body.entryId });
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+
+                        const res = await agent.get('/profile');
+
+                        expect(res).to.have.status(200);
+                        expect(res.body.likedEntries).to.be.an('array').with.lengthOf(0);
+
+                        await Like.findByIdAndDelete(like._id);
+                    });
                 });
             });
         });
 
-        describe('Sad paths', function () {
-            describe('Logout and unlike a liked entry', function () {
-                it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
-                    await agent.post('/logout');
+        describe('Test the DELETE /entry/:entryId/like route', function () {
+            describe('Happy paths', function () {
+                describe('Login and unlike a liked entry', function () {
+                    it('should return a 200 status and return a success message and remove the like from the database', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/like');
 
-                    const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
+                        const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
+                        const foundLike = await Like.findOne({ entry: storyRes.body.entryId });
 
-                    expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Like successfully removed." });
+                        expect(foundLike).to.be.null;
 
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
                 });
             });
 
-            describe('Login and unlike an entry that isn\'t liked', function () {
-                it('should return a 404 status and an error message', async function () {
-                    await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/login').send(testUserLogin);
+            describe('Sad paths', function () {
+                describe('Logout and unlike a liked entry', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                        await agent.post('/logout');
 
-                    const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
+                        const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
 
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "You have not liked that entry." });
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
                 });
-            });
 
-            describe('Login and unlike a nonexistant entry', function () {
-                it('should return a 404 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                describe('Login and unlike an entry that isn\'t liked', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent.delete('/entry/000000000000000000000000/like');
+                        const res = await agent.delete('/entry/' + storyRes.body.entryId + '/like');
 
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "You have not liked that entry." });
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
                 });
-            });
 
-            describe('Login and unlike with a bad entryId', function () {
-                it('should return a 400 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                describe('Login and unlike a nonexistant entry', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent.delete('/entry/blarg/like');
+                        const res = await agent.delete('/entry/000000000000000000000000/like');
 
-                    expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "There is no entry with that entryId." });
+                    });
+                });
+
+                describe('Login and unlike with a bad entryId', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.delete('/entry/blarg/like');
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted entryId." });
+                    });
                 });
             });
         });
     });
+
 
     describe('Test the flag handling routes', function () {
         describe('Test POST /entry/:entryId/flag', function () {
