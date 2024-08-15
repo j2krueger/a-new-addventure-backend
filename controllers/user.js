@@ -177,13 +177,27 @@ async function unFollowUser(req, res, next) {
 
 async function lockUser(req, res, next) {
     try {
-        const user = await User.findById(req.foundUserById);
+        const user = req.foundUserById;
         if (user.locked) {
             return res.status(409).json({ error: "That user is already locked." });
         }
         user.locked = true;
         user.save();
         return res.status(200).json({ message: "User successfully locked." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+async function unlockUser(req, res, next) {
+    try {
+        const user = req.foundUserById;
+        if (!user.locked) {
+            return res.status(409).json({ error: "That user is not locked." });
+        }
+        user.locked = false;
+        await user.save();
+        return res.status(200).json({ message: "User successfully unlocked." })
     } catch (error) {
         return next(error);
     }
@@ -201,4 +215,5 @@ module.exports = {
     followUser,
     unFollowUser,
     lockUser,
+    unlockUser,
 };

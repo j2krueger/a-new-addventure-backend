@@ -1534,7 +1534,7 @@ paths:
           description: Default error sample response
   /admin/user/{userId}/lock:
     summary: Lock a user
-    delete:
+    post:
       tags:
         - Admin
         - User
@@ -1565,6 +1565,49 @@ paths:
           content:
             application/json:
               example: { "error": "There is no user with that userId." }
+        "409":
+          description: User already locked."
+          content:
+            application/json:
+              example: { "error": "That user is already locked." }
+        default:
+          description: Default error sample response
+    delete:
+      tags:
+        - Admin
+        - User
+      summary: Unlock a user
+      description: Unlock a user
+      operationId: unlock_user
+      parameters:
+        - name: userId
+          in: path
+          description: the ID of the user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: Successfully unlocked user.
+          content:
+            application/json:
+              example: { "message": "User successfully unlocked." }
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted userId." }
+        "404":
+          description: Entry not found.
+          content:
+            application/json:
+              example: { "error": "There is no user with that userId." }
+        "409":
+          description: User not locked."
+          content:
+            application/json:
+              example: { "error": "That user is not locked." }
         default:
           description: Default error sample response
   /chain/{entryId}:
