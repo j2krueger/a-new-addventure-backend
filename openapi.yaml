@@ -1610,6 +1610,76 @@ paths:
               example: { "error": "That user is not locked." }
         default:
           description: Default error sample response
+  /admin/user/{userId}:
+    summary: Alter a user
+    put:
+      tags:
+        - Admin
+        - User
+      summary: Alter a user
+      description:
+        "Submit a JSON object containing one or more of the follwing fields with values of the apropriate type:\
+        \ admin: <boolean>, moderator: <boolean>, bio: <string>, publishEmail: <boolean>. The user's database entry will have\
+        \ it's corresponding entry set to the given value."
+      operationId: alter_user
+      parameters:
+        - name: userId
+          in: path
+          description: the ID of the user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlterUser"
+            example:
+              {
+                "admin": true,
+                "moderator": true,
+                "bio": "I am a doofus who put naughty words in my bio.",
+                "publishEmail": false,
+              }
+      responses:
+        "200":
+          description: "Successfully changed user settings."
+          content:
+            application/json:
+              example:
+                {
+                  "userId": "668ee23ce1dcd980cf0739f9",
+                  "userName": "FreddyQuaoar",
+                  "email": "FreddyQuaoar@example.com",
+                  "admin": false,
+                  "moderator": true,
+                  "bio": "I haven't decided what to put in my bio yet.",
+                  "publishEmail": false,
+                  "darkMode": false,
+                  "locked": false,
+                  "publishedEntries": [],
+                  "followedAuthors": [],
+                  "likedEntries": [],
+                  "bookmarkedEntries": [],
+                }
+        "400":
+          description: Invalid request.
+          content:
+            application/json:
+              examples:
+                invalidRequest:
+                  value: { "error": "Invalid request." }
+                misformedUserId:
+                  value: { "error": "That is not a properly formatted userId." }
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              example: { error: "There is no user with that userId." }
+        default:
+          description: Default error sample response
   /chain/{entryId}:
     summary: GET the entry chain ending at the specified entry
     get:
@@ -1797,6 +1867,16 @@ components:
         publishEmail:
           type: boolean
         darkMode:
+          type: boolean
+    AlterUser:
+      properties:
+        bio:
+          type: string
+        publishEmail:
+          type: boolean
+        admin:
+          type: boolean
+        moderator:
           type: boolean
     NewStory:
       required:

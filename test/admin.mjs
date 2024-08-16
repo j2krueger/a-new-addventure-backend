@@ -622,12 +622,12 @@ describe('Test the admin routes', function () {
             let lockedUserId, unlockedUserId;
 
             before('Set up users for lock testing', async function () {
-                const res = await agent.post('/register')
+                const unlockedUserRes = await agent.post('/register')
                     .send({ userName: 'unlocked' + newUserName, email: 'unlocked' + newEmail, password: newPassword });
-                unlockedUserId = res.body.userId;
-                const res2 = await agent.post('/register')
+                unlockedUserId = unlockedUserRes.body.userId;
+                const lockedUserRes = await agent.post('/register')
                     .send({ userName: 'locked' + newUserName, email: 'locked' + newEmail, password: newPassword });
-                lockedUserId = res2.body.userId;
+                lockedUserId = lockedUserRes.body.userId;
             });
 
             beforeEach('Make sure each user is in the correct state before each test', async function () {
@@ -688,6 +688,122 @@ describe('Test the admin routes', function () {
 
                         expect(res).to.have.status(409);
                         expect(res.body).to.deep.equal({ error: "That user is not locked." });
+                    });
+                });
+            });
+        });
+
+        describe('Test the PUT /admin/user/:userId route', function () {
+            let testUserId, testAdminId;
+
+            before('Setup users for testing PUT /admin/user/:userId route', async function () {
+                const testUserRes = await agent.post('/register')
+                    .send({ userName: 'testUser' + newUserName, email: 'testUser' + newEmail, password: newPassword });
+                testUserId = testUserRes.body.userId;
+                const testAdminRes = await agent.post('/register')
+                    .send({ userName: 'testAdmin' + newUserName, email: 'testAdmin' + newEmail, password: newPassword });
+                testAdminId = testAdminRes.body.userId;
+            });
+
+            beforeEach('Make sure the test users are in a consistent state before each test', async function () {
+                let testUser = await User.findById(testUserId);
+                testUser.admin = false;
+                testUser.bio = "Red";
+                testUser.publishEmail = true;
+                await testUser.save();
+                let testAdmin = await User.findById(testAdminId);
+                testAdmin.admin = true;
+                await testAdmin.save();
+            });
+
+            after('Teardown test users', async function () {
+                await User.findByIdAndDelete(testUserId);
+                await User.findByIdAndDelete(testAdminId);
+            })
+
+            describe('Happy paths', function () {
+                describe('Login as admin and PUT { admin: true }', function () {
+                    it('should return a 200 status and user.privateProfile() and set the user\'s admin field to true', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.put('/admin/user/' + testUserId).send({ admin: true });
+                        const user = await User.findById(testUserId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal(JSON.parse(JSON.stringify(user.privateProfile())));
+                        expect(user.admin).to.be.true;
+                    });
+                });
+
+                describe('Login as admin and PUT { admin: false }', function () {
+                    it('should return a 200 status and user.privateProfile() and set the user\'s admin field to false', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.put('/admin/user/' + testAdminId).send({ admin: false });
+                        const user = await User.findById(testAdminId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal(JSON.parse(JSON.stringify(user.privateProfile())));
+                        expect(user.admin).to.be.false;
+                    });
+                });
+
+                describe('Login as admin and PUT { bio: "Blue" }', function () {
+                    it('should return a 200 status and user.privateProfile() and set the user\'s bio to "Blue"', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.put('/admin/user/' + testUserId).send({ bio: "Blue" });
+                        const user = await User.findById(testUserId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal(JSON.parse(JSON.stringify(user.privateProfile())));
+                        expect(user.bio).to.deep.equal("Blue");
+                    });
+                });
+
+                describe('Login as admin and PUT { publishEmail: false }', function () {
+                    it('should return a 200 status and user.privateProfile() and set the user\'s publishEmail to false', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.put('/admin/user/' + testUserId).send({ publishEmail: false });
+                        const user = await User.findById(testUserId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal(JSON.parse(JSON.stringify(user.privateProfile())));
+                        expect(user.publishEmail).to.be.false;
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Logout and PUT /admin/user/:userId with { admin: true }', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.put('/admin/user/' + testUserId).send({ admin: true });
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as non-admin and PUT /admin/user/:userId with { admin: true }', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.put('/admin/user/' + testUserId).send({ admin: true });
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as admin and PUT /admin/user/:userId with { admin: "true" }', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.put('/admin/user/' + testUserId).send({ admin: "true" });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Invalid request." });
                     });
                 });
             });

@@ -171,7 +171,7 @@ userSchema.methods.basicInfo = function basicInfo() {
 }
 
 
-const userSetable = {
+const userSettable = {
   bio: "string",
   publishEmail: "boolean",
   darkMode: "boolean",
@@ -179,7 +179,26 @@ const userSetable = {
 
 userSchema.methods.applySettings = async function applySettings(settings) {
   for (const key in settings) {
-    if (!(key in userSetable && typeof settings[key] == userSetable[key])) {
+    if (!(key in userSettable && typeof settings[key] == userSettable[key])) {
+      throw new Error("Invalid request.");
+    }
+  }
+  for (const key in settings) {
+    this[key] = settings[key];
+  }
+  return (await this.save());
+}
+
+const adminSettable = {
+  admin: "boolean",
+  moderator: "boolean",
+  bio: "string",
+  publishEmail: "boolean",
+}
+
+userSchema.methods.adminApplySettings = async function adminApplySettings(settings) {
+  for (const key in settings) {
+    if (!(key in adminSettable && typeof settings[key] == adminSettable[key])) {
       throw new Error("Invalid request.");
     }
   }

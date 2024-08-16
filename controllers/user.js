@@ -134,11 +134,11 @@ async function putProfile(req, res, next) {
         const result = await req.authenticatedUser.applySettings(req.body);
         req.session.user = result;
         res.status(200).json(result.privateProfile());
-    } catch (err) {
-        if (err.message == "Invalid request.") {
-            return res.status(400).json({ error: err.message });
+    } catch (error) {
+        if (error.message == "Invalid request.") {
+            return res.status(400).json({ error: error.message });
         } else {
-            next(err);
+            next(error);
         }
     }
 }
@@ -203,6 +203,19 @@ async function unlockUser(req, res, next) {
     }
 }
 
+async function alterUser(req, res, next) {
+    try {
+        req.foundUserById = await req.foundUserById.adminApplySettings(req.body);
+        return res.status(200).json(req.foundUserById.privateProfile());
+    } catch (error) {
+        if (error.message == "Invalid request.") {
+            return res.status(400).json({ error: error.message });
+        } else {
+            next(error);
+        }
+    }
+}
+
 module.exports = {
     paramUserId,
     registerUser,
@@ -216,4 +229,5 @@ module.exports = {
     unFollowUser,
     lockUser,
     unlockUser,
+    alterUser,
 };
