@@ -1611,7 +1611,58 @@ paths:
         default:
           description: Default error sample response
   /admin/user/{userId}:
-    summary: Alter a user
+    summary: Examine or alter a user's information
+    get:
+      tags:
+        - Admin
+        - User
+      summary: Examine a user's information
+      description: "Return the document from the users collection with the given userId"
+      operationId: examine_user
+      parameters:
+        - name: userId
+          in: path
+          description: the ID of the user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: "Successfully retrieved user document."
+          content:
+            application/json:
+              example:
+                {
+                  "_id": "668ee23ce1dcd980cf0739f9",
+                  "userName": "FreddyQuaoar",
+                  "email": "FreddyQuaoar@example.com",
+                  "passwordHash": "$2b$10$Bl2UBfX1bgDx0gV9IOesp.tPhNR5fRE1v/jHHn/RkUyoWQweVtJSu",
+                  "admin": false,
+                  "moderator": true,
+                  "bio": "I haven't decided what to put in my bio yet.",
+                  "publishEmail": false,
+                  "darkMode": false,
+                  "__v": 0,
+                  "locked": false,
+                  "publishedEntries": [],
+                  "followedAuthors": [],
+                  "likedEntries": [],
+                  "bookmarkedEntries": [],
+                  "id": "668ee23ce1dcd980cf0739f9",
+                }
+        "400":
+          description: Invalid request.
+          content:
+            application/json:
+              example: { "error": "That is not a properly formatted userId." }
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              example: { error: "There is no user with that userId." }
+        default:
+          description: Default error sample response
     put:
       tags:
         - Admin

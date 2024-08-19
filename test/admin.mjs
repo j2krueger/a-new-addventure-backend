@@ -16,7 +16,7 @@ const {
     adminLogin,
     testStory,
     testEntry,
-    // newUserPrivateProfile,
+    newUserPrivateProfile,
     // newUserPublicInfo,
     // newUserBasicInfo,
     // summaryKeys,
@@ -688,6 +688,44 @@ describe('Test the admin routes', function () {
 
                         expect(res).to.have.status(409);
                         expect(res.body).to.deep.equal({ error: "That user is not locked." });
+                    });
+                });
+            });
+        });
+
+        describe('Test the GET /admin/user/:userId route', function () {
+            describe('Happy paths', function () {
+                describe('Login as admin and GET /admin/user/:userId', function () {
+                    it('should return a 200 status and return the user\'s entire database document', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.get('/admin/user/' + newUserPrivateProfile().userId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body.locked).to.be.false;
+                        expect(res.body._id).to.deep.equal(newUserPrivateProfile().userId)
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Logout and GET /admin/user/:userId', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.get('/admin/user/' + newUserPrivateProfile().userId);
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as non-admin and GET /admin/user/:userId', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.get('/admin/user/' + newUserPrivateProfile().userId);
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
                 });
             });

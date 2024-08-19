@@ -33,6 +33,7 @@ router.put('/admin/message/:messageId', miscControllers.putMessage);
 router.delete('/admin/message/:messageId', miscControllers.deleteMessage);
 router.post('/admin/user/:userId/lock', userControllers.lockUser);
 router.delete('/admin/user/:userId/lock', userControllers.unlockUser);
+router.get('/admin/user/:userId', userControllers.adminGetUser);
 router.put('/admin/user/:userId', userControllers.alterUser);
 
 // user related routes

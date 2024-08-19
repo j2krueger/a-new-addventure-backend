@@ -203,6 +203,10 @@ async function unlockUser(req, res, next) {
     }
 }
 
+async function adminGetUser(req, res) {
+    res.status(200).json(req.foundUserById);
+}
+
 async function alterUser(req, res, next) {
     try {
         req.foundUserById = await req.foundUserById.adminApplySettings(req.body);
@@ -229,5 +233,6 @@ module.exports = {
     unFollowUser,
     lockUser,
     unlockUser,
+    adminGetUser,
     alterUser,
 };
