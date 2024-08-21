@@ -545,13 +545,13 @@ paths:
           name: regex
           schema:
             type: string
-          description: "A regular expression, only entries that match regexp in one of the fields specified in 'fields' will be returned"
+          description: "A regular expression, only entries that match regex in one of the fields specified in 'fields' will be returned"
         - in: query
           name: fields
           schema:
             type: string
           description:
-            "a string containing letters specifying fields in which to look for matches of 'regexp' with the following\
+            "a string containing letters specifying fields in which to look for matches of 'regex' with the following\
             \ correspondence: s: storyTitle, e: entryTitle, a: authorName, b: bodyText. If 'fields' is not specified,\
             \ it defaults to 'seab'"
         - in: query
@@ -582,37 +582,43 @@ paths:
               example:
                 [
                   {
-                    "storyId": "6688142fb004b799a5a29d03",
-                    "entryId": "6688142fb004b799a5a29d03",
-                    "storyTitle": "Random Title",
+                    "storyId": "6695b2573550c66db1ab9106",
+                    "entryId": "66a7fd2095206fecbb52c189",
+                    "storyTitle": "In the beginning...",
+                    "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                    "authorName": "Freddy",
+                    "authorId": "668490250029a28118a8d1be",
+                    "previousEntry": "6695b2573550c66db1ab9106",
+                    "keywords": [],
+                    "likes": 0,
+                    "likedByUser": false,
+                    "bookmarkedByUser": true,
+                  },
+                  {
+                    "storyId": "66c6570904c7e9974e060273",
+                    "entryId": "66c6570904c7e9974e060273",
+                    "storyTitle": "In the beginnning...",
                     "entryTitle": null,
                     "authorName": "Freddy",
                     "authorId": "668490250029a28118a8d1be",
                     "previousEntry": null,
+                    "keywords": ["drama", "sad"],
                     "likes": 0,
                     "likedByUser": false,
+                    "bookmarkedByUser": false,
                   },
                   {
-                    "storyId": "6688142fb004b799a5a29d03",
-                    "entryId": "668820191cb99dfdc244c23c",
-                    "storyTitle": "Random Title",
-                    "entryTitle": "Chapter the first",
+                    "storyId": "66c6570904c7e9974e060273",
+                    "entryId": "66c6578d04c7e9974e060287",
+                    "storyTitle": "In the beginnning...",
+                    "entryTitle": "In the beginnning...",
                     "authorName": "Freddy",
                     "authorId": "668490250029a28118a8d1be",
-                    "previousEntry": "6688142fb004b799a5a29d03",
+                    "previousEntry": "66c6570904c7e9974e060273",
+                    "keywords": ["drama", "sad"],
                     "likes": 0,
                     "likedByUser": false,
-                  },
-                  {
-                    "storyId": "66a5a2ab375bbb2298ff7420",
-                    "entryId": "66a5a2ab375bbb2298ff7420",
-                    "storyTitle": "7th newest ",
-                    "entryTitle": null,
-                    "authorName": "apmanager",
-                    "authorId": "667b294248b8805d71a96a03",
-                    "previousEntry": null,
-                    "likes": 1,
-                    "likedByUser": true,
+                    "bookmarkedByUser": false,
                   },
                 ]
         default:
@@ -634,6 +640,7 @@ paths:
               {
                 "storyTitle": "Random Title",
                 "bodyText": "Genji no monogatari",
+                "keywords": ["drama", "sad"],
               }
       responses:
         "201":
@@ -642,16 +649,17 @@ paths:
             application/json:
               example:
                 {
-                  "storyId": "66ba234d47197cfda2cca67f",
-                  "entryId": "66ba234d47197cfda2cca67f",
+                  "storyId": "66c6570904c7e9974e060273",
+                  "entryId": "66c6570904c7e9974e060273",
                   "storyTitle": "In the beginnning...",
                   "entryTitle": null,
                   "authorName": "Freddy",
                   "authorId": "668490250029a28118a8d1be",
                   "bodyText": "testkurmdlqazsvnepyhs",
                   "previousEntry": null,
+                  "createDate": "2024-08-21T21:07:21.032Z",
+                  "keywords": ["drama", "sad"],
                   "likes": 0,
-                  "createDate": "2024-08-12T14:59:25.128Z",
                 }
         "400":
           description: "Bad request."
@@ -662,6 +670,8 @@ paths:
                   value: { "error": "Missing story title." }
                 missingBodyText:
                   value: { "error": "Missing story text." }
+                badKeywords:
+                  value: { "error": "keywords must be an array of strings." }
         default:
           description: Default error sample response
   /entry/{entryId}:
@@ -687,6 +697,7 @@ paths:
             application/json:
               example:
                 {
+                  "storyId": "6688142fb004b799a5a29d03",
                   "entryId": "6688142fb004b799a5a29d03",
                   "authorName": "Freddy",
                   "authorId": "668490250029a28118a8d1be",
@@ -694,11 +705,11 @@ paths:
                   "storyTitle": "Random Title",
                   "bodyText": "Genji no monogatari",
                   "previousEntry": null,
-                  "flagId": null,
+                  "createDate": "2024-07-05T15:41:35.510Z",
+                  "keywords": ["sad"],
                   "likes": 0,
                   "likedByUser": false,
-                  "createDate": "2024-07-05T15:41:35.510Z",
-                  "storyId": "6688142fb004b799a5a29d03",
+                  "bookmarkedByUser": false,
                   "continuationEntries":
                     [
                       {
@@ -708,7 +719,7 @@ paths:
                         "entryTitle": "Chapter the first",
                         "authorName": "Freddy",
                         "previousEntry": "6688142fb004b799a5a29d03",
-                        "likes": 0,
+                        "keywords": ["happy", "cat"],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -717,7 +728,7 @@ paths:
                         "entryTitle": "adding to this entries list of sub entries",
                         "authorName": "apmanager",
                         "previousEntry": "6688142fb004b799a5a29d03",
-                        "likes": 0,
+                        "keywords": [],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -726,34 +737,7 @@ paths:
                         "entryTitle": "adding another to list of entries",
                         "authorName": "apmanager",
                         "previousEntry": "6688142fb004b799a5a29d03",
-                        "likes": 0,
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668c47eae0989ccd9cd6ecc8",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "today is today",
-                        "authorName": "apmanager",
-                        "previousEntry": "6688142fb004b799a5a29d03",
-                        "likes": 0,
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668d51e61be56166aaaa6cc2",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "Suddenly, a wild accountant appears!",
-                        "authorName": "Freddy",
-                        "previousEntry": "6688142fb004b799a5a29d03",
-                        "likes": 0,
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "66a5a060375bbb2298ff7353",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "sixth title",
-                        "authorName": "apmanager",
-                        "previousEntry": "6688142fb004b799a5a29d03",
-                        "likes": 0,
+                        "keywords": [],
                       },
                     ],
                 }
@@ -786,6 +770,7 @@ paths:
               {
                 "entryTitle": "Random Title",
                 "bodyText": "Genji no monogatari",
+                "keywords": ["drama", "sad"],
               }
       responses:
         "201":
@@ -794,17 +779,17 @@ paths:
             application/json:
               example:
                 {
+                  "storyId": "66c6570904c7e9974e060273",
+                  "entryId": "66c6578d04c7e9974e060287",
+                  "storyTitle": "In the beginnning...",
+                  "entryTitle": "In the beginnning...",
                   "authorName": "Freddy",
-                  "entryTitle": "Chapter the zeroeth",
-                  "storyTitle": "Random Title",
-                  "bodyText": "Genji no monogatari",
-                  "previousEntry": null,
-                  "flagId": null,
+                  "authorId": "668490250029a28118a8d1be",
+                  "bodyText": "testkurmdlqazsvnepyhs",
+                  "previousEntry": "66c6570904c7e9974e060273",
+                  "createDate": "2024-08-21T21:09:33.232Z",
+                  "keywords": ["drama", "sad"],
                   "likes": 0,
-                  "_id": "6688142fb004b799a5a29d03",
-                  "createDate": "2024-07-05T15:41:35.510Z",
-                  "storyId": "6688142fb004b799a5a29d03",
-                  "__v": 0,
                 }
         "400":
           description: "Bad request."
@@ -815,6 +800,8 @@ paths:
                   value: { "error": "Missing entry title." }
                 missingBodyText:
                   value: { "error": "Missing story text." }
+                badKeywords:
+                  value: { "error": "keywords must be an array of strings." }
         default:
           description: Default error sample response
   /entry/{entryId}/like:
@@ -1020,57 +1007,19 @@ paths:
                   value: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
-  /entry/{entryId}/keyword/{keyword}:
-    summary: GET/POST/DELETE keywords
-    get:
+  /entry/{entryId}/keyword:
+    summary: PUT/DELETE keywords
+    put:
       tags:
         - Entry
         - Keyword
-      summary: Get list of keywords on entry.
-      description:
-        "Gets a list of the keywords applied to the entry. Special keywords\
-        \ first, then non-special inherited keywords, then non-special non-inherited\
-        \ keywords."
-      operationId: get_keywords
+      summary: Apply new keywords to an entry
+      description: "Adds one or more keywords to an existing entry. Only the post's author can use this route."
+      operationId: put_new_keywords
       parameters:
         - name: entryId
           in: path
           description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-        - name: keyword
-          in: path
-          description: a keyword
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      responses:
-        default:
-          description: Default error sample response
-    post:
-      tags:
-        - Entry
-        - Keyword
-      summary: Post new keywords to an entry
-      description:
-        "Posts one or more keywords to be applied to an existing entry.\
-        \ Admins, mods, and creating author get their new keywords automatically applied,\
-        \ anyone else gets their keywords submitted to a mod queue."
-      operationId: post_new_keywords
-      parameters:
-        - name: entryId
-          in: path
-          description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-        - name: keyword
-          in: path
-          description: a keyword
           required: true
           style: simple
           explode: false
@@ -1084,21 +1033,12 @@ paths:
         - Keyword
       summary: Delete keywords from an entry.
       description:
-        "If given keywords are not inherited, admins, mods, and the entry\
-        \ creator get the keyword deleted immediately, anyone else gets keyword deletion\
-        \ request submitted to mod queue."
+        "Delete one or more keywords from an entry. Only the entry's author can use this route."
       operationId: delete_keywords
       parameters:
         - name: entryId
           in: path
           description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-        - name: keyword
-          in: path
-          description: a keyword
           required: true
           style: simple
           explode: false
@@ -1860,15 +1800,19 @@ paths:
         default:
           description: Default error sample response
   /keywords:
-    summary: GET a list of defined keywords
+    summary: GET a list of keywords in use and their counts.
     get:
+      parameters:
+        - in: query
+          name: regex
+          schema:
+            type: string
+          description: "An optional regular expression, only matching keywords will be returned"
       tags:
         - Keyword
         - Search
       summary: Get a list of defined keywords
-      description:
-        "Get a list of all used keywords, sorted alphabetically or by use\
-        \ count. If a query string is used, return only matching keywords."
+      description: "Get a list of all used keywords, sorted by number of occurences. If a query string is used, return only matching keywords."
       operationId: get_keyword_list
       responses:
         "200":
@@ -1878,14 +1822,18 @@ paths:
               examples:
                 registered:
                   value:
-                    { "keywords": ["NSFW", "GORE", "SEX", "FF:Sailor Moon"] }
+                    [
+                      { "keyword": "kitten", "count": 1729 },
+                      { "keyword": "cat", "count": 97 },
+                      { "keyword": "dog", "count": 12 },
+                    ]
         "404":
           description: "No matching keywords found."
           content:
             application/json:
               examples:
                 registered:
-                  value: { "keywords": [] }
+                  value: { "error": "No matching keywords found." }
         default:
           description: Default error sample response
 components:
@@ -1938,6 +1886,10 @@ components:
           type: string
         bodyText:
           type: string
+        keywords:
+          type: array
+          items:
+            type: string
     ContinueStory:
       required:
         - entryTitle
@@ -1947,6 +1899,10 @@ components:
           type: string
         bodyText:
           type: string
+        keywords:
+          type: array
+          items:
+            type: string
     Message:
       required:
         - messageText

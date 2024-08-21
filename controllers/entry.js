@@ -181,12 +181,22 @@ async function getFlagList(req, res, next) {
 }
 
 async function createStory(req, res) {
-  const { storyTitle, bodyText, } = req.body;
+  const { storyTitle, bodyText, keywords, } = req.body;
 
   if (typeof storyTitle != 'string') {
     return res.status(400).json({ error: "Missing story title." });
   } else if (typeof bodyText != 'string') {
     return res.status(400).json({ error: "Missing story text." });
+  }
+  if (keywords) {
+    if (!Array.isArray(keywords)) {
+      return res.status(400).json({ error: "keywords must be an array of strings." });
+    }
+    for (const keyword of keywords) {
+      if (typeof keyword != "string") {
+        return res.status(400).json({ error: "keywords must be an array of strings." });
+      }
+    }
   }
 
   try {
@@ -195,6 +205,7 @@ async function createStory(req, res) {
       bodyText,
       previousEntry: null,
       authorName: req.authenticatedUser.userName,
+      keywords,
     });
     await entry.saveNewStory();
 
@@ -205,11 +216,22 @@ async function createStory(req, res) {
 }
 
 async function continueStory(req, res) {
-  const { bodyText, entryTitle, } = req.body;
+  const { bodyText, entryTitle, keywords, } = req.body;
+
   if (typeof bodyText != 'string') {
     return res.status(400).json({ error: "Missing story text." });
   } else if (typeof entryTitle != 'string') {
     return res.status(400).json({ error: "Missing entry title." });
+  }
+  if (keywords) {
+    if (!Array.isArray(keywords)) {
+      return res.status(400).json({ error: "keywords must be an array of strings." });
+    }
+    for (const keyword of keywords) {
+      if (typeof keyword != "string") {
+        return res.status(400).json({ error: "keywords must be an array of strings." });
+      }
+    }
   }
 
   try {
@@ -218,6 +240,7 @@ async function continueStory(req, res) {
       entryTitle,
       authorName: req.authenticatedUser.userName,
       previousEntry: req.foundEntryById._id,
+      keywords,
     })
     await entry.saveContinuationEntry(req.foundEntryById);
 
@@ -305,6 +328,36 @@ async function unBookmarkEntry(req, res, next) {
   }
 }
 
+async function getKeywordList(req, res, next) {
+  try {
+    const { regex } = req.query;
+    const query = regex ? { $match: { keywords: { $regex: regex, $options: 'i' } } } : null;
+    const result = await Entry.aggregate([
+      {
+        $match: {
+          keywords: { $not: { $size: 0 } },
+        }
+      },
+      { $unwind: "$keywords" },
+      query,
+      {
+        $group: {
+          _id: '$keywords',
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 100 },
+    ].filter(stage => stage != undefined && stage != null));
+    if (result.length == 0) {
+      return res.status(404).json({ error: "No matching keywords found." })
+    }
+    return res.status(200).json(result.map(x => { return { keyword: x._id, count: x.count } }));
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   paramEntryId,
   paramFlagId,
@@ -321,4 +374,5 @@ module.exports = {
   deleteEntryById,
   deleteFlag,
   getFlagList,
+  getKeywordList,
 }

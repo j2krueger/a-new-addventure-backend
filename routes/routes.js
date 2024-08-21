@@ -1,7 +1,7 @@
 "use strict";
 
 const constants = require('../helpers/constants');
-const { lockedUserAuth, userAuth, adminAuth } = require('../helpers/auth');
+const { userAuth, unlockedUserAuth, adminAuth } = require('../helpers/auth');
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
@@ -43,23 +43,24 @@ router.post('/logout', userControllers.logoutUser);
 router.get('/user', userControllers.getUser);
 router.get('/user/:userId', userControllers.getUserInfoById);
 // authorized user related routes
-router.post('/user/:userId/follow', lockedUserAuth, userControllers.followUser);
-router.delete('/user/:userId/follow', lockedUserAuth, userControllers.unFollowUser);
-router.get('/profile', lockedUserAuth, userControllers.getProfile);
-router.put('/profile', lockedUserAuth, userControllers.putProfile)
+router.post('/user/:userId/follow', userAuth, userControllers.followUser);
+router.delete('/user/:userId/follow', userAuth, userControllers.unFollowUser);
+router.get('/profile', userAuth, userControllers.getProfile);
+router.put('/profile', userAuth, userControllers.putProfile)
 
 // unauthorized entry routes
 router.get('/entry', entryControllers.getEntryList);
 router.get('/entry/:entryId', entryControllers.getEntryById);
 router.post('/entry/:entryId/flag', entryControllers.flagEntry);
 router.get('/chain/:entryId', entryControllers.getChainById);
+router.get('/keyword', entryControllers.getKeywordList);
 // authorized entry related routes
-router.post('/entry', userAuth, entryControllers.createStory);
-router.post('/entry/:entryId', userAuth, entryControllers.continueStory);
-router.post('/entry/:entryId/like', lockedUserAuth, entryControllers.likeEntry);
-router.delete('/entry/:entryId/like', lockedUserAuth, entryControllers.unLikeEntry);
-router.post('/entry/:entryId/bookmark', lockedUserAuth, entryControllers.bookmarkEntry);
-router.delete('/entry/:entryId/bookmark', lockedUserAuth, entryControllers.unBookmarkEntry);
+router.post('/entry', unlockedUserAuth, entryControllers.createStory);
+router.post('/entry/:entryId', unlockedUserAuth, entryControllers.continueStory);
+router.post('/entry/:entryId/like', userAuth, entryControllers.likeEntry);
+router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
+router.post('/entry/:entryId/bookmark', userAuth, entryControllers.bookmarkEntry);
+router.delete('/entry/:entryId/bookmark', userAuth, entryControllers.unBookmarkEntry);
 
 // miscelaneous routes
 router.post('/message', miscControllers.postMessage);

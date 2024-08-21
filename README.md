@@ -122,16 +122,14 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 
 ## Software tools/libraries:
 - "use strict";
-- node/npm
 - git/github
+- node/npm
 - MongoDB
 - express
 - bcrypt
 - sessions
 - eslint
-- validator.js
-- passport(password, oauth)
-- mocha/chai
+- mocha/chai/chai-http
 - helmet
 
 
@@ -174,135 +172,83 @@ collection: likes
 	entry: "hashed"
 }
 
-Table users {
-  userId integer [primary key]
-  userName integer
-  email integer
-  password varchar
-  bio varchar
-}
-REF: users.username < entry.authorName
-
-Table entry {
-  entryId integer [primary key]
-  storyId integer
-  authorName varchar 
-  entryTitle varchar
-  storyTitle varchar
-  bodyText varchar
-  previousEntry integer
-  createdDate timestamp
-  flagId integer
-  likes integer
+collection users: {
+  _id: ObjectId,
+  userName: String,
+  email: String,
+  passwordHash: String,
+  admin: Boolean,
+  moderator: Boolean,
+  locked: Boolean,
+  bio: String,
+  publishEmail: Boolean,
+  darkMode: Boolean,
 }
 
-REF: entry.storyId > story.storyId
-REF: entry.storyTitle > story.storyTitle
-REF: entry.flagId > flagEntry.flagId
-REF: entry.entryId > flagEntry.entryId
-
-Table userRating {
-  userId integer
-  entryId integer
-  rating integer 
-    
+collection entries: {
+  _id: ObjectId,
+  storyId: ObjectId,	// references collection entries
+  authorName: String,
+  entryTitle: String,
+  storyTitle: String,
+  bodyText: String,
+  previousEntry: ObjectId,	// references collection entries
+  createDate: Date,
 }
 
-REF: users.userId < userRating.userId
-REF: entry.entryId < userRating.entryId
-
-Table flagEntry {
-  flagId integer
-  entryId integer
-  reason varchar
+collection bookmarks: {
+	_id: ObjectId,
+	user: ObjectId,	// references collection users
+	entry: ObjectId,	// references collection entries
+	createDate: Date,
 }
 
-Table story {
-  storyId integer [primary key]
-  storyTitle varchar
-  originEntry integer
+collection flags: {
+	_id: ObjectId,
+	user: ObjectId,	// references collection users
+	entry: ObjectId,	// references collection entries
+	reason: String,
+	createDate: Date,
 }
 
-Table userBlock {
-  userBlockId integer
-  userId interger
-  blockedUserId integer
+collection follows: {
+	_id: ObjectId,
+	follower: ObjectId,	// references collection users
+	following: ObjectId,	// references collection users
 }
-REF: users.userId < userBlock.userId
-REF: users.userId < userBlock.blockedUserId
+
+collection likes: {
+	_id: ObjectId,
+	user: ObjectId,	// references collection users
+	entry: ObjectId,	// references collection entries
+}
+
+collection messages: {
+	_id: ObjectId,
+	name: String,
+	email: String,
+	messageText: String,
+	createDate: Date,
+	verified: Boolean,
+	read: Boolean,
+}
+
+
+sessions - managed entirely by express-session
 
 ---
-## Old Database schemas (hang on to it until we're sure we don't need it):
-### story schema
-- id: int;
-- title: text
 
-### entry schema:
-- id: int;
-- parent_id: int; null if root of new story
-- author_id: int
-- story_id: int; mandatory/inherited
-- branch_title: text; default/inherited, can be changed
-- entry_title: text; string
-- keywords -- mandatory/inherited?, can add more
-- choice_text: text; Mandatory where not a new story
-- body_text: text; plain text? markdown? html? bbcode?
-- likes: int
-- dislikes: int
+Changes to implement keywords/keyword search
 
-
-### user schema:
-_id: int
-userName: string
-email: string
-admin: boolean
-moderator: boolean
-profile: {
-	public: {
-		bio: "I like trains."
-	},
-	publishEmail: false,
-	blockedKeywords: [],
-	blockedAuthors: [],
-	followedAuthors: [],
-	followedStories: [],
-	likes: [],
-	dislikes: [],
-	darkMode: boolean,
+additional field 'keywords' in collection entries:
+collection entries: {
+  _id: ObjectId,
+  storyId: ObjectId,	// references collection entries
+  authorName: String,
+  entryTitle: String,
+  storyTitle: String,
+  bodyText: String,
+  previousEntry: ObjectId,	// references collection entries
+  keywords: [String],	// New field, needs multikey index <=========================
+  createDate: Date,
 }
-//- consecutive_login_failures: int; reset to 0 on successful login
-//- last_login_fail: timestamp; if n login fails, wait n seconds before allowing another login attempt, if it's been less than n seconds since the last login attempt, don't even check against the stored hash, just increment failure count and update timestamp (replace with next_allowed_login_attempt?)
-
-### user_ratings schema:
- - user_id: int
- - entry_id: int
- - rating: int ; can only be +1, 0, -1
-
-### entry_comment schema
-- id: int
-- entry_id: int
-- user_id: int
-- date_time: timestamp
-- body: text
-
-### keyword schema
-- id: int
-- keyword: text
-- alias_of: int ; id of null if not an alias
-- implies: int ; consider allowing for multiple implications
-
-### entries_keywords schema
-- keyword_id: int
-- entry_id: int
-
-### user_blocked_keywords schema
-- keyword_id: int
-- user_id: int
-
-### flag_queue schema
- - id: int
- - entry_id: int
- - entry_comment_id: int
- - keyword_id: int
- - reason: text
-

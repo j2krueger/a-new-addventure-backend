@@ -33,6 +33,10 @@ const entrySchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    keywords: {
+        type: [String],
+        default: [],
+    },
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -137,6 +141,7 @@ entrySchema.methods.summary = function summary() {
         authorName: this.authorName,
         authorId: this.authorId,
         previousEntry: this.previousEntry,
+        keywords: this.keywords,
         likes: this.likes,
         likedByUser: this.likedByUser,
         bookmarkedByUser: this.bookmarkedByUser,
@@ -153,15 +158,17 @@ entrySchema.methods.fullInfo = async function fullInfo() {
         authorId: this.authorId,
         bodyText: this.bodyText,
         previousEntry: this.previousEntry,
+        createDate: this.createDate,
+        keywords: this.keywords,
         likes: this.likes,
         likedByUser: this.likedByUser,
         bookmarkedByUser: this.bookmarkedByUser,
-        createDate: this.createDate,
     };
 }
 
 entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithContinuations() {
     return {
+        storyId: this.storyId,
         entryId: this._id,
         authorName: this.authorName,
         authorId: this.authorId,
@@ -169,11 +176,11 @@ entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithConti
         storyTitle: this.storyTitle,
         bodyText: this.bodyText,
         previousEntry: this.previousEntry,
+        createDate: this.createDate,
+        keywords: this.keywords,
         likes: this.likes,
         likedByUser: this.likedByUser,
         bookmarkedByUser: this.bookmarkedByUser,
-        createDate: this.createDate,
-        storyId: this.storyId,
         continuationEntries: this.continuationEntries,
     };
 }

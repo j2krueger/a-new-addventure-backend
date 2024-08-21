@@ -21,13 +21,13 @@ const newEmail = newUserName + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();
 const testUserLogin = { name: newUserName, password: newPassword };
 const adminLogin = { name: "Freddy", password: constants.adminPassword };
-const testStory = { storyTitle: testString, bodyText: testString };
-const testEntry = { entryTitle: testString + "1", bodyText: testString + "2" };
+const testStory = { storyTitle: testString, bodyText: testString, keywords: ["testStory", testString, newUserName] };
+const testEntry = { entryTitle: testString + "1", bodyText: testString + "2", keywords: ["testEntry", testString, newUserName] };
 let _newUserPrivateProfile;
 let _newUserPublicInfo;
 let _newUserBasicInfo;
 
-const summaryKeys = ['storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry', 'likes']
+const summaryKeys = ['storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry', 'likes', 'keywords'];
 
 function populateUserInfo(newUser) {
     _newUserPrivateProfile = JSON.parse(JSON.stringify(newUser));
@@ -44,12 +44,16 @@ function newUserPublicInfo() {
     return _newUserPublicInfo;
 }
 
+function newUserBasicInfo() {
+    return _newUserBasicInfo;
+}
+
 function expectMongoObjectId(object) {
     expect(object).to.be.a('string').that.matches(/^[0-9a-f]{24}$/);
 }
 
-function newUserBasicInfo() {
-    return _newUserBasicInfo;
+function deepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
 }
 
 export {
@@ -82,4 +86,5 @@ export {
     // functions
     populateUserInfo,
     expectMongoObjectId,
+    deepCopy,
 };

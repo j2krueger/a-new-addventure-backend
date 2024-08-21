@@ -31,6 +31,7 @@ const {
     // functions
     // populateUserInfo,
     expectMongoObjectId,
+    deepCopy,
 } = globals;
 
 describe('Test the entry handling routes', function () {
@@ -187,7 +188,7 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('GET /entry with search query string {regexp: "Freddy", fields: "w"}', function () {
+                describe('GET /entry with search query string {regex: "Freddy", fields: "w"}', function () {
                     it('should return a 400 status and an error message.', async function () {
                         const res = await agent.get('/entry').query({ regex: "Freddy", fields: "w" });
 
@@ -196,7 +197,7 @@ describe('Test the entry handling routes', function () {
                     });;
                 });
 
-                describe('GET /entry with search query string {regexp: "Freddy", fields: "aea"}', function () {
+                describe('GET /entry with search query string {regex: "Freddy", fields: "aea"}', function () {
                     it('should return a 400 status and an error message.', async function () {
                         const res = await agent.get('/entry').query({ regex: "Freddy", fields: "aea" });
 
@@ -461,21 +462,36 @@ describe('Test the entry handling routes', function () {
                     it('should return a 201 CREATED and the entry.fullInfo()', async function () {
                         await agent.post('/login').send(testUserLogin);
 
-                        const entryRes = await agent.post('/entry').send(testStory);
+                        const res = await agent.post('/entry').send(testStory);
 
-                        expect(entryRes).to.have.status(201);
-                        expectMongoObjectId(entryRes.body.storyId);
-                        expect(entryRes.body.entryId).to.deep.equal(entryRes.body.storyId);
-                        expect(entryRes.body.storyTitle).to.deep.equal(testStory.storyTitle);
-                        expect(entryRes.body.entryTitle).to.be.null;
-                        expect(entryRes.body.authorName).to.deep.equal(testUserLogin.name);
-                        expectMongoObjectId(entryRes.body.authorId);
-                        expect(entryRes.body.bodyText).to.deep.equal(testStory.bodyText);
-                        expect(entryRes.body.previousEntry).to.be.null;
-                        expect(entryRes.body.likes).to.deep.equal(0);
-                        expect(entryRes.body.createDate).to.be.a('string');
+                        expect(res).to.have.status(201);
+                        expectMongoObjectId(res.body.storyId);
+                        expect(res.body.entryId).to.deep.equal(res.body.storyId);
+                        expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                        expect(res.body.entryTitle).to.be.null;
+                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expectMongoObjectId(res.body.authorId);
+                        expect(res.body.bodyText).to.deep.equal(testStory.bodyText);
+                        expect(res.body.previousEntry).to.be.null;
+                        expect(res.body.likes).to.deep.equal(0);
+                        expect(res.body.createDate).to.be.a('string');
+                        expect(res.body.keywords).to.deep.equal(testStory.keywords);
 
-                        await Entry.findByIdAndDelete(entryRes.body.entryId);
+                        await Entry.findByIdAndDelete(res.body.entryId);
+                    });
+                });
+
+                describe('POST /entry with testStory but no keywords', function () {
+                    it('should return a keywords value of an empty array', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const testStoryNoKeywords = deepCopy(testStory);
+                        delete testStoryNoKeywords.keywords;
+
+                        const res = await agent.post('/entry').send(testStoryNoKeywords);
+
+                        expect(res.body.keywords).to.deep.equal([]);
+
+                        await Entry.findByIdAndDelete(res.body.entryId);
                     });
                 });
 
@@ -492,6 +508,7 @@ describe('Test the entry handling routes', function () {
                         expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
                         expect(res.body.publishedEntries[0].authorName).to.deep.equal(entryRes.body.authorName);
                         expect(res.body.publishedEntries[0].previousEntry).to.deep.equal(entryRes.body.previousEntry);
+                        expect(res.body.publishedEntries[0].keywords).to.deep.equal(entryRes.body.keywords);
 
                         await Entry.findByIdAndDelete(entryRes.body.entryId);
                     });
@@ -507,6 +524,7 @@ describe('Test the entry handling routes', function () {
                         expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
                         expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
                         expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+                        expect(res.body.publishedEntries[0].keywords).to.deep.equal(entryRes.body.keywords);
 
                         await Entry.findByIdAndDelete(entryRes.body.entryId);
                     });
@@ -545,6 +563,36 @@ describe('Test the entry handling routes', function () {
                         expect(res.body).to.deep.equal({ error: "Missing story title." });
                     });
                 });
+
+                describe('Post /entry with keywords defined to be something other than an array', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const testStoryBadKeywords = deepCopy(testStory);
+                        testStoryBadKeywords.keywords = "string";
+
+                        const res = await agent.post('/entry').send(testStoryBadKeywords);
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "keywords must be an array of strings." })
+
+                        await Entry.findByIdAndDelete(res.body.entryId);
+                    });
+                });
+
+                describe('Post /entry with keywords defined to be an array containing a non-string', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const testStoryBadKeywords = deepCopy(testStory);
+                        testStoryBadKeywords.keywords.push(1);
+
+                        const res = await agent.post('/entry').send(testStoryBadKeywords);
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "keywords must be an array of strings." })
+
+                        await Entry.findByIdAndDelete(res.body.entryId);
+                    });
+                });
             });
         });
 
@@ -568,6 +616,34 @@ describe('Test the entry handling routes', function () {
                         expect(res.body.previousEntry).to.deep.equal(storyRes.body.entryId);
                         expect(res.body.likes).to.deep.equal(0);
                         expect(res.body.createDate).to.be.a('string');
+                        expect(res.body.keywords).to.deep.equal(testEntry.keywords);
+
+                        await Entry.findByIdAndDelete(res.body.entryId);
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('POST /entry/:entryId with testEntry but no keywords', function () {
+                    it('should return a 201 status and the entry.fullInfo()', async function () {
+                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const testEntryNoKeywords = deepCopy(testEntry);
+                        delete testEntryNoKeywords.keywords;
+
+                        const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntryNoKeywords);
+
+                        expect(res).to.have.status(201);
+                        expectMongoObjectId(res.body.entryId);
+                        expect(res.body.storyId).to.deep.equal(storyRes.body.storyId);
+                        expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
+                        expect(res.body.entryTitle).to.deep.equal(testEntry.entryTitle);
+                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expect(res.body.authorId).to.deep.equal(loginRes.body.userId);
+                        expect(res.body.bodyText).to.deep.equal(testEntry.bodyText);
+                        expect(res.body.previousEntry).to.deep.equal(storyRes.body.entryId);
+                        expect(res.body.likes).to.deep.equal(0);
+                        expect(res.body.createDate).to.be.a('string');
+                        expect(res.body.keywords).to.deep.equal([]);
 
                         await Entry.findByIdAndDelete(res.body.entryId);
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
@@ -588,6 +664,7 @@ describe('Test the entry handling routes', function () {
                         expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
                         expect(res.body.publishedEntries[0].authorName).to.deep.equal(entryRes.body.authorName);
                         expect(res.body.publishedEntries[0].previouEntry).to.deep.equal(entryRes.body.previouEntry);
+                        expect(res.body.publishedEntries[0].keywords).to.deep.equal(entryRes.body.keywords);
 
                         await Entry.findByIdAndDelete(entryRes.body.entryId);
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
@@ -605,6 +682,7 @@ describe('Test the entry handling routes', function () {
                         expect(res.body.publishedEntries[0].entryId).to.deep.equal(entryRes.body.entryId);
                         expect(res.body.publishedEntries[0].storyTitle).to.deep.equal(entryRes.body.storyTitle);
                         expect(res.body.publishedEntries[0].entryTitle).to.deep.equal(entryRes.body.entryTitle);
+                        expect(res.body.publishedEntries[0].keywords).to.deep.equal(entryRes.body.keywords);
 
                         await Entry.findByIdAndDelete(entryRes.body.entryId);
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
@@ -650,6 +728,38 @@ describe('Test the entry handling routes', function () {
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Missing entry title." });
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('POST /entry/:entryId with keywords defined to be something other than an array', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const testEntryBadKeywords = deepCopy(testEntry);
+                        testEntryBadKeywords.keywords = "string";
+
+                        const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntryBadKeywords);
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "keywords must be an array of strings." });
+
+                        await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    });
+                });
+
+                describe('POST /entry/:entryId with keywords defined to be an array containing a non-string', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(testUserLogin);
+                        const storyRes = await agent.post('/entry').send(testStory);
+                        const testEntryBadKeywords = deepCopy(testEntry);
+                        testEntryBadKeywords.keywords.push(1);
+
+                        const res = await agent.post('/entry/' + storyRes.body.entryId).send(testEntryBadKeywords);
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "keywords must be an array of strings." });
 
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
                     });
@@ -1215,6 +1325,54 @@ describe('Test the entry handling routes', function () {
 
                     await Entry.findByIdAndDelete(storyRes3.body.entryId);
                     await Entry.findByIdAndDelete(storyRes2.body.entryId);
+                });
+            });
+        });
+    });
+
+    describe('Test the GET /keyword route', function () {
+        let story;
+
+        before('Setup entry for keyword testing', async function () {
+            await agent.post('/login').send(testUserLogin);
+            const storyRes = await agent.post('/entry').send(testStory);
+            story = storyRes.body;
+        });
+
+        after('Teardown entry for keyword testing', async function () {
+            await Entry.findByIdAndDelete(story.entryId);
+        });
+
+        describe('Happy paths', function () {
+            describe('GET /keyword', function () {
+                it('should return a 200 status and an array of keywords and their counts', async function () {
+                    const res = await agent.get('/keyword');
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.an('array').with.lengthOf.at.least(3);
+                });
+            });
+
+            describe('GET /keyword with a query: { regex: testString }', function () {
+                it('should return a 200 status and an array of keywords matching the regular expression, and their counts.', async function () {
+                    const res = await agent.get('/keyword').query({ regex: testString });
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.an('array').with.lengthOf.at.least(2);
+                    for (const keyword of res.body) {
+                        expect(keyword.keyword).to.match(new RegExp(testString));
+                    }
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('GET /keyword with a query string that doesn\'t match any keywords', function () {
+                it('should return a 404 status and an error message', async function () {
+                    const res = await agent.get('/keyword').query({ regex: testString + testString });
+
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.deep.equal({ error: "No matching keywords found." });
                 });
             });
         });

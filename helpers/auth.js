@@ -2,7 +2,7 @@
 
 const User = require('../models/user.js');
 
-async function lockedUserAuth(req, res, next) {
+async function userAuth(req, res, next) {
     if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
         return next()
     }
@@ -16,7 +16,7 @@ async function lockedUserAuth(req, res, next) {
     res.redirect('/login');
 }
 
-async function userAuth(req, res, next) {
+async function unlockedUserAuth(req, res, next) {
     if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
         return next()
     }
@@ -59,8 +59,8 @@ async function adminAuth(req, res, next) {
 }
 
 module.exports = {
-    lockedUserAuth,
     userAuth,
+    unlockedUserAuth,
     modAuth,
     adminAuth,
 };
