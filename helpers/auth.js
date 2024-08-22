@@ -30,6 +30,20 @@ async function unlockedUserAuth(req, res, next) {
     res.redirect('/login');
 }
 
+async function entryAuthorAuth(req, res, next) {
+    if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
+        return next()
+    }
+    if (req?.session?.user?._id) {
+        const user = await User.findByIdAndPopulate(req.session.user._id);
+        if (user && !user.locked && user.userName == req.foundEntryById.authorName) {
+            req.authenticatedUser = user;
+            return next();
+        }
+    }
+    res.redirect('/login');
+}
+
 async function modAuth(req, res, next) {
     if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
         return next()
@@ -61,6 +75,7 @@ async function adminAuth(req, res, next) {
 module.exports = {
     userAuth,
     unlockedUserAuth,
+    entryAuthorAuth,
     modAuth,
     adminAuth,
 };

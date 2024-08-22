@@ -760,6 +760,14 @@ paths:
       summary: Post a new story
       description: "Post the entry title and text of an entry to continue a story."
       operationId: continue_story
+      parameters:
+        - name: entryId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       requestBody:
         description: "Continue a story."
         content:
@@ -1003,7 +1011,8 @@ paths:
               examples:
                 notBookmarked:
                   value: { "error": "You don't have that entry bookmarked." }
-                missingEntry:
+
+                missingKeyword:
                   value: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
@@ -1024,7 +1033,35 @@ paths:
           style: simple
           explode: false
           schema: {}
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Keywords"
+            example: ["drama", "sad"]
       responses:
+        "200":
+          description: "Successfully added all keywords"
+          content:
+            application/json:
+              example: { "message": "Keywords successfully added." }
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                badEntryId:
+                  value:
+                    { "error": "That is not a properly formatted entryId." }
+                badKeywords:
+                  value:
+                    { "error": "Request body must be an array of strings." }
+        "404":
+          description: "Entry not found"
+          content:
+            application/json:
+              example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
     delete:
@@ -1032,8 +1069,7 @@ paths:
         - Entry
         - Keyword
       summary: Delete keywords from an entry.
-      description:
-        "Delete one or more keywords from an entry. Only the entry's author can use this route."
+      description: "Delete one or more keywords from an entry. Only the entry's author can use this route."
       operationId: delete_keywords
       parameters:
         - name: entryId
@@ -1043,127 +1079,39 @@ paths:
           style: simple
           explode: false
           schema: {}
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Keywords"
+            example: ["drama", "silly"]
       responses:
-        default:
-          description: Default error sample response
-  /entry/{entryId}/comment:
-    summary: GET/POST comments on entry
-    get:
-      tags:
-        - Entry
-        - Comment
-      summary: Get comments posted to an entry
-      description:
-        Get a list of the comments that have been posted to an entry. Each
-        comment entry will have the userName of the user who posted it attatched.
-      operationId: get_comments
-      parameters:
-        - name: entryId
-          in: path
-          description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      responses:
-        default:
-          description: Default error sample response
-    post:
-      tags:
-        - Entry
-        - Comment
-      summary: Post a new comment.
-      description: Post a new comment to an entry. Any logged in user.
-      operationId: post_comment
-      parameters:
-        - name: entryId
-          in: path
-          description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      responses:
-        default:
-          description: Default error sample response
-  /entry/{entryId}/comment/{commentId}:
-    summary: PUT/DELETE a comment
-    put:
-      tags:
-        - Entry
-        - Comment
-      summary: Edit a comment.
-      description: Edit a comment. Admin/mod/comment creator only.
-      operationId: edit_comment
-      parameters:
-        - name: entryId
-          in: path
-          description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-        - name: commentId
-          in: path
-          description: the ID of the comment
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      responses:
-        default:
-          description: Default error sample response
-    delete:
-      tags:
-        - Entry
-        - Comment
-      summary: Delete a comment.
-      description: Delete a comment. Admin/mod/comment creator only.
-      operationId: delete_comment
-      parameters:
-        - name: entryId
-          in: path
-          description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-        - name: commentId
-          in: path
-          description: the ID of the comment
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      responses:
-        default:
-          description: Default error sample response
-  /entry/{entryId}/comment/{commentId}/flag:
-    summary: POST a flag for review on a comment
-    post:
-      tags:
-        - Entry
-        - Comment
-        - Flag
-      summary: Post a flag for review on a comment
-      description: "Post a flag for review on a comment, inserted into mod queue"
-      operationId: flag_comment
-      parameters:
-        - name: entryId
-          in: path
-          description: the ID of the entry
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-        - name: commentId
-          in: path
-          description: the ID of the comment
-          required: true
-          style: simple
-          explode: false
-          schema: {}
-      responses:
+        "200":
+          description: "Successfully deleted all keywords"
+          content:
+            application/json:
+              example: { "message": "Keywords successfully deleted." }
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                badEntryId:
+                  value:
+                    { "error": "That is not a properly formatted entryId." }
+                badKeywords:
+                  value:
+                    { "error": "Request body must be an array of strings." }
+        "404":
+          description: "Entity not found"
+          content:
+            application/json:
+              examples:
+                missingEntry:
+                  value: { "error": "There is no entry with that entryId." }
+                missingKeyword:
+                  value: { "error": "Keyword not found in entry." }
         default:
           description: Default error sample response
   /message:
@@ -1470,6 +1418,106 @@ paths:
           content:
             application/json:
               example: { "error": "There is no entry with that entryId." }
+        default:
+          description: Default error sample response
+  /admin/entry/{entryId}/keyword:
+    summary: PUT/DELETE keywords
+    put:
+      tags:
+        - Entry
+        - Keyword
+        - Admin
+      summary: Apply new keywords to an entry
+      description: "Adds one or more keywords to an existing entry. Only admins can use this route."
+      operationId: admin_put_new_keywords
+      parameters:
+        - name: entryId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Keywords"
+            example: ["drama", "sad"]
+      responses:
+        "200":
+          description: "Successfully added all keywords"
+          content:
+            application/json:
+              example: { "message": "Keywords successfully added." }
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                badEntryId:
+                  value:
+                    { "error": "That is not a properly formatted entryId." }
+                badKeywords:
+                  value:
+                    { "error": "Request body must be an array of strings." }
+        "404":
+          description: "Entry not found"
+          content:
+            application/json:
+              example: { "error": "There is no entry with that entryId." }
+        default:
+          description: Default error sample response
+    delete:
+      tags:
+        - Entry
+        - Keyword
+        - Admin
+      summary: Delete keywords from an entry.
+      description: "Delete one or more keywords from an entry. Only admins can use this route."
+      operationId: admin_delete_keywords
+      parameters:
+        - name: entryId
+          in: path
+          description: the ID of the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Keywords"
+            example: ["drama", "silly"]
+      responses:
+        "200":
+          description: "Successfully deleted all keywords"
+          content:
+            application/json:
+              example: { "message": "Keywords successfully deleted." }
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                badEntryId:
+                  value:
+                    { "error": "That is not a properly formatted entryId." }
+                badKeywords:
+                  value:
+                    { "error": "Request body must be an array of strings." }
+        "404":
+          description: "Entity not found"
+          content:
+            application/json:
+              examples:
+                missingEntry:
+                  value: { "error": "There is no entry with that entryId." }
+                missingKeyword:
+                  value: { "error": "Keyword not found in entry." }
         default:
           description: Default error sample response
   /admin/user/{userId}/lock:
@@ -1925,3 +1973,7 @@ components:
       properties:
         reason:
           type: string
+    Keywords:
+      type: array
+      items:
+        type: string

@@ -847,4 +847,152 @@ describe('Test the admin routes', function () {
             });
         });
     });
+
+    describe('Test the keyword modification routes', function () {
+        let story;
+
+        beforeEach('Setup entry for keyword testing', async function () {
+            await agent.post('/login').send(testUserLogin);
+            const storyRes = await agent.post('/entry').send(testStory);
+            story = storyRes.body;
+        });
+
+        afterEach('Teardown entry for keyword testing', async function () {
+            await Entry.findByIdAndDelete(story.entryId);
+        });
+
+        describe('Test the PUT /admin/entry/:entryId/keyword route', function () {
+            describe('Happy paths', function () {
+                describe('Login as admin and add a keyword', function () {
+                    it('should return a 200 status and a success message, and add the keyword to the entry in the database.', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send(["silly"]);
+                        const entry = await Entry.findById(story.entryId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Keywords successfully added." });
+                        expect(entry.keywords).to.be.an('array');
+                        expect(entry.keywords).to.include("silly");
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Login as a non-admin and add a keyword', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send(["silly"]);
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Logout and add a keyword', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send(["silly"]);
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as admin and do a PUT with a non-array', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send("silly");
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
+                    });
+                });
+
+                describe('Login as admin and add an invalid keyword', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send(["silly?"]);
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
+                    });
+                });
+            });
+        });
+
+        describe('Test the DELETE /admin/entry/:entryId/keyword route', function () {
+            describe('Happy paths', function () {
+                describe('Login as admin and delete a keyword', function () {
+                    it('should return a 200 status and a success message, and remove the keyword from the entry', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword').send([story.keywords[2]]);
+                        const entry = await Entry.findById(story.entryId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Keywords successfully deleted." });
+                        expect(entry.keywords).to.not.include(story.keywords[2]);
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Login as a non-admin and delete a keyword', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword').send([story.keywords[2]]);
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Logout and delete a keyword', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword').send([story.keywords[2]]);
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login as admin and DELETE with a non-array', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword').send("silly");
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
+                    });
+                });
+
+                describe('Login as admin and DELETE with an invalid keyword', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword').send(["silly?"]);
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
+                    });
+                });
+
+                describe('Login as admin and DELETE with a keyword that the entry doesn\'t have', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        await agent.post('/login').send(adminLogin);
+
+                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword').send(["silly"]);
+
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "Keyword not found in entry." });
+                    });
+                });
+            });
+        });
+    });
 });

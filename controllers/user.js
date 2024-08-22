@@ -47,8 +47,8 @@ async function registerUser(req, res) {
         });
         try {
             await newUser.save();
-        } catch (err) {
-            return res.status(500).json(err);
+        } catch (error) {
+            return res.status(500).json(error);
         }
         res.status(201).json(newUser.privateProfile());
     }
@@ -66,11 +66,11 @@ async function loginUser(req, res, next) {
         if (!user || !await bcrypt.compare(password, user.passwordHash)) {
             return res.status(401).json({ error: "Incorrect name or password." });
         } else {
-            req.session.regenerate(function (err) {
-                if (err) next(err);
+            req.session.regenerate(function (error) {
+                if (error) next(error);
                 req.session.user = user;
-                req.session.save(async function (err) {
-                    if (err) next(err);
+                req.session.save(async function (error) {
+                    if (error) next(error);
                     const token = jwt.sign(
                         {
                             email: user.email,
@@ -95,8 +95,8 @@ async function loginUser(req, res, next) {
 }
 
 function logoutUser(req, res, next) {
-    req.session.destroy(function (err) {
-        if (err) return next(err);
+    req.session.destroy(function (error) {
+        if (error) return next(error);
         res.status(200).json({ message: "Logout successful." });
     })
 }

@@ -1,7 +1,7 @@
 "use strict";
 
 const constants = require('../helpers/constants');
-const { userAuth, unlockedUserAuth, adminAuth } = require('../helpers/auth');
+const { userAuth, unlockedUserAuth, entryAuthorAuth, adminAuth } = require('../helpers/auth');
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
@@ -35,6 +35,8 @@ router.post('/admin/user/:userId/lock', userControllers.lockUser);
 router.delete('/admin/user/:userId/lock', userControllers.unlockUser);
 router.get('/admin/user/:userId', userControllers.adminGetUser);
 router.put('/admin/user/:userId', userControllers.alterUser);
+router.put('/admin/entry/:entryId/keyword', entryControllers.addKeywords);
+router.delete('/admin/entry/:entryId/keyword', entryControllers.deleteKeywords);
 
 // user related routes
 router.post('/register', userControllers.registerUser);
@@ -61,6 +63,8 @@ router.post('/entry/:entryId/like', userAuth, entryControllers.likeEntry);
 router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
 router.post('/entry/:entryId/bookmark', userAuth, entryControllers.bookmarkEntry);
 router.delete('/entry/:entryId/bookmark', userAuth, entryControllers.unBookmarkEntry);
+router.put('/entry/:entryId/keyword', entryAuthorAuth, entryControllers.addKeywords);
+router.delete('/entry/:entryId/keyword', entryAuthorAuth, entryControllers.deleteKeywords);
 
 // miscelaneous routes
 router.post('/message', miscControllers.postMessage);

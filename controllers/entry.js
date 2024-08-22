@@ -5,6 +5,10 @@ const Entry = require('../models/entry');
 const Like = require('../models/like');
 const Flag = require('../models/flag');
 const Bookmark = require('../models/bookmark');
+const {
+  // isValidKeyword,
+  isValidKeywordArray
+} = require('../helpers/validation');
 
 async function paramEntryId(req, res, next, value) {
   if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
@@ -19,8 +23,8 @@ async function paramEntryId(req, res, next, value) {
       return res.status(404).json({ error: "There is no entry with that entryId." });
     }
     return next();
-  } catch (err) {
-    return next(err);
+  } catch (error) {
+    return next(error);
   }
 }
 
@@ -37,8 +41,8 @@ async function paramFlagId(req, res, next, value) {
       return res.status(404).json({ error: "There is no flag with that flagId." });
     }
     return next();
-  } catch (err) {
-    return next(err);
+  } catch (error) {
+    return next(error);
   }
 }
 
@@ -180,74 +184,52 @@ async function getFlagList(req, res, next) {
   }
 }
 
-async function createStory(req, res) {
-  const { storyTitle, bodyText, keywords, } = req.body;
-
-  if (typeof storyTitle != 'string') {
-    return res.status(400).json({ error: "Missing story title." });
-  } else if (typeof bodyText != 'string') {
+async function createEntry(storyTitle, entryTitle, bodyText, authorName, keywords, previousEntry, res) {
+  if (typeof bodyText != 'string') {
     return res.status(400).json({ error: "Missing story text." });
   }
-  if (keywords) {
-    if (!Array.isArray(keywords)) {
-      return res.status(400).json({ error: "keywords must be an array of strings." });
-    }
-    for (const keyword of keywords) {
-      if (typeof keyword != "string") {
-        return res.status(400).json({ error: "keywords must be an array of strings." });
-      }
-    }
+  if (typeof storyTitle != 'string') {
+    return res.status(400).json({ error: "Missing story title." });
   }
+  if (previousEntry != null && typeof entryTitle != 'string') {
+    return res.status(400).json({ error: "Missing entry title." });
+  }
+  if (keywords && !isValidKeywordArray(keywords)) {
+    return res.status(400).json({ error: "Request body must be an array of strings." });
+  }
+
+  keywords = Array.from(new Set(keywords));
 
   try {
     const entry = new Entry({
       storyTitle,
+      entryTitle,
       bodyText,
-      previousEntry: null,
-      authorName: req.authenticatedUser.userName,
+      previousEntry,
+      authorName,
       keywords,
     });
-    await entry.saveNewStory();
+    if (previousEntry === null) {
+      await entry.saveNewStory();
+    } else {
+      await entry.saveContinuationEntry({ storyId: previousEntry, storyTitle });
+    }
 
     return res.status(201).json(await entry.fullInfo());
   } catch (error) {
     return res.status(500).json(error);
   }
+
+}
+
+async function createStory(req, res) {
+  const { storyTitle, bodyText, keywords, } = req.body;
+  await createEntry(storyTitle, null, bodyText, req.authenticatedUser.userName, keywords, null, res);
 }
 
 async function continueStory(req, res) {
   const { bodyText, entryTitle, keywords, } = req.body;
-
-  if (typeof bodyText != 'string') {
-    return res.status(400).json({ error: "Missing story text." });
-  } else if (typeof entryTitle != 'string') {
-    return res.status(400).json({ error: "Missing entry title." });
-  }
-  if (keywords) {
-    if (!Array.isArray(keywords)) {
-      return res.status(400).json({ error: "keywords must be an array of strings." });
-    }
-    for (const keyword of keywords) {
-      if (typeof keyword != "string") {
-        return res.status(400).json({ error: "keywords must be an array of strings." });
-      }
-    }
-  }
-
-  try {
-    const entry = new Entry({
-      bodyText,
-      entryTitle,
-      authorName: req.authenticatedUser.userName,
-      previousEntry: req.foundEntryById._id,
-      keywords,
-    })
-    await entry.saveContinuationEntry(req.foundEntryById);
-
-    return res.status(201).json(await entry.fullInfo());
-  } catch (error) {
-    return res.status(500).json(error);
-  }
+  await createEntry(req.foundEntryById.storyTitle, entryTitle, bodyText, req.authenticatedUser.userName, keywords, req.foundEntryById._id, res);
 }
 
 async function likeEntry(req, res, next) {
@@ -358,6 +340,37 @@ async function getKeywordList(req, res, next) {
   }
 }
 
+async function addKeywords(req, res, next) {
+  try {
+    if (!isValidKeywordArray(req.body)) {
+      return res.status(400).json({ error: "Request body must be an array of strings." });
+    }
+    req.foundEntryById.keywords = Array.from(new Set([...req.body, ...req.foundEntryById.keywords]));
+    await req.foundEntryById.save();
+    return res.status(200).json({ message: "Keywords successfully added." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function deleteKeywords(req, res, next) {
+  try {
+    if (!isValidKeywordArray(req.body)) {
+      return res.status(400).json({ error: "Request body must be an array of strings." });
+    }
+    const entryKeywords = new Set(req.foundEntryById.keywords);
+    const deleteKeywords = new Set(req.body);
+    if (!entryKeywords.isSupersetOf(deleteKeywords)) {
+      return res.status(404).json({ error: "Keyword not found in entry." });
+    }
+    req.foundEntryById.keywords = Array.from(entryKeywords.difference(deleteKeywords));
+    req.foundEntryById.save();
+    return res.status(200).json({ message: "Keywords successfully deleted." });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   paramEntryId,
   paramFlagId,
@@ -375,4 +388,6 @@ module.exports = {
   deleteFlag,
   getFlagList,
   getKeywordList,
+  addKeywords,
+  deleteKeywords,
 }
