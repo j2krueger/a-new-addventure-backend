@@ -57,7 +57,7 @@ if (constants.localDeploy) {
         cookie: {
             httpOnly: true,
             maxAge: constants.loginExpirationTime,
-            sameSite: 'none',
+            sameSite: 'strict',
         }
     }));
 } else {
@@ -70,8 +70,9 @@ if (constants.localDeploy) {
         cookie: {
             httpOnly: true,
             maxAge: constants.loginExpirationTime,
-            sameSite: 'none',
+            sameSite: 'strict',
             secure: true,
+            domain: '.quiltedchronicles.org',
         }
     }));
 }
