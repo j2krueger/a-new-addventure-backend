@@ -47,60 +47,85 @@ async function paramFlagId(req, res, next, value) {
 }
 
 async function getEntryList(req, res) {
-  const fieldLookup = {
-    s: 'storyTitle',
-    e: 'entryTitle',
-    a: 'authorName',
-    b: 'bodyText',
-  }
   const orderLookup = {
     s: ['storyTitle', 1],
     e: ['entryTitle', 1],
     a: ['authorName', 1],
     l: ['likes', 1],
     c: ['createDate', 1],
-    b: ['bodyText', 1],
     S: ['storyTitle', -1],
     E: ['entryTitle', -1],
     A: ['authorName', -1],
     L: ['likes', -1],
     C: ['createDate', -1],
-    B: ['bodyText', -1],
   }
-  const { page, regex, fields, order, storiesOnly } = req.query;
+  const { page, storiesOnly, search, } = req.query;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
-  const entryQuery = storiesOnly ? { previousEntry: null } : {};
-  if (regex) {
-    entryQuery["$or"] = [];
-    for (const fieldChar of (fields || "seab")) {
-      if (fieldChar in fieldLookup) {
-        const field = fieldLookup[fieldChar];
-        const queryPart = {};
-        queryPart[field] = { $regex: regex };
-        if (!entryQuery["$or"].find(element => field in element)) {
-          entryQuery["$or"].push(queryPart);
-        } else {
-          return res.status(400).json({ error: "Misformed query string." });
-        }
-      } else {
-        return res.status(400).json({ error: "Misformed query string." });
-      }
-    }
+
+  // Validate and separate tokens
+  const tokenList = search ? search.split(/\s+/).filter(x => x) : "o:C".split(/\s+/).filter(x => x);
+  const searchREString = '^((?<fields>[seabkSEAK]+):)?(?<word>[\\w.-]+)$'
+  const sortREString = '^o:(?<sort>[sealcSEALC]+)$'
+  const searchRE = new RegExp(searchREString);
+  const sortRE = new RegExp(sortREString);
+  const tokenRE = new RegExp(searchREString + '|' + sortREString);
+  if (!tokenList.every(token => tokenRE.test(token))) {
+    return res.status(400).json({ error: "Misformed query string." });
   }
-  const sortQuery = {}
-  const sortArray = (order || "C").split('').map(order => orderLookup[order]);
-  if (order) {
-    for (const sortField of sortArray) {
-      if (sortField && !(sortField[0] in sortQuery)) {
-        sortQuery[sortField[0]] = sortField[1];
-      } else {
-        return res.status(400).json({ error: "Misformed query string." });
-      }
-    }
+  const sortList = tokenList.filter(token => sortRE.test(token));
+  const searchList = tokenList.filter(token => searchRE.test(token));
+  if (sortList.length > 1) {
+    return res.status(400).json({ error: "Misformed query string." });
   }
-  sortQuery["_id"] = 1; // make sure the sort order is completely unambiguous so it plays well with pagination
+  const sortTerm = sortList.length ? sortRE.exec(sortList[0]).groups.sort : 'C'; // default to latest first
+  if (/([sealc]).*\1/i.test(sortTerm)) {
+    return res.status(400).json({ error: "Misformed query string." });
+  }
+  if (searchList.some(token => /([seabk]).*\1.*:/i.test(token))) {
+    return res.status(400).json({ error: "Misformed query string." });
+  }
+
+  // Construct the sort query
+  const sortQuery = {};
+  for (const field of sortTerm) {
+    const [name, order] = orderLookup[field];
+    sortQuery[name] = order;
+  }
+  sortQuery._id = -1; // make sure the sort order is completely unambiguous so it plays well with pagination
+
+
+  // Construct the search query
+  const termArray = [];
+  const searchQuery = storiesOnly ? { previousEntry: null } : {};
+  for (const searchTerm of searchList) {
+    const groups = searchRE.exec(searchTerm).groups;
+    const fields = groups.fields ?? "seabK";
+    const word = groups.word;
+
+    const fieldLookup = {
+      s: { storyTitle: { $regex: word, $options: 'i' } },
+      e: { entryTitle: { $regex: word, $options: 'i' } },
+      a: { authorName: { $regex: word, $options: 'i' } },
+      b: { bodyText: { $regex: word, $options: 'i' } },
+      k: { keywords: { $regex: word, $options: 'i' } },
+      S: { storyTitle: word },
+      E: { entryTitle: word },
+      A: { authorName: word },
+      K: { keywords: word },
+    }
+
+    const termQuery = [];
+    for (const field of fields) {
+      termQuery.push(fieldLookup[field]);
+    }
+    termArray.push({ $or: termQuery });
+  }
+  if (termArray.length) {
+    searchQuery["$and"] = termArray;
+  }
+
   const entryList = await Entry.findAndPopulate(
-    entryQuery,
+    searchQuery,
     sortQuery,
     zPage * constants.entriesPerPage,
     constants.entriesPerPage,

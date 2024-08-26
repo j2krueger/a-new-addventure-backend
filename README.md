@@ -193,6 +193,7 @@ collection entries: {
   storyTitle: String,
   bodyText: String,
   previousEntry: ObjectId,	// references collection entries
+  keywords: [String],	// New field, needs multikey index <=========================
   createDate: Date,
 }
 
@@ -237,18 +238,26 @@ collection messages: {
 sessions - managed entirely by express-session
 
 ---
+match fields (capitals indicate match whole field exactly, except on body text):
+ - s: story title
+ - e: entry title
+ - a: author
+ - b: body text
+ - k: keyword
+order fields (captials indicate descending order):
+ - s: story title
+ - e: entry title
+ - a: author
+ - l: likes
+ - c: created
 
-Changes to implement keywords/keyword search
 
-additional field 'keywords' in collection entries:
-collection entries: {
-  _id: ObjectId,
-  storyId: ObjectId,	// references collection entries
-  authorName: String,
-  entryTitle: String,
-  storyTitle: String,
-  bodyText: String,
-  previousEntry: ObjectId,	// references collection entries
-  keywords: [String],	// New field, needs multikey index <=========================
-  createDate: Date,
-}
+ s: { storyTitle: { $regex: word } },
+      e: { entryTitle: { $regex: word } },
+      a: { authorName: { $regex: word } },
+      b: { bodyText: { $regex: word } },
+      k: { keywords: { $regex: word } },
+      S: { storyTitle: word },
+      E: { entryTitle: word },
+      A: { authorName: word },
+      K: { keywords: word },

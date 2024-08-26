@@ -542,33 +542,25 @@ paths:
             type: integer
           description: "The page number of results the user is requesting. Absence is equivalent to 'page=1'"
         - in: query
-          name: regex
-          schema:
-            type: string
-          description: "A regular expression, only entries that match regex in one of the fields specified in 'fields' will be returned"
-        - in: query
-          name: fields
-          schema:
-            type: string
-          description:
-            "a string containing letters specifying fields in which to look for matches of 'regex' with the following\
-            \ correspondence: s: storyTitle, e: entryTitle, a: authorName, b: bodyText. If 'fields' is not specified,\
-            \ it defaults to 'seab'"
-        - in: query
-          name: order
-          schema:
-            type: string
-          description:
-            "a string specifying the sort order of the results. Each of the following letters specifies a field: s:storyTitle, e:entryTitle,\
-            \ a:authorName, l:likes, c:createDate, b:bodyText. Lowercase letters specify ascending order, capital letters specify decending order.\
-            \ Fields specified earlier take priority over fields specified later, e.g. if 'order' is 'sE', then entries will be sorted in alphabetical\
-            \ order by storyTitle, and entries with the same storyTitle will be sorted in reverse alphabetical order by entryTitle. Text field sorts\
-            \ are case insensitive. If 'order' is not specified, it defaults to 'C' (newest first)."
-        - in: query
           name: storiesOnly
           schema:
             type: boolean
           description: "If true, only returns stories, i.e. entries that have storyId equal to entryId and previousEntry equal to null"
+        - in: query
+          name: search
+          schema:
+            type: string
+          description:
+            A string submitted by the user that specifies what to search for, in which fields, and what order the results should
+            be returned in. The string must consist of 0 or more white space separated tokens. The string may contain 0 or 1 tokens
+            matching the regular expression "o:[sealcSEALC]+", which specifies the sort order of the results. The letters after the
+            "o:" specify the fields to sort by, "s:storyTitle", "e:entryTitle", "a:author", "l:likes", "c:createDate" with the
+            earlier letters having higher priority than the later letters, and captial letters indicating descending order rather
+            than ascending. If no sort order specification is given, the sort order defaults to "o:C". All other tokens must match
+            the regular expression "([seabkSEAK]+:)?[\\w.-]+". The optional prefix terminating with the colon specifies the fields
+            ("s:storyTitle" "e:entryTitle" "a:authorName" "b:bodyText" "k:keywords", captials indicate the word given must match
+            the whole field and be case insensitive) in which to search for the word that makes up the rest of the token. Tokens
+            that don't include the optional prefix are treated as if they had the prefix "seabK:".
       tags:
         - Entry
       summary: GET a list of recent entries
@@ -1439,7 +1431,7 @@ paths:
           explode: false
           schema: {}
       requestBody:
-        description: ""
+        description: "An array of the keywords to add."
         content:
           application/json:
             schema:
@@ -1486,7 +1478,7 @@ paths:
           explode: false
           schema: {}
       requestBody:
-        description: ""
+        description: "An array of the keywords to delete"
         content:
           application/json:
             schema:

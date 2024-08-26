@@ -107,9 +107,9 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('GET /entry with search query string {regex: "Freddy", fields: "a"} ', function () {
+                describe('GET /entry with search query string { search: "a:Freddy" } ', function () {
                     it('should return a 200 OK list of entries with authorName matching "Freddy"', async function () {
-                        const res = await agent.get('/entry').query({ regex: 'Freddy', fields: 'a' });
+                        const res = await agent.get('/entry').query({ search: "a:Freddy" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -123,14 +123,14 @@ describe('Test the entry handling routes', function () {
                             } else {
                                 expect(entry.entryTitle).to.be.a('string');
                             }
-                            expect(entry.authorName).to.be.a('string').which.matches(/Freddy/);
+                            expect(entry.authorName).to.be.a('string').which.matches(/Freddy/i);
                         }
                     });
                 });
 
-                describe('GET /entry with search query string {regex: "dd", fields: "e"} ', function () {
+                describe('GET /entry with search query string { search: "e:dd"} ', function () {
                     it('should return a 200 OK list of entries with entryTitle matching "dd"', async function () {
-                        const res = await agent.get('/entry').query({ regex: 'dd', fields: 'e' });
+                        const res = await agent.get('/entry').query({ search: 'e:dd' });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -139,15 +139,15 @@ describe('Test the entry handling routes', function () {
                             expectMongoObjectId(entry.storyId);
                             expectMongoObjectId(entry.entryId);
                             expect(entry.storyTitle).to.be.a('string');
-                            expect(entry.entryTitle).to.be.a('string').which.matches(/dd/);
+                            expect(entry.entryTitle).to.be.a('string').which.matches(/dd/i);
                             expect(entry.authorName).to.be.a('string');
                         }
                     });
                 });
 
-                describe('GET /entry with search query string {regex: "beginning", fields: "s"} ', function () {
+                describe('GET /entry with search query string { search: "s:beginning" } ', function () {
                     it('should return a 200 OK list of entries with storyTitle matching "beginning"', async function () {
-                        const res = await agent.get('/entry').query({ regex: 'beginning', fields: 's' });
+                        const res = await agent.get('/entry').query({ search: 's:beginning' });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -155,7 +155,7 @@ describe('Test the entry handling routes', function () {
                             expect(entry).to.have.all.keys(...summaryKeys);
                             expectMongoObjectId(entry.storyId);
                             expectMongoObjectId(entry.entryId);
-                            expect(entry.storyTitle).to.be.a('string').which.matches(/beginning/);
+                            expect(entry.storyTitle).to.be.a('string').which.matches(/beginning/i);
                             if (entry.storyId == entry.entryId) {
                                 expect(entry.entryTitle).to.be.null;
                             } else {
@@ -166,9 +166,9 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('GET /entry with search query string {regex: "dd", fields: "ae"} ', function () {
+                describe('GET /entry with search query string { search: "ae:dd" } ', function () {
                     it('should return a 200 OK list of entries with authorName OR entry title matching "dd"', async function () {
-                        const res = await agent.get('/entry').query({ regex: 'dd', fields: 'ae' });
+                        const res = await agent.get('/entry').query({ search: 'ae:dd' });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -183,32 +183,32 @@ describe('Test the entry handling routes', function () {
                                 expect(entry.entryTitle).to.be.a('string');
                             }
                             expect(entry.authorName).to.be.a('string');
-                            expect(entry.authorName + ' ' + entry.entryTitle).to.be.a('string').which.matches(/dd/);
+                            expect(entry.authorName + ' ' + entry.entryTitle).to.be.a('string').which.matches(/dd/i);
                         }
                     });
                 });
 
-                describe('GET /entry with search query string {regex: "Freddy", fields: "w"}', function () {
+                describe('GET /entry with search query string { search: "w:Freddy" }', function () {
                     it('should return a 400 status and an error message.', async function () {
-                        const res = await agent.get('/entry').query({ regex: "Freddy", fields: "w" });
+                        const res = await agent.get('/entry').query({ search: "w:Freddy" });
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Misformed query string." })
                     });;
                 });
 
-                describe('GET /entry with search query string {regex: "Freddy", fields: "aea"}', function () {
+                describe('GET /entry with search query string { search: "aea:Freddy" }', function () {
                     it('should return a 400 status and an error message.', async function () {
-                        const res = await agent.get('/entry').query({ regex: "Freddy", fields: "aea" });
+                        const res = await agent.get('/entry').query({ search: "aea:Freddy" });
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Misformed query string." })
                     });;
                 });
 
-                describe('GET /entry with search query string {order: "a"}', function () {
+                describe('GET /entry with search query string { search: "o:a" }', function () {
                     it('should return a 200 OK list of entries sorted in increasing order by author', async function () {
-                        const res = await agent.get('/entry').query({ order: "a" });
+                        const res = await agent.get('/entry').query({ search: "o:a" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -230,9 +230,9 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('GET /entry with search query string {order: "A"}', function () {
+                describe('GET /entry with search query string { search: "o:A" }', function () {
                     it('should return a 200 OK list of entries sorted in decreasing order by author', async function () {
-                        const res = await agent.get('/entry').query({ order: "A" });
+                        const res = await agent.get('/entry').query({ search: "o:A" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -254,9 +254,9 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('GET /entry with search query string {order: "e"}', function () {
+                describe('GET /entry with search query string { search: "o:e" }', function () {
                     it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                        const res = await agent.get('/entry').query({ order: "e" });
+                        const res = await agent.get('/entry').query({ search: "o:e" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -277,9 +277,9 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('GET /entry with search query string {order: "E"}', function () {
+                describe('GET /entry with search query string { search: "o:E" }', function () {
                     it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                        const res = await agent.get('/entry').query({ order: "E" });
+                        const res = await agent.get('/entry').query({ search: "o:E" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -300,9 +300,9 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('GET /entry with search query string {order: "sE"}', function () {
+                describe('GET /entry with search query string { search: "o:sE" }', function () {
                     it('should return a 200 OK list of entries sorted in increasing order by entryTitle', async function () {
-                        const res = await agent.get('/entry').query({ order: "sE" });
+                        const res = await agent.get('/entry').query({ search: "o:sE" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
@@ -329,27 +329,27 @@ describe('Test the entry handling routes', function () {
             });
 
             describe('Sad paths', function () {
-                describe('GET /entry with search query string {order: "x"}', function () {
+                describe('GET /entry with search query string { search: "o:x" }', function () {
                     it('should return a 400 status and an error message.', async function () {
-                        const res = await agent.get('/entry').query({ order: "x" });
+                        const res = await agent.get('/entry').query({ search: "o:x" });
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Misformed query string." })
                     });;
                 });
 
-                describe('GET /entry with search query string {order: "aea"}', function () {
+                describe('GET /entry with search query string { search: "o:aea" }', function () {
                     it('should return a 400 status and an error message.', async function () {
-                        const res = await agent.get('/entry').query({ order: "aea" });
+                        const res = await agent.get('/entry').query({ search: "o:aea" });
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Misformed query string." })
                     });;
                 });
 
-                describe('GET /entry with search query string {order: "aeA"}', function () {
+                describe('GET /entry with search query string { search: "o:aeA" }', function () {
                     it('should return a 400 status and an error message.', async function () {
-                        const res = await agent.get('/entry').query({ order: "aeA" });
+                        const res = await agent.get('/entry').query({ search: "o:aeA" });
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Misformed query string." })
@@ -840,14 +840,14 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('Login and like an entry and check GET /entry?regex=<testString>', function () {
+                describe('Login and like an entry and check GET /entry?search=<testString>', function () {
                     it('should return bookmarkedByUser is true in the entry', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/entry').send(testStory);
                         const loginRes = await agent.post('/login').send(testUserLogin);
                         await agent.post('/entry/' + storyRes.body.entryId + '/like');
 
-                        const entryIdRes = await agent.get('/entry').query({ regex: testString });
+                        const entryIdRes = await agent.get('/entry').query({ search: testString });
 
                         expect(entryIdRes.body).to.be.an('array').with.lengthOf(1);
                         expect(entryIdRes.body[0].likedByUser).to.be.true;
@@ -1149,14 +1149,14 @@ describe('Test the entry handling routes', function () {
                     });
                 });
 
-                describe('Login, post a bookmark, and GET /entry?regex=<testString>', function () {
+                describe('Login, post a bookmark, and GET /entry?search=<testString>', function () {
                     it('should return bookmarkedByUser is true in the entry', async function () {
                         await agent.post('/login').send(testUserLogin);
                         const storyRes = await agent.post('/entry').send(testStory);
                         await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
                         const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
 
-                        const res = await agent.get('/entry').query({ regex: testString, });
+                        const res = await agent.get('/entry').query({ search: testString, });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf(1);
