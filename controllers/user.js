@@ -204,13 +204,23 @@ async function unlockUser(req, res, next) {
 }
 
 async function adminGetUser(req, res) {
-    res.status(200).json(req.foundUserById);
+    const {
+        // eslint-disable-next-line no-unused-vars
+        passwordHash,
+        ...result
+    } = JSON.parse(JSON.stringify(req.foundUserById));
+    res.status(200).json(result);
 }
 
 async function alterUser(req, res, next) {
     try {
         req.foundUserById = await req.foundUserById.adminApplySettings(req.body);
-        return res.status(200).json(req.foundUserById.privateProfile());
+        const {
+            // eslint-disable-next-line no-unused-vars
+            passwordHash,
+            ...result
+        } = JSON.parse(JSON.stringify(req.foundUserById));
+        return res.status(200).json(result);
     } catch (error) {
         if (error.message == "Invalid request.") {
             return res.status(400).json({ error: error.message });

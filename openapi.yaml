@@ -27,9 +27,9 @@ paths:
               $ref: "#/components/schemas/Register"
             example:
               {
-                "userName": "Freddy",
-                "email": "Freddy@example.com",
-                "password": "s33krit!",
+                "userName": "EasterBunny",
+                "email": "EasterBunny@example.com",
+                "password": "12345678",
               }
       responses:
         "201":
@@ -38,11 +38,19 @@ paths:
             application/json:
               example:
                 {
-                  "userId": "66845f61c806ebe5276df8db",
-                  "userName": "Freddy",
-                  "email": "Freddy@example.com",
+                  "userId": "66ce0c8dc538303360039d01",
+                  "userName": "EasterBunny",
+                  "email": "EasterBunny@example.com",
+                  "admin": false,
+                  "moderator": false,
                   "bio": "I haven't decided what to put in my bio yet.",
                   "publishEmail": false,
+                  "darkMode": false,
+                  "locked": false,
+                  "publishedEntries": [],
+                  "followedAuthors": [],
+                  "likedEntries": [],
+                  "bookmarkedEntries": [],
                 }
         "400":
           description: "If any of the fields are missing, return an error."
@@ -67,7 +75,7 @@ paths:
         default:
           description: Default error sample response
   /login:
-    summary: GET/POST login
+    summary: POST login
     post:
       tags:
         - User
@@ -83,7 +91,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Login"
-            example: { "name": "Freddy", "password": "s33krit!" }
+            example: { "name": "EasterBunny", "password": "12345678" }
       responses:
         "200":
           description: "If the login is successful, return the users private profile information to indicate success."
@@ -91,11 +99,19 @@ paths:
             application/json:
               example:
                 {
-                  "userId": "667afb5feb94737bf4556b7e",
-                  "userName": "Hank R. Chief",
-                  "email": "Hank@example.com",
+                  "userId": "66ce0c8dc538303360039d01",
+                  "userName": "EasterBunny",
+                  "email": "EasterBunny@example.com",
+                  "admin": false,
+                  "moderator": false,
                   "bio": "I haven't decided what to put in my bio yet.",
                   "publishEmail": false,
+                  "darkMode": false,
+                  "locked": false,
+                  "publishedEntries": [],
+                  "followedAuthors": [],
+                  "likedEntries": [],
+                  "bookmarkedEntries": [],
                 }
         "400":
           description: "Missing field."
@@ -159,9 +175,10 @@ paths:
                   "email": "Freddy@example.com",
                   "admin": true,
                   "moderator": false,
-                  "bio": "I have REALLY decided what to put in my bio yet.",
+                  "bio": "I'm not particularly good at bio. I'm really more of a math/physics/computers kinda guy.",
                   "publishEmail": true,
                   "darkMode": true,
+                  "locked": false,
                   "publishedEntries":
                     [
                       {
@@ -171,7 +188,7 @@ paths:
                         "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
                         "authorName": "Freddy",
                         "previousEntry": "6695b2573550c66db1ab9106",
-                        "likes": 0,
+                        "keywords": [],
                       },
                       {
                         "storyId": "6695b2573550c66db1ab9106",
@@ -180,25 +197,16 @@ paths:
                         "entryTitle": null,
                         "authorName": "Freddy",
                         "previousEntry": null,
-                        "likes": 0,
+                        "keywords": [],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668820191cb99dfdc244c23c",
+                        "entryId": "668d51e61be56166aaaa6cc2",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the first",
+                        "entryTitle": "Suddenly, a wild accountant appears!",
                         "authorName": "Freddy",
                         "previousEntry": "6688142fb004b799a5a29d03",
-                        "likes": 0,
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "6688142fb004b799a5a29d03",
-                        "storyTitle": "Random Title",
-                        "entryTitle": null,
-                        "authorName": "Freddy",
-                        "previousEntry": null,
-                        "likes": 0,
+                        "keywords": [],
                       },
                     ],
                   "followedAuthors":
@@ -234,7 +242,7 @@ paths:
                         "authorName": "apmanager",
                         "authorId": "667b294248b8805d71a96a03",
                         "previousEntry": null,
-                        "likes": 0,
+                        "keywords": [],
                       },
                     ],
                   "bookmarkedEntries":
@@ -247,6 +255,17 @@ paths:
                         "authorName": "Freddy",
                         "authorId": "668490250029a28118a8d1be",
                         "previousEntry": "6695b2573550c66db1ab9106",
+                        "keywords": [],
+                      },
+                      {
+                        "storyId": "66a5a2ab375bbb2298ff7420",
+                        "entryId": "66a5a2ab375bbb2298ff7420",
+                        "storyTitle": "7th newest ",
+                        "entryTitle": null,
+                        "authorName": "apmanager",
+                        "authorId": "667b294248b8805d71a96a03",
+                        "previousEntry": null,
+                        "keywords": [],
                       },
                     ],
                 }
@@ -285,35 +304,99 @@ paths:
                   "userId": "668490250029a28118a8d1be",
                   "userName": "Freddy",
                   "email": "Freddy@example.com",
-                  "bio": "I HAVE decided what to put in my bio yet.",
+                  "admin": true,
+                  "moderator": false,
+                  "bio": "I'm not particularly good at bio. I'm really more of a math/physics/computers kinda guy.",
                   "publishEmail": true,
-                  "darkMode": false,
+                  "darkMode": true,
+                  "locked": false,
                   "publishedEntries":
                     [
                       {
-                        "entryId": "6685cf32fb208efa4de7dfab",
-                        "storyTitle": "Story Title",
+                        "storyId": "6695b2573550c66db1ab9106",
+                        "entryId": "66a7fd2095206fecbb52c189",
+                        "storyTitle": "In the beginning...",
+                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "authorName": "Freddy",
+                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "keywords": [],
+                      },
+                      {
+                        "storyId": "6695b2573550c66db1ab9106",
+                        "entryId": "6695b2573550c66db1ab9106",
+                        "storyTitle": "In the beginning...",
                         "entryTitle": null,
+                        "authorName": "Freddy",
+                        "previousEntry": null,
+                        "keywords": [],
                       },
                       {
-                        "entryId": "6685d031715453a8be27589b",
-                        "storyTitle": "Super Good Title",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668d51e61be56166aaaa6cc2",
+                        "storyTitle": "Random Title",
+                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "authorName": "Freddy",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "keywords": [],
+                      },
+                    ],
+                  "followedAuthors":
+                    [
+                      {
+                        "userName": "apmanager",
+                        "userId": "667b294248b8805d71a96a03",
+                      },
+                      {
+                        "userName": "BlackLagoon",
+                        "userId": "668ee18ae1dcd980cf0739c2",
+                      },
+                      {
+                        "userName": "FreddyJupiter",
+                        "userId": "668ee1cfe1dcd980cf0739db",
+                      },
+                      {
+                        "userName": "FreddyMercury",
+                        "userId": "668ee198e1dcd980cf0739c7",
+                      },
+                      {
+                        "userName": "FreddyQuaoar",
+                        "userId": "668ee23ce1dcd980cf0739f9",
+                      },
+                    ],
+                  "likedEntries":
+                    [
+                      {
+                        "storyId": "66a5a2ab375bbb2298ff7420",
+                        "entryId": "66a5a2ab375bbb2298ff7420",
+                        "storyTitle": "7th newest ",
                         "entryTitle": null,
+                        "authorName": "apmanager",
+                        "authorId": "667b294248b8805d71a96a03",
+                        "previousEntry": null,
+                        "keywords": [],
+                      },
+                    ],
+                  "bookmarkedEntries":
+                    [
+                      {
+                        "storyId": "6695b2573550c66db1ab9106",
+                        "entryId": "66a7fd2095206fecbb52c189",
+                        "storyTitle": "In the beginning...",
+                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "authorName": "Freddy",
+                        "authorId": "668490250029a28118a8d1be",
+                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "keywords": [],
                       },
                       {
-                        "entryId": "6688142fb004b799a5a29d03",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the zeroeth",
-                      },
-                      {
-                        "entryId": "668820191cb99dfdc244c23c",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the first",
-                      },
-                      {
-                        "entryId": "668857a03f120ae7785257d4",
-                        "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the zeroeth",
+                        "storyId": "66a5a2ab375bbb2298ff7420",
+                        "entryId": "66a5a2ab375bbb2298ff7420",
+                        "storyTitle": "7th newest ",
+                        "entryTitle": null,
+                        "authorName": "apmanager",
+                        "authorId": "667b294248b8805d71a96a03",
+                        "previousEntry": null,
+                        "keywords": [],
                       },
                     ],
                 }
@@ -360,22 +443,58 @@ paths:
               example:
                 [
                   {
-                    "userId": "668ee1dae1dcd980cf0739e0",
-                    "userName": "FreddySaturn",
+                    "userId": "668490250029a28118a8d1be",
+                    "userName": "Freddy",
+                    "email": "Freddy@example.com",
+                    "bio": "I'm not particularly good at bio. I'm really more of a math/physics/computers kinda guy.",
+                    "publishedEntries":
+                      [
+                        {
+                          "storyId": "6695b2573550c66db1ab9106",
+                          "entryId": "66a7fd2095206fecbb52c189",
+                          "storyTitle": "In the beginning...",
+                          "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                          "authorName": "Freddy",
+                          "previousEntry": "6695b2573550c66db1ab9106",
+                          "keywords": [],
+                        },
+                        {
+                          "storyId": "6695b2573550c66db1ab9106",
+                          "entryId": "6695b2573550c66db1ab9106",
+                          "storyTitle": "In the beginning...",
+                          "entryTitle": null,
+                          "authorName": "Freddy",
+                          "previousEntry": null,
+                          "keywords": [],
+                        },
+                        {
+                          "storyId": "6688142fb004b799a5a29d03",
+                          "entryId": "668d51e61be56166aaaa6cc2",
+                          "storyTitle": "Random Title",
+                          "entryTitle": "Suddenly, a wild accountant appears!",
+                          "authorName": "Freddy",
+                          "previousEntry": "6688142fb004b799a5a29d03",
+                          "keywords": [],
+                        },
+                      ],
+                  },
+                  {
+                    "userId": "668ee325e1dcd980cf073a1c",
+                    "userName": "FreddyCallisto",
                     "email": "",
                     "bio": "I haven't decided what to put in my bio yet.",
                     "publishedEntries": [],
                   },
                   {
-                    "userId": "668ee27de1dcd980cf073a08",
-                    "userName": "FreddySedna",
+                    "userId": "668ee24be1dcd980cf0739fe",
+                    "userName": "FreddyCeres",
                     "email": "",
                     "bio": "I haven't decided what to put in my bio yet.",
                     "publishedEntries": [],
                   },
                   {
-                    "userId": "668ee31ae1dcd980cf073a17",
-                    "userName": "FreddyTitan",
+                    "userId": "668ee1b6e1dcd980cf0739d1",
+                    "userName": "FreddyEarth",
                     "email": "",
                     "bio": "I haven't decided what to put in my bio yet.",
                     "publishedEntries": [],
@@ -385,7 +504,7 @@ paths:
           description: "No users matching the search string found."
           content:
             application/json:
-              example: { error: "No matching users found." }
+              example: { "error": "No matching users found." }
         default:
           description: Default error sample response
   /user/{userId}:
@@ -395,9 +514,8 @@ paths:
         - User
       summary: Get a user's public profile.
       description:
-        "Get a webpage showing the specified user's public profile, including\
-        \ userName, bio, email if user has decided to make that public, links to entries\
-        \ and comments, possibly other stuff we think of later."
+        Get the user's public information by userId, including userName, bio, email if they have set publishEmail to true, and links to their
+        published entries.
       operationId: get_public_profile
       parameters:
         - name: userId
@@ -417,33 +535,71 @@ paths:
                   "userId": "668490250029a28118a8d1be",
                   "userName": "Freddy",
                   "email": "Freddy@example.com",
-                  "bio": "I HAVE decided what to put in my bio yet.",
+                  "bio": "I'm not particularly good at bio. I'm really more of a math/physics/computers kinda guy.",
                   "publishedEntries":
                     [
                       {
-                        "entryId": "6685cf32fb208efa4de7dfab",
-                        "storyTitle": "Story Title",
-                        "entryTitle": null,
+                        "storyId": "6695b2573550c66db1ab9106",
+                        "entryId": "66a7fd2095206fecbb52c189",
+                        "storyTitle": "In the beginning...",
+                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "authorName": "Freddy",
+                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "keywords": [],
                       },
                       {
-                        "entryId": "6685d031715453a8be27589b",
-                        "storyTitle": "Super Good Title",
+                        "storyId": "6695b2573550c66db1ab9106",
+                        "entryId": "6695b2573550c66db1ab9106",
+                        "storyTitle": "In the beginning...",
                         "entryTitle": null,
+                        "authorName": "Freddy",
+                        "previousEntry": null,
+                        "keywords": [],
                       },
                       {
-                        "entryId": "6688142fb004b799a5a29d03",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "668d51e61be56166aaaa6cc2",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the zeroeth",
+                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "authorName": "Freddy",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "keywords": [],
                       },
                       {
+                        "storyId": "66885d8e6715f290d4ce03a9",
+                        "entryId": "66885d8e6715f290d4ce03a9",
+                        "storyTitle": "Random Title",
+                        "entryTitle": null,
+                        "authorName": "Freddy",
+                        "previousEntry": null,
+                        "keywords": [],
+                      },
+                      {
+                        "storyId": "668857a03f120ae7785257d4",
+                        "entryId": "668857a03f120ae7785257d4",
+                        "storyTitle": "Random Title",
+                        "entryTitle": null,
+                        "authorName": "Freddy",
+                        "previousEntry": null,
+                        "keywords": [],
+                      },
+                      {
+                        "storyId": "6688142fb004b799a5a29d03",
                         "entryId": "668820191cb99dfdc244c23c",
                         "storyTitle": "Random Title",
                         "entryTitle": "Chapter the first",
+                        "authorName": "Freddy",
+                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "keywords": [],
                       },
                       {
-                        "entryId": "668857a03f120ae7785257d4",
+                        "storyId": "6688142fb004b799a5a29d03",
+                        "entryId": "6688142fb004b799a5a29d03",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the zeroeth",
+                        "entryTitle": null,
+                        "authorName": "Freddy",
+                        "previousEntry": null,
+                        "keywords": [],
                       },
                     ],
                 }
@@ -768,8 +924,8 @@ paths:
               $ref: "#/components/schemas/ContinueStory"
             example:
               {
-                "entryTitle": "Random Title",
-                "bodyText": "Genji no monogatari",
+                "storyTitle": "Once upon a time...",
+                "bodyText": "Once upon a time, there were there were 92 little pigs. The first little pig built his house out of hydrogen, which was really dificult.",
                 "keywords": ["drama", "sad"],
               }
       responses:
@@ -779,15 +935,15 @@ paths:
             application/json:
               example:
                 {
-                  "storyId": "66c6570904c7e9974e060273",
-                  "entryId": "66c6578d04c7e9974e060287",
-                  "storyTitle": "In the beginnning...",
-                  "entryTitle": "In the beginnning...",
+                  "storyId": "66ce142dc538303360039d3b",
+                  "entryId": "66ce142dc538303360039d3b",
+                  "storyTitle": "Once upon a time...",
+                  "entryTitle": null,
                   "authorName": "Freddy",
                   "authorId": "668490250029a28118a8d1be",
-                  "bodyText": "testkurmdlqazsvnepyhs",
-                  "previousEntry": "66c6570904c7e9974e060273",
-                  "createDate": "2024-08-21T21:09:33.232Z",
+                  "bodyText": "Once upon a time, there were there were 92 little pigs. The first little pig built his house out of hydrogen, which was really dificult.",
+                  "previousEntry": null,
+                  "createDate": "2024-08-27T18:00:13.862Z",
                   "keywords": ["drama", "sad"],
                   "likes": 0,
                 }
@@ -1026,7 +1182,7 @@ paths:
           explode: false
           schema: {}
       requestBody:
-        description: ""
+        description: "Array of keywords to add to an entry"
         content:
           application/json:
             schema:
@@ -1072,7 +1228,7 @@ paths:
           explode: false
           schema: {}
       requestBody:
-        description: ""
+        description: "Array of keywords to delete from an entry"
         content:
           application/json:
             schema:
@@ -1116,13 +1272,13 @@ paths:
       operationId: post_message
       requestBody:
         description:
-          "The body JSON must include messageText, and optionally any or all of name, email, and useLoginInfo. If useLoginInfo is set to true, and the\
-          \ submitter of the form is a logged in user, the name and email of the message are set to the user's userName and email, and the message is\
-          \ marked as verified when it is added to the database. If useLoginInfo is not set, but the name and email match the userName and email of a\
-          \ logged in user, then the email is marked as verified. If useLoginInfo is set to true and the submitter is not logged in, they are redirected\
-          \ to /login. If useLoginInfo is set to false, or not included, and either there is no logged in user, or the name or email provided do not match\
-          \ the username and email of the logged in user, then name and email will be used to set their respective submitted values (if present), and\
-          \ the message will not be marked as verified."
+          The body JSON must include messageText, and optionally any or all of name, email, and useLoginInfo. If useLoginInfo is set to true,
+          and the submitter of the form is a logged in user, the name and email of the message are set to the user's userName and email, and
+          the message is marked as verified when it is added to the database. If useLoginInfo is not set, but the name and email match the
+          userName and email of a logged in user, then the email is marked as verified. If useLoginInfo is set to true and the submitter is
+          not logged in, they are redirected to /login. If useLoginInfo is set to false, or not included, and either there is no logged in
+          user, or the name or email provided do not match the username and email of the logged in user, then name and email will be used to
+          set their respective submitted values (if present), and the message will not be marked as verified.
         content:
           application/json:
             schema:
@@ -1185,8 +1341,8 @@ paths:
                     "messageText": "This should NOT be a verified message",
                     "verified": false,
                     "read": false,
-                    "__v": 0,
                     "createDate": "2024-07-23T19:30:14.089Z",
+                    "__v": 0,
                   },
                   {
                     "_id": "66a00443827cfd41d2557be0",
@@ -1195,17 +1351,17 @@ paths:
                     "messageText": "This should NOT be a verified message",
                     "verified": false,
                     "read": false,
-                    "__v": 0,
                     "createDate": "2024-07-23T19:30:14.089Z",
+                    "__v": 0,
                   },
                   {
-                    "_id": "66a004c0e6e6a8e16fca8210",
-                    "name": "Anonymous",
-                    "email": "No email",
-                    "messageText": "This is an anonymous message to the admins",
-                    "verified": false,
-                    "read": false,
-                    "createDate": "2024-07-23T19:30:08.007Z",
+                    "_id": "66a006ee5e9ad8a79398ae45",
+                    "name": "Freddy",
+                    "email": "Freddy@example.com",
+                    "messageText": "This should be a verified message, and have a createDate.",
+                    "verified": true,
+                    "read": true,
+                    "createDate": "2024-07-23T19:39:26.146Z",
                     "__v": 0,
                   },
                 ]
@@ -1308,37 +1464,69 @@ paths:
               example:
                 [
                   {
-                    "_id": "66aad3654c90731489adad4e",
+                    "_id": "66ad3d1c263beda349fb2a41",
                     "user":
                       {
-                        "_id": "668490250029a28118a8d1be",
-                        "userName": "Freddy",
-                        "email": "Freddy@example.com",
-                        "passwordHash": "$2b$10$UzF100wv.GI8Ba6nEqYvSOSnYW17HyLuLup5uSyg1knoA/aMSADsi",
+                        "_id": "667b294248b8805d71a96a03",
+                        "userName": "apmanager",
+                        "email": "rfoley00@live.com",
                         "admin": true,
-                        "moderator": false,
-                        "bio": "I have REALLY decided what to put in my bio yet.",
-                        "publishEmail": true,
+                        "bio": "I haven't decided what to put in my bio yet.",
                         "darkMode": true,
-                        "__v": 0,
-                        "id": "668490250029a28118a8d1be",
+                        "moderator": false,
+                        "publishEmail": true,
+                        "locked": false,
+                        "id": "667b294248b8805d71a96a03",
                       },
                     "entry":
                       {
-                        "_id": "668892f10371e6c253583148",
-                        "authorName": "apmanager",
-                        "entryTitle": "dddddddddddd",
-                        "bodyText": "dddddddddddddddddd",
-                        "choiceText": "dddddd",
-                        "previousEntry": "66885d8e6715f290d4ce03a9",
-                        "createDate": "2024-07-06T00:42:25.059Z",
-                        "storyId": "66885d8e6715f290d4ce03a9",
+                        "keywords": [],
+                        "_id": "6688142fb004b799a5a29d03",
+                        "authorName": "Freddy",
+                        "entryTitle": null,
                         "storyTitle": "Random Title",
+                        "bodyText": "Genji no monogatari",
+                        "previousEntry": null,
+                        "createDate": "2024-07-05T15:41:35.510Z",
+                        "storyId": "6688142fb004b799a5a29d03",
                         "__v": 0,
-                        "id": "668892f10371e6c253583148",
+                        "id": "6688142fb004b799a5a29d03",
                       },
-                    "reason": "This author has clearly misspelled 'When in the course of human events'",
-                    "createDate": "2024-08-01T17:38:48.795Z",
+                    "reason": "spam",
+                    "createDate": "2024-08-02T20:10:04.480Z",
+                    "__v": 0,
+                  },
+                  {
+                    "_id": "66bcc1308c632c903d8e5f98",
+                    "user":
+                      {
+                        "_id": "667b294248b8805d71a96a03",
+                        "userName": "apmanager",
+                        "email": "rfoley00@live.com",
+                        "admin": true,
+                        "bio": "I haven't decided what to put in my bio yet.",
+                        "darkMode": true,
+                        "moderator": false,
+                        "publishEmail": true,
+                        "locked": false,
+                        "id": "667b294248b8805d71a96a03",
+                      },
+                    "entry":
+                      {
+                        "keywords": [],
+                        "_id": "66a7fd2095206fecbb52c189",
+                        "authorName": "Freddy",
+                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "bodyText": "Lerrald and Vred set forth to find the greatest mapmaker in all the land, the Cartesian Bear. This meant that they were going south, because the Cartesian Bear was well known to dislike Polar Bears, and stay as far away from them as possible.\n\n\"So,\" spake Vred, as they travelled, \"do you think the whole story is going to be full of referential humor and obscure math jokes like this?\"\n\n\"Indeed,\" replied Lerrald, \"for the author art a nerd of the greatest magnitude. Also, the breaking of the fourth wall shalt most likely continue unabated.\"\n\nWhereupon Vred stopped walking for a moment, frowned, exclaimed \"Dang it!\" and hurried to catch up with Lerrald.",
+                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "createDate": "2024-07-29T20:35:44.858Z",
+                        "storyId": "6695b2573550c66db1ab9106",
+                        "storyTitle": "In the beginning...",
+                        "__v": 0,
+                        "id": "66a7fd2095206fecbb52c189",
+                      },
+                    "reason": "spam",
+                    "createDate": "2024-08-14T14:37:37.001Z",
                     "__v": 0,
                   },
                 ]
@@ -1617,9 +1805,8 @@ paths:
                   "_id": "668ee23ce1dcd980cf0739f9",
                   "userName": "FreddyQuaoar",
                   "email": "FreddyQuaoar@example.com",
-                  "passwordHash": "$2b$10$Bl2UBfX1bgDx0gV9IOesp.tPhNR5fRE1v/jHHn/RkUyoWQweVtJSu",
                   "admin": false,
-                  "moderator": true,
+                  "moderator": false,
                   "bio": "I haven't decided what to put in my bio yet.",
                   "publishEmail": false,
                   "darkMode": false,
@@ -1640,7 +1827,7 @@ paths:
           description: User not found.
           content:
             application/json:
-              example: { error: "There is no user with that userId." }
+              example: { "error": "There is no user with that userId." }
         default:
           description: Default error sample response
     put:
@@ -1662,7 +1849,7 @@ paths:
           explode: false
           schema: {}
       requestBody:
-        description: ""
+        description: "Fields in the user's database document to change, and the values they should be changed to"
         content:
           application/json:
             schema:
@@ -1681,19 +1868,21 @@ paths:
             application/json:
               example:
                 {
-                  "userId": "668ee23ce1dcd980cf0739f9",
+                  "_id": "668ee23ce1dcd980cf0739f9",
                   "userName": "FreddyQuaoar",
                   "email": "FreddyQuaoar@example.com",
                   "admin": false,
-                  "moderator": true,
+                  "moderator": false,
                   "bio": "I haven't decided what to put in my bio yet.",
                   "publishEmail": false,
                   "darkMode": false,
+                  "__v": 0,
                   "locked": false,
                   "publishedEntries": [],
                   "followedAuthors": [],
                   "likedEntries": [],
                   "bookmarkedEntries": [],
+                  "id": "668ee23ce1dcd980cf0739f9",
                 }
         "400":
           description: Invalid request.
@@ -1708,7 +1897,7 @@ paths:
           description: User not found.
           content:
             application/json:
-              example: { error: "There is no user with that userId." }
+              example: { "error": "There is no user with that userId." }
         default:
           description: Default error sample response
   /chain/{entryId}:
@@ -1739,6 +1928,7 @@ paths:
                   value:
                     [
                       {
+                        "storyId": "6688142fb004b799a5a29d03",
                         "entryId": "6688142fb004b799a5a29d03",
                         "authorName": "Freddy",
                         "authorId": "668490250029a28118a8d1be",
@@ -1746,11 +1936,11 @@ paths:
                         "storyTitle": "Random Title",
                         "bodyText": "Genji no monogatari",
                         "previousEntry": null,
+                        "createDate": "2024-07-05T15:41:35.510Z",
+                        "keywords": [],
                         "likes": 0,
                         "likedByUser": false,
                         "bookmarkedByUser": false,
-                        "createDate": "2024-07-05T15:41:35.510Z",
-                        "storyId": "6688142fb004b799a5a29d03",
                         "continuationEntries":
                           [
                             {
@@ -1760,6 +1950,7 @@ paths:
                               "entryTitle": "Chapter the first",
                               "authorName": "Freddy",
                               "previousEntry": "6688142fb004b799a5a29d03",
+                              "keywords": [],
                             },
                             {
                               "storyId": "6688142fb004b799a5a29d03",
@@ -1768,10 +1959,12 @@ paths:
                               "entryTitle": "adding to this entries list of sub entries",
                               "authorName": "apmanager",
                               "previousEntry": "6688142fb004b799a5a29d03",
+                              "keywords": [],
                             },
                           ],
                       },
                       {
+                        "storyId": "6688142fb004b799a5a29d03",
                         "entryId": "668d51e61be56166aaaa6cc2",
                         "authorName": "Freddy",
                         "authorId": "668490250029a28118a8d1be",
@@ -1779,11 +1972,11 @@ paths:
                         "storyTitle": "Random Title",
                         "bodyText": "It throws a bundle of tax forms at our hero, Bob, stunning him! The existential dread is almost enough to keep him from dodging the subsequent thrown calculator, but he manages to roll out of the way in time, and retaliate with a well-swung Swingline stapler!",
                         "previousEntry": "6688142fb004b799a5a29d03",
+                        "createDate": "2024-07-09T15:06:14.267Z",
+                        "keywords": [],
                         "likes": 0,
                         "likedByUser": false,
                         "bookmarkedByUser": false,
-                        "createDate": "2024-07-09T15:06:14.267Z",
-                        "storyId": "6688142fb004b799a5a29d03",
                         "continuationEntries": [],
                       },
                     ]
@@ -1791,6 +1984,7 @@ paths:
                   value:
                     [
                       {
+                        "storyId": "66bd0377fd83fe5734584642",
                         "entryId": "66bd0378fd83fe5734584651",
                         "authorName": "testkurmdlqazsvnepyhs0.7645244396758495",
                         "authorId": "66bd0374fd83fe5734584612",
@@ -1798,9 +1992,9 @@ paths:
                         "storyTitle": "testkurmdlqazsvnepyhs",
                         "bodyText": "testkurmdlqazsvnepyhs2",
                         "previousEntry": "66bd0377fd83fe5734584642",
-                        "likes": 0,
                         "createDate": "2024-08-14T19:20:24.445Z",
-                        "storyId": "66bd0377fd83fe5734584642",
+                        "keywords": [],
+                        "likes": 0,
                         "continuationEntries":
                           [
                             {
@@ -1814,6 +2008,7 @@ paths:
                           ],
                       },
                       {
+                        "storyId": "66bd0377fd83fe5734584642",
                         "entryId": "66bd0379fd83fe5734584660",
                         "authorName": "testkurmdlqazsvnepyhs0.7645244396758495",
                         "authorId": "66bd0374fd83fe5734584612",
@@ -1821,9 +2016,9 @@ paths:
                         "storyTitle": "testkurmdlqazsvnepyhs",
                         "bodyText": "testkurmdlqazsvnepyhs2",
                         "previousEntry": "66bd0378fd83fe5734584651",
-                        "likes": 0,
                         "createDate": "2024-08-14T19:20:25.135Z",
-                        "storyId": "66bd0377fd83fe5734584642",
+                        "keywords": [],
+                        "likes": 0,
                         "continuationEntries": [],
                       },
                     ]
@@ -1863,9 +2058,11 @@ paths:
                 registered:
                   value:
                     [
-                      { "keyword": "kitten", "count": 1729 },
-                      { "keyword": "cat", "count": 97 },
-                      { "keyword": "dog", "count": 12 },
+                      { "keyword": "keywords", "count": 2 },
+                      { "keyword": "testing", "count": 2 },
+                      { "keyword": "lock", "count": 2 },
+                      { "keyword": "sad", "count": 1 },
+                      { "keyword": "drama", "count": 1 },
                     ]
         "404":
           description: "No matching keywords found."

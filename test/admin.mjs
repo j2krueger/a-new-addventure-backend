@@ -765,10 +765,11 @@ describe('Test the admin routes', function () {
                         await agent.post('/login').send(adminLogin);
 
                         const res = await agent.put('/admin/user/' + testUserId).send({ admin: true });
-                        const user = await User.findById(testUserId);
+                        const user = JSON.parse(JSON.stringify(await User.findByIdAndPopulate(testUserId)));
+                        delete user.passwordHash;
 
                         expect(res).to.have.status(200);
-                        expect(res.body).to.deep.equal(JSON.parse(JSON.stringify(user.privateProfile())));
+                        expect(res.body).to.deep.equal(user);
                         expect(user.admin).to.be.true;
                     });
                 });
@@ -778,10 +779,11 @@ describe('Test the admin routes', function () {
                         await agent.post('/login').send(adminLogin);
 
                         const res = await agent.put('/admin/user/' + testAdminId).send({ admin: false });
-                        const user = await User.findById(testAdminId);
+                        const user = JSON.parse(JSON.stringify(await User.findByIdAndPopulate(testAdminId)));
+                        delete user.passwordHash;
 
                         expect(res).to.have.status(200);
-                        expect(res.body).to.deep.equal(JSON.parse(JSON.stringify(user.privateProfile())));
+                        expect(res.body).to.deep.equal(user);
                         expect(user.admin).to.be.false;
                     });
                 });
@@ -791,10 +793,11 @@ describe('Test the admin routes', function () {
                         await agent.post('/login').send(adminLogin);
 
                         const res = await agent.put('/admin/user/' + testUserId).send({ bio: "Blue" });
-                        const user = await User.findById(testUserId);
+                        const user = JSON.parse(JSON.stringify(await User.findByIdAndPopulate(testUserId)));
+                        delete user.passwordHash;
 
                         expect(res).to.have.status(200);
-                        expect(res.body).to.deep.equal(JSON.parse(JSON.stringify(user.privateProfile())));
+                        expect(res.body).to.deep.equal(user);
                         expect(user.bio).to.deep.equal("Blue");
                     });
                 });
@@ -804,10 +807,11 @@ describe('Test the admin routes', function () {
                         await agent.post('/login').send(adminLogin);
 
                         const res = await agent.put('/admin/user/' + testUserId).send({ publishEmail: false });
-                        const user = await User.findById(testUserId);
+                        const user = JSON.parse(JSON.stringify(await User.findByIdAndPopulate(testUserId)));
+                        delete user.passwordHash;
 
                         expect(res).to.have.status(200);
-                        expect(res.body).to.deep.equal(JSON.parse(JSON.stringify(user.privateProfile())));
+                        expect(res.body).to.deep.equal(user);
                         expect(user.publishEmail).to.be.false;
                     });
                 });

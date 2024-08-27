@@ -148,7 +148,7 @@ async function getChainById(req, res, next) {
   try {
     const results = [await req.foundEntryById.fullInfoWithContinuations()];
     while (results[0].previousEntry) {
-      const nextPreviousEntry = await Entry.findByIdAndPopulate(results[0].previousEntry, req?.session?.user?.id);
+      const nextPreviousEntry = await Entry.findByIdAndPopulate(results[0].previousEntry, req?.session?.user?._id);
       if (!nextPreviousEntry) {
         break;
       }
@@ -191,7 +191,7 @@ async function getFlagList(req, res, next) {
   try {
     const flagArray = await Flag
       .find()
-      .populate('user')
+      .populate('user', '-passwordHash')
       .populate({
         path: 'entry',
         transform: entry => {
