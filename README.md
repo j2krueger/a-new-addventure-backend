@@ -238,26 +238,35 @@ collection messages: {
 sessions - managed entirely by express-session
 
 ---
-match fields (capitals indicate match whole field exactly, except on body text):
- - s: story title
- - e: entry title
- - a: author
- - b: body text
- - k: keyword
-order fields (captials indicate descending order):
- - s: story title
- - e: entry title
- - a: author
- - l: likes
- - c: created
+
+## Entry Search (GET /entry?search="...")
+
+When searching for an entry, for the most part you should just need to enter one or more search words and the site should return all of the entries that include each search word in at least one of the following places: the body text of the entry, the entry title, the story title, the author name, or keywords.
+
+For more control over where a search word should be searched for, you can prefix that particular word with one or more field specifiers and a colon. For example, if you know the name of the author of the entry you're looking for is *Freddy*, you can include the term `A:Freddy`, and the search will only match entries written by the user *Freddy*, but not the users *freddy*, *FreddyMercury*, or *GetFreddyGetSetGo*. If you only know or remember part of the author's name, you can include the term `a:Freddy`, and the search can match entries by any of the above users, but not by *Fredy* or *Fred-dy*. Neither term will match against an entry written by the user *Michael* even if it has the name *Freddy* in the body text.
+
+You can also combine multiple field specifiers in one search term, and the term will match as long as the word is in one of the fields specified. The term `Ab:Freddy`, for example, will match any entry written by the user *Freddy*, as well as any entry containing *Freddy*, *freddy*, *FREDDY*, or *getfreddygetsetgo* in the body text. Any word with no field specifier prefix acts exactly as if it were prefixed with `seabK:`.
+
+Specifies a case insensitive match to any part of the field:
+s: story title
+e: entry title
+a: author name
+b: body text
+k: keywords
+
+Specifies a case sensitive match to the entire field:
+S: story title
+E: entry title
+A: author name
+K: keywords
 
 
- s: { storyTitle: { $regex: word } },
-      e: { entryTitle: { $regex: word } },
-      a: { authorName: { $regex: word } },
-      b: { bodyText: { $regex: word } },
-      k: { keywords: { $regex: word } },
-      S: { storyTitle: word },
-      E: { entryTitle: word },
-      A: { authorName: word },
-      K: { keywords: word },
+By default, the returned entries are sorted with the newest ones first and the oldest ones last, but you can also specify the sort order of the list of returned entries by adding a term starting with `o:`, followed by one or more of the following field specifiers:
+
+s: story title
+e: entry title
+a: author name
+l: number of likes
+c: creation date of the entry
+
+If a field specifier is lowercase, then that field will be sorted in ascending order (a to z, lower numbers before higher numbers, earliest/oldest to latest/newest), and if the field specifier is uppercase, that field will be sorted in decending order (z to a, higher numbers before lower numbers, latest/newest to earliest/oldest). Text is always sorted in a case insensitive way, so *ABBA* and *anonymouse* will both be before *ZZZ* and *zzz*. 
