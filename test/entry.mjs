@@ -1484,17 +1484,17 @@ describe('Test the entry handling routes', function () {
             });
         });
 
-        describe('Test the DELETE /entry/:entryId/keyword route', function () {
+        describe('Test the DELETE /entry/:entryId/keyword/:keywordValue route', function () {
             describe('Happy paths', function () {
                 describe('Login as author and delete a keyword', function () {
                     it('should return a 200 status and a success message, and remove the keyword from the entry', async function () {
                         await agent.post('/login').send(testUserLogin);
 
-                        const res = await agent.delete('/entry/' + story.entryId + '/keyword').send([story.keywords[2]]);
+                        const res = await agent.delete('/entry/' + story.entryId + '/keyword/' + story.keywords[2]);
                         const entry = await Entry.findById(story.entryId);
 
                         expect(res).to.have.status(200);
-                        expect(res.body).to.deep.equal({ message: "Keywords successfully deleted." });
+                        expect(res.body).to.deep.equal({ message: "Keyword successfully deleted." });
                         expect(entry.keywords).to.not.include(story.keywords[2]);
                     });
                 });
@@ -1505,7 +1505,7 @@ describe('Test the entry handling routes', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/login').send(adminLogin);
 
-                        const res = await agent.delete('/entry/' + story.entryId + '/keyword').send([story.keywords[2]]);
+                        const res = await agent.delete('/entry/' + story.entryId + '/keyword/' + story.keywords[2]);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
@@ -1515,20 +1515,9 @@ describe('Test the entry handling routes', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/logout');
 
-                        const res = await agent.delete('/entry/' + story.entryId + '/keyword').send([story.keywords[2]]);
+                        const res = await agent.delete('/entry/' + story.entryId + '/keyword/' + story.keywords[2]);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
-                    });
-                });
-
-                describe('Login as author and DELETE with a non-array', function () {
-                    it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
-
-                        const res = await agent.delete('/entry/' + story.entryId + '/keyword').send("silly");
-
-                        expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
                     });
                 });
 
@@ -1536,10 +1525,10 @@ describe('Test the entry handling routes', function () {
                     it('should return a 400 status and an error message', async function () {
                         await agent.post('/login').send(testUserLogin);
 
-                        const res = await agent.delete('/entry/' + story.entryId + '/keyword').send(["silly?"]);
+                        const res = await agent.delete('/entry/' + story.entryId + '/keyword/silly!');
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
+                        expect(res.body).to.deep.equal({ error: "That is not a valid keyword." });
                     });
                 });
 
@@ -1547,7 +1536,7 @@ describe('Test the entry handling routes', function () {
                     it('should return a 404 status and an error message', async function () {
                         await agent.post('/login').send(testUserLogin);
 
-                        const res = await agent.delete('/entry/' + story.entryId + '/keyword').send(["silly"]);
+                        const res = await agent.delete('/entry/' + story.entryId + '/keyword/silly');
 
                         expect(res).to.have.status(404);
                         expect(res.body).to.deep.equal({ error: "Keyword not found in entry." });

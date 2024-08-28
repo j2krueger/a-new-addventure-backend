@@ -378,28 +378,43 @@ describe('Test the user handling routes', function () {
     });
 
     describe('Test the POST /user/:userId/follow route', function () {
-        describe('Happy paths', function () {
-            describe('Login and POST /user/668490250029a28118a8d1be/follow', function () {
-                it('should return 200 ok and a success message', async function () {
-                    const loginRes = await agent.post('/login').send(testUserLogin);
+        let followedUserId;
 
-                    const res = await agent.post('/user/668490250029a28118a8d1be/follow');
-                    const follow = await Follow.findOne({ follower: loginRes.body.userId });
+        before('Set up user for follow testing', async function () {
+            const res = await agent.post('/register')
+                .send({ userName: 'followed-' + newUserName, email: 'followed-' + newEmail, password: newPassword });
+            followedUserId = res.body.userId;
+        });
+
+        afterEach('Make sure all follows on followedUserId are deleted after each test', async function () {
+            await Follow.deleteMany({ following: followedUserId });
+        });
+
+        after('Teardown user for follow testing', async function () {
+            await User.findByIdAndDelete(followedUserId);
+        })
+
+        describe('Happy paths', function () {
+            describe('Login and POST /user/:userId/follow', function () {
+                it('should return 200 ok and a success message, and add a follow to the database', async function () {
+                    await agent.post('/login').send(testUserLogin);
+
+                    const res = await agent.post('/user/' + followedUserId + '/follow');
+                    const follows = await Follow.find({ following: followedUserId });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Follow successful." });
-
-                    await Follow.findByIdAndDelete(follow._id);
+                    expect(follows).to.be.an('array').with.lengthOf(1);
                 });
             });
         });
 
         describe('Sad paths', function () {
-            describe('Logout and POST /user/668490250029a28118a8d1be/follow', function () {
+            describe('Logout and POST /user/:userId/follow', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/logout');
 
-                    const res = await agent.post('/user/668490250029a28118a8d1be/follow');
+                    const res = await agent.post('/user/' + followedUserId + '/follow');
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });
@@ -416,17 +431,15 @@ describe('Test the user handling routes', function () {
                 });
             });
 
-            describe('Login and POST /user/668490250029a28118a8d1be/follow again', function () {
+            describe('Login and POST /user/:userId/follow again', function () {
                 it('should return a 409 status and an error message', async function () {
-                    const loginRes = await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUserLogin);
 
-                    await agent.post('/user/668490250029a28118a8d1be/follow');
-                    const res = await agent.post('/user/668490250029a28118a8d1be/follow');
+                    await agent.post('/user/' + followedUserId + '/follow');
+                    const res = await agent.post('/user/' + followedUserId + '/follow');
 
                     expect(res).to.have.status(409);
                     expect(res.body).to.deep.equal({ error: "You are already following that user." });
-
-                    await Follow.findOneAndDelete({ follower: loginRes.body.userId });
                 });
             });
 

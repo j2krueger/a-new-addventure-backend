@@ -6,7 +6,7 @@ const Like = require('../models/like');
 const Flag = require('../models/flag');
 const Bookmark = require('../models/bookmark');
 const {
-  // isValidKeyword,
+  isValidKeyword,
   isValidKeywordArray
 } = require('../helpers/validation');
 
@@ -44,6 +44,14 @@ async function paramFlagId(req, res, next, value) {
   } catch (error) {
     return next(error);
   }
+}
+
+async function paramKeyword(req, res, next, value) {
+  if (!isValidKeyword(value)) {
+    return res.status(400).json({ error: "That is not a valid keyword." })
+  }
+  req.keywordValue = value;
+  return next();
 }
 
 async function getEntryList(req, res) {
@@ -378,19 +386,16 @@ async function addKeywords(req, res, next) {
   }
 }
 
-async function deleteKeywords(req, res, next) {
+async function deleteKeyword(req, res, next) {
   try {
-    if (!isValidKeywordArray(req.body)) {
-      return res.status(400).json({ error: "Request body must be an array of strings." });
-    }
-    const entryKeywords = new Set(req.foundEntryById.keywords);
-    const deleteKeywords = new Set(req.body);
-    if (!entryKeywords.isSupersetOf(deleteKeywords)) {
+    const entryKeywordSet = new Set(req.foundEntryById.keywords);
+    const deleteKeywordSet = new Set([req.keywordValue]);
+    if (!entryKeywordSet.isSupersetOf(deleteKeywordSet)) {
       return res.status(404).json({ error: "Keyword not found in entry." });
     }
-    req.foundEntryById.keywords = Array.from(entryKeywords.difference(deleteKeywords));
+    req.foundEntryById.keywords = Array.from(entryKeywordSet.difference(deleteKeywordSet));
     req.foundEntryById.save();
-    return res.status(200).json({ message: "Keywords successfully deleted." });
+    return res.status(200).json({ message: "Keyword successfully deleted." });
   } catch (error) {
     return next(error);
   }
@@ -399,6 +404,7 @@ async function deleteKeywords(req, res, next) {
 module.exports = {
   paramEntryId,
   paramFlagId,
+  paramKeyword,
   getEntryList,
   getEntryById,
   getChainById,
@@ -414,5 +420,5 @@ module.exports = {
   getFlagList,
   getKeywordList,
   addKeywords,
-  deleteKeywords,
+  deleteKeyword,
 }

@@ -9,7 +9,6 @@ const userControllers = require('../controllers/user');
 const entryControllers = require('../controllers/entry');
 const miscControllers = require('../controllers/misc');
 
-
 router.use(cors({
     origin: constants.corsAllowURLs,
     credentials: true
@@ -19,6 +18,7 @@ router.use(cors({
 router.param('userId', userControllers.paramUserId);
 router.param('entryId', entryControllers.paramEntryId);
 router.param('flagId', entryControllers.paramFlagId);
+router.param('keywordValue', entryControllers.paramKeyword);
 router.param('messageId', miscControllers.paramMessageId);
 
 // All routes starting with /admin are restricted to logged in admins
@@ -36,7 +36,7 @@ router.delete('/admin/user/:userId/lock', userControllers.unlockUser);
 router.get('/admin/user/:userId', userControllers.adminGetUser);
 router.put('/admin/user/:userId', userControllers.alterUser);
 router.put('/admin/entry/:entryId/keyword', entryControllers.addKeywords);
-router.delete('/admin/entry/:entryId/keyword', entryControllers.deleteKeywords);
+router.delete('/admin/entry/:entryId/keyword/:keywordValue', entryControllers.deleteKeyword);
 
 // user related routes
 router.post('/register', userControllers.registerUser);
@@ -64,16 +64,9 @@ router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
 router.post('/entry/:entryId/bookmark', userAuth, entryControllers.bookmarkEntry);
 router.delete('/entry/:entryId/bookmark', userAuth, entryControllers.unBookmarkEntry);
 router.put('/entry/:entryId/keyword', entryAuthorAuth, entryControllers.addKeywords);
-router.delete('/entry/:entryId/keyword', entryAuthorAuth, entryControllers.deleteKeywords);
+router.delete('/entry/:entryId/keyword/:keywordValue', entryAuthorAuth, entryControllers.deleteKeyword);
 
 // miscelaneous routes
 router.post('/message', miscControllers.postMessage);
-
-if (constants.localDeploy && constants.testing) { // use on loca
-    router.get('/sessioncheck', function (req, res) {
-        res.status(200).json(req.session);
-    });
-}
-
 
 module.exports = router;

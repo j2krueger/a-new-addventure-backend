@@ -1165,7 +1165,7 @@ paths:
         default:
           description: Default error sample response
   /entry/{entryId}/keyword:
-    summary: PUT/DELETE keywords
+    summary: Add one or more keywords to an entry
     put:
       tags:
         - Entry
@@ -1212,34 +1212,36 @@ paths:
               example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
+  /entry/{entryId}/keyword/{keywordValue}:
+    summary: Delete a keyword from an entry
     delete:
       tags:
         - Entry
         - Keyword
       summary: Delete keywords from an entry.
       description: "Delete one or more keywords from an entry. Only the entry's author can use this route."
-      operationId: delete_keywords
+      operationId: delete_keyword
       parameters:
         - name: entryId
           in: path
-          description: the ID of the entry
+          description: The ID of the entry
           required: true
           style: simple
           explode: false
           schema: {}
-      requestBody:
-        description: "Array of keywords to delete from an entry"
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Keywords"
-            example: ["drama", "silly"]
+        - name: keywordValue
+          in: path
+          description: The keyword to delete
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         "200":
-          description: "Successfully deleted all keywords"
+          description: "Successfully deleted the keyword"
           content:
             application/json:
-              example: { "message": "Keywords successfully deleted." }
+              example: { "message": "Keyword successfully deleted." }
         "400":
           description: "Bad request"
           content:
@@ -1248,9 +1250,8 @@ paths:
                 badEntryId:
                   value:
                     { "error": "That is not a properly formatted entryId." }
-                badKeywords:
-                  value:
-                    { "error": "Request body must be an array of strings." }
+                badKeyword:
+                  value: { "error": "That is not a valid keyword." }
         "404":
           description: "Entity not found"
           content:
@@ -1601,7 +1602,7 @@ paths:
         default:
           description: Default error sample response
   /admin/entry/{entryId}/keyword:
-    summary: PUT/DELETE keywords
+    summary: Add one or more keywords to an entry
     put:
       tags:
         - Entry
@@ -1649,6 +1650,8 @@ paths:
               example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
+  /admin/entry/{entryId}/keyword/{keywordValue}:
+    summary: Delete a keyword from an entry
     delete:
       tags:
         - Entry
@@ -1656,28 +1659,28 @@ paths:
         - Admin
       summary: Delete keywords from an entry.
       description: "Delete one or more keywords from an entry. Only admins can use this route."
-      operationId: admin_delete_keywords
+      operationId: admin_delete_keyword
       parameters:
         - name: entryId
           in: path
-          description: the ID of the entry
+          description: The ID of the entry
           required: true
           style: simple
           explode: false
           schema: {}
-      requestBody:
-        description: "An array of the keywords to delete"
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Keywords"
-            example: ["drama", "silly"]
+        - name: keywordValue
+          in: path
+          description: The keyword to delete from the entry
+          required: true
+          style: simple
+          explode: false
+          schema: {}
       responses:
         "200":
-          description: "Successfully deleted all keywords"
+          description: "Successfully deleted the keyword"
           content:
             application/json:
-              example: { "message": "Keywords successfully deleted." }
+              example: { "message": "Keyword successfully deleted." }
         "400":
           description: "Bad request"
           content:
@@ -1687,8 +1690,7 @@ paths:
                   value:
                     { "error": "That is not a properly formatted entryId." }
                 badKeywords:
-                  value:
-                    { "error": "Request body must be an array of strings." }
+                  value: { "error": "That is not a valid keyword." }
         "404":
           description: "Entity not found"
           content:
