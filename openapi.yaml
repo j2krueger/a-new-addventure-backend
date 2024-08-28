@@ -2036,6 +2036,22 @@ paths:
               example: { "error": "There is no entry with that entryId." }
         default:
           description: Default error sample response
+  /stats:
+    summary: Get some basic site statistics
+    get:
+      tags:
+        - Statistics
+      summary: Get some basic site statistics
+      description: Get the number of users, stories, and entries currently on the site.
+      operationId: get_stats
+      responses:
+        "200":
+          description: Successfully got site statistics.
+          content:
+            application/json:
+              example: { "users": 36, "stories": 9, "entries": 17 }
+        default:
+          description: Default error sample response
   /keywords:
     summary: GET a list of keywords in use and their counts.
     get:

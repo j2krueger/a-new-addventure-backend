@@ -126,4 +126,32 @@ describe('Test miscelaneous routes', function () {
             });
         });
     });
+
+    describe('Test the GET /stats route', function () {
+        describe('Logout and GET /stats', function () {
+            it('should return a 200 status and some statistics.', async function () {
+                await agent.post('/logout');
+
+                const res = await agent.get('/stats');
+
+                expect(res).to.have.status(200);
+                expect(res.body.users).to.be.a('number');
+                expect(res.body.stories).to.be.a('number');
+                expect(res.body.entries).to.be.a('number');
+            });
+        });
+
+        describe('Login and GET /stats', function () {
+            it('should return a 200 status and some statistics', async function () {
+                await agent.post('/login').send(testUserLogin);
+
+                const res = await agent.get('/stats');
+
+                expect(res).to.have.status(200);
+                expect(res.body.users).to.be.a('number');
+                expect(res.body.stories).to.be.a('number');
+                expect(res.body.entries).to.be.a('number');
+            });
+        });
+    });
 });

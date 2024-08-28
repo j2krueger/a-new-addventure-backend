@@ -3,6 +3,7 @@
 // const constants = require('../helpers/constants');
 const Message = require('../models/message');
 const User = require('../models/user');
+const Entry = require('../models/entry');
 
 async function paramMessageId(req, res, next, value) {
     if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
@@ -77,10 +78,23 @@ async function deleteMessage(req, res, next) {
     }
 }
 
+async function getStats(req, res, next) {
+    try {
+        const result = {};
+        result.users = await User.countDocuments();
+        result.stories = await Entry.countDocuments({ previousEntry: null })
+        result.entries = await Entry.countDocuments();
+        return res.status(200).json(result);
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     paramMessageId,
     postMessage,
     getMessage,
     putMessage,
     deleteMessage,
+    getStats,
 }

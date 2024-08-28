@@ -66,7 +66,8 @@ router.delete('/entry/:entryId/bookmark', userAuth, entryControllers.unBookmarkE
 router.put('/entry/:entryId/keyword', entryAuthorAuth, entryControllers.addKeywords);
 router.delete('/entry/:entryId/keyword/:keywordValue', entryAuthorAuth, entryControllers.deleteKeyword);
 
-// miscelaneous routes
+// miscellaneous routes
 router.post('/message', miscControllers.postMessage);
+router.get('/stats', miscControllers.getStats);
 
 module.exports = router;
