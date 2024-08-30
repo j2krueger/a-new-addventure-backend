@@ -46,29 +46,24 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 - Anyone can read, only logged in users can post/edit/delete
 - post an entry that starts a story
 	- story title
-	- branch title
 	- entry title
 	- author by login 
 	- keywords
 	- body
 - post an entry that continues a story
-	- branch title/default inherited
 	- entry title
-	- choice text - unique on continued entry
 	- author
 	- keywords
 	- body
-- edit an entry (creator/mod/admin only) (keep all versions, only display last)
-- delete an entry (creator/mod/admin only)
+- edit an entry (creator/mod/admin only) (keep all versions?, only display last)
+- delete an entry (mod/admin only)
 - flag an entry
-- edit keywords for an entry (any logged in user can add keywords?)
-	- the keywords "NSFW", "SEX", "GORE", and "FF:(title)":
+- edit keywords for an entry (author/mods/admins can add keywords)
+	- the keywords "NSFW", "SEX", "GORE", and "FF.(title)":
 		- Must be marked when applicable
 		- are automatically propagated to all continuations
 		- may only be removed by mod/admin/?creator?
-		- "FF:(title)" indicates fan fiction, e.g. "FF:Gurren Lagann"
-- comment on an entry
-- user to user DMs
+		- "FF.(title)" indicates fan fiction, e.g. "FF.Gurren Lagann"
 - register user
 	- username
 	- password
@@ -105,18 +100,8 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 		 - rating?
 - Flag:
 	- entry
-	- keyword
-	- comment
-	- user
-- i18n/l10n?
 - timeout on email validation
-- logging
-	- log all requests with IP, keep for maybe a month
-	- log all failed login requests with IP in a separate file, keep for at least a year
-	- send email to admins on multiple failed logins in an hour
-	- on multiple failed logins from a given IP in under a minute
-		- send email, sms
-		- auto IP ban?
+
 
 ---
 
@@ -124,10 +109,12 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 - "use strict";
 - git/github
 - node/npm
-- MongoDB
+- MongoDB/Mongoose
 - express
-- bcrypt
 - express-session
+- bcrypt
+- morgan
+- nodemailer
 - eslint
 - mocha/chai/chai-http
 

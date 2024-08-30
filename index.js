@@ -72,7 +72,7 @@ if (constants.localDeploy) {
             maxAge: constants.loginExpirationTime,
             sameSite: 'strict',
             secure: true,
-            domain: '.quiltedchronicles.org',
+            // domain: '.quiltedchronicles.org',
         }
     }));
 }
