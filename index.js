@@ -70,7 +70,7 @@ if (constants.localDeploy) {
         cookie: {
             httpOnly: true,
             maxAge: constants.loginExpirationTime,
-            sameSite: 'strict',
+            sameSite: 'none',
             secure: true,
             // domain: '.quiltedchronicles.org',
         }
