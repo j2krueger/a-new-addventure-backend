@@ -15,7 +15,7 @@ import Like from '../models/like.js';
 import Flag from '../models/flag.js';
 import Bookmark from '../models/bookmark.js';
 
-const testString = "testkurmdlqazsvnepyhs";
+const { testString } = constants;
 const newUserName = testString + Math.random();
 const newEmail = newUserName + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();

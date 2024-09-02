@@ -40,7 +40,7 @@ describe('Test the user handling routes', function () {
     describe('Test the POST /register route', function () {
         describe('Happy paths', function () {
             describe('POST /register with unique userName, unique email, and password', function () {
-                it('should return 201 created and the new user\'s privateProfile()', async function () {
+                it('should return 201 status and the new user\'s privateProfile()', async function () {
                     const res = await agent.post('/register').send({ userName: 'test' + newUserName, email: 'test' + newEmail, password: newPassword });
 
                     expect(res).to.have.status(201);
@@ -103,7 +103,81 @@ describe('Test the user handling routes', function () {
                 })
             })
         });
+    });
 
+    describe('Test email verification', function () {
+        describe('Happy paths', function () {
+            describe('Register user and logout and POST /verify/:userId/:emailVerificationKey', function () {
+                it('should return a 200 status and a success message, and set user\'s emailVerified field to true', async function () {
+                    const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    await agent.post('/logout');
+
+                    const user = await User.findById(userRes.body.userId);
+                    const res = await agent.post('/verify/' + user._id + '/' + user.emailVerificationKey);
+                    const reUser = await User.findById(userRes.body.userId);
+
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.deep.equal({ message: "Email successfully verified." });
+                    expect(reUser.emailVerified).to.be.true;
+
+                    await User.findByIdAndDelete(user._id);
+                });
+            });
+        });
+
+        describe('Sad paths', function () {
+            describe('POST /verify/:userId/:emailVerificationKey with the wrong key', function () {
+                it('should return a 403 status and an error message, and not set emailVerified to true', async function () {
+                    const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    await agent.post('/logout');
+
+                    const user = await User.findById(userRes.body.userId);
+                    const res = await agent.post('/verify/' + user._id + '/00000000000000000000');
+                    const reUser = await User.findById(userRes.body.userId);
+
+                    expect(res).to.have.status(403);
+                    expect(res.body).to.deep.equal({ error: "Bad email verification key." });
+                    expect(reUser.emailVerified).to.be.false;
+
+                    await User.findByIdAndDelete(user._id);
+                });
+            });
+
+            describe('POST /verify/:userId/:emailVerificationKey with misformed key', function () {
+                it('should return a 400 status and an error message, and not set emailVerified to true', async function () {
+                    const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    await agent.post('/logout');
+
+                    const user = await User.findById(userRes.body.userId);
+                    const res = await agent.post('/verify/' + user._id + '/0');
+                    const reUser = await User.findById(userRes.body.userId);
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted email verification key." });
+                    expect(reUser.emailVerified).to.be.false;
+
+                    await User.findByIdAndDelete(user._id);
+                });
+            });
+
+            describe('POST /verify/:userId/:emailVerificationKey with user whose email has already been verified', function () {
+                it('should return a 409 status and an error message', async function () {
+                    const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    await agent.post('/logout');
+
+                    const user = await User.findById(userRes.body.userId);
+                    await agent.post('/verify/' + user._id + '/' + user.emailVerificationKey);
+                    const res = await agent.post('/verify/' + user._id + '/' + user.emailVerificationKey);
+                    const reUser = await User.findById(userRes.body.userId);
+
+                    expect(res).to.have.status(409);
+                    expect(res.body).to.deep.equal({ error: "Email already verified." });
+                    expect(reUser.emailVerified).to.be.true;
+
+                    await User.findByIdAndDelete(user._id);
+                });
+            });
+        });
     });
 
     describe('Test the POST /login route', function () {

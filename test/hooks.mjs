@@ -37,9 +37,7 @@ export const mochaHooks = {
         } catch (error) {
             console.log("Database not conected: ", error)
         }
-        const res = await agent
-            .post('/register')
-            .send({ userName: newUserName, email: newEmail, password: newPassword });
+        const res = await agent.post('/register').send({ userName: newUserName, email: newEmail, password: newPassword });
 
         expect(res).to.have.status(201);
         expect(res.body).to.be.an('object');

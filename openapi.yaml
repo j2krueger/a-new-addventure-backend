@@ -688,6 +688,86 @@ paths:
               example: { "error": "No follow to remove." }
         default:
           description: Default error sample response
+  /verify:
+    summary: If a user with an unverified email address is logged in, send a verification to their email address.
+    post:
+      tags:
+        - User
+      summary: If a user with an unverified email address is logged in, send a verification to their email address.
+      description:
+        If a user with an unverified email address is logged in, send a verification to their email address,
+        containing a link with the userId and an emailVerificationKey.
+      operationId: send_verification_email
+      responses:
+        "200":
+          description: "Verification email successfully sent"
+          content:
+            application/json:
+              example: { "message": "Verification email sent." }
+        default:
+          description: Default error sample response
+  /verify/{userId}/{emailVerificationKey}:
+    summary: Verify an email address
+    post:
+      tags:
+        - User
+      summary: Verify an email address.
+      description:
+        When a user is registered, or a user with an unverified email posts to the /verify route, an email is sent to
+        the user's email address containing a link to the front end that contains their userId and emailVerificationKey.
+        That page on the front end posts to this route with the userId and emailVerificationKey, setting the user's
+        emailVerified field to true.
+      operationId: verify_email
+      parameters:
+        - name: userId
+          in: path
+          description: the ID of a user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+        - name: emailVerificationKey
+          in: path
+          description: the email verification key
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      responses:
+        "200":
+          description: "email successfully verified"
+          content:
+            application/json:
+              example: { "message": "Email successfully verified." }
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                badUserId:
+                  value: { "error": "That is not a properly formatted userId." }
+                badEmailVerificationKey:
+                  value:
+                    {
+                      "error": "That is not a properly formatted email verification key.",
+                    }
+        "403":
+          description: "Unauthorized"
+          content:
+            application/json:
+              example: { "error": "Bad email verification key." }
+        "404":
+          description: "User not found"
+          content:
+            application/json:
+              example: { "error": "There is no user with that userId." }
+        "409":
+          description: "Email is already verified."
+          content:
+            application/json:
+              example: { "error": "Email already verified." }
+        default:
+          description: Default error sample response
   /entry:
     summary: GET/POST entries
     get:

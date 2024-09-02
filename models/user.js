@@ -44,6 +44,13 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  emailVerificationKey: {
+    type: String,
+  },
 }, {
   toJSON: { virtuals: true },
   toObject: { virtuals: true },

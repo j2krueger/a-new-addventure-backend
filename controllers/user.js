@@ -6,6 +6,8 @@ const saltRounds = 10;
 const User = require('../models/user');
 const Follow = require('../models/follow');
 const jwt = require('jsonwebtoken');
+const transporter = require('../helpers/mail');
+const { randomBytes } = require('node:crypto');
 
 
 async function paramUserId(req, res, next, value) {
@@ -22,6 +24,27 @@ async function paramUserId(req, res, next, value) {
     } catch (error) {
         return next(error);
     }
+}
+
+async function paramEmailVerificationKey(req, res, next, value) {
+    if (typeof value != 'string' || !/^[0-9a-f]{20}$/.test(value)) {
+        return res.status(400).json({ error: "That is not a properly formatted email verification key." });
+    }
+    req.emailVerificationKey = value;
+    return next();
+}
+
+async function sendVerificationEmailHelper(user) {
+    user.emailVerificationKey = randomBytes(10).toString('hex');
+    const userId = user._id;
+    const email = user.email.includes(constants.testString) ? constants.testEmailAddress : user.email;
+    await transporter.sendMail({
+        from: constants.siteEmailAddress,
+        to: email,
+        subject: "Email Verification from QuiltedChronicles.org",
+        html: `Just a basic link: <a href="https://api.quiltedchronicles.org/verify/${userId}/${user.emailVerificationKey}">Click here to verify</a>
+        UserName: ${user.userName}`,
+    });
 }
 
 async function registerUser(req, res) {
@@ -46,11 +69,39 @@ async function registerUser(req, res) {
             passwordHash: passwordHash,
         });
         try {
+            await sendVerificationEmailHelper(newUser);
             await newUser.save();
         } catch (error) {
             return res.status(500).json(error);
         }
         res.status(201).json(newUser.privateProfile());
+    }
+}
+
+async function sendVerificationEmail(req, res, next) {
+    try {
+        await sendVerificationEmailHelper(req.authenticatedUser);
+        await req.authenticatedUser.save();
+        res.status(200).json({ message: "Verification email sent." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+async function verifyEmail(req, res, next) {
+    try {
+        if (req.foundUserById.emailVerified) {
+            return res.status(409).json({ error: "Email already verified." });
+        }
+        if (req.foundUserById.emailVerificationKey != req.emailVerificationKey) {
+            return res.status(403).json({ error: "Bad email verification key." });
+        }
+        req.foundUserById.emailVerified = true;
+        await req.foundUserById.save();
+        await User.updateOne({ _id: req.foundUserById._id }, { $unset: { emailVerificationKey: 1 } });
+        return res.status(200).json({ message: "Email successfully verified." });
+    } catch (error) {
+        return next(error);
     }
 }
 
@@ -232,7 +283,10 @@ async function alterUser(req, res, next) {
 
 module.exports = {
     paramUserId,
+    paramEmailVerificationKey,
     registerUser,
+    verifyEmail,
+    sendVerificationEmail,
     loginUser,
     logoutUser,
     getUser,
