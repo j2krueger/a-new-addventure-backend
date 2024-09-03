@@ -26,6 +26,7 @@ const testEntry = { entryTitle: testString + "1", bodyText: testString + "2", ke
 let _newUserPrivateProfile;
 let _newUserPublicInfo;
 let _newUserBasicInfo;
+let _verificationEmailCount = 0;
 
 const summaryKeys = ['storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry', 'likes', 'keywords'];
 
@@ -46,6 +47,14 @@ function newUserPublicInfo() {
 
 function newUserBasicInfo() {
     return _newUserBasicInfo;
+}
+
+function shouldSendVerificationEmail() {
+    _verificationEmailCount++;
+}
+
+function expectedNumberOfVerificationEmails() {
+    return _verificationEmailCount;
 }
 
 function expectMongoObjectId(object) {
@@ -74,6 +83,8 @@ export {
     newUserPrivateProfile,
     newUserPublicInfo,
     newUserBasicInfo,
+    shouldSendVerificationEmail,
+    expectedNumberOfVerificationEmails,
     summaryKeys,
     // models
     User,

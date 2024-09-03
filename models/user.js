@@ -156,6 +156,7 @@ userSchema.methods.privateProfile = function privateProfile() {
     publishEmail: this.publishEmail,
     darkMode: this.darkMode,
     locked: this.locked,
+    emailVerified: this.emailVerified,
     publishedEntries: this.publishedEntries || [],
     followedAuthors: this.followedAuthors || [],
     likedEntries: this.likedEntries || [],
