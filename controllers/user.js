@@ -105,6 +105,26 @@ async function verifyEmail(req, res, next) {
     }
 }
 
+async function changePassword(req, res, next) {
+    try {
+        const { password, newPassword } = req.body;
+        if (!password) {
+            return res.status(400).json({ error: "Missing password." });
+        }
+        if (!newPassword) {
+            return res.status(400).json({ error: "Missing newPassword." });
+        }
+        if (!await bcrypt.compare(password, req.authenticatedUser.passwordHash)) {
+            return res.status(403).json({ error: "Incorrect password." });
+        }
+        req.authenticatedUser.passwordHash = await bcrypt.hash(newPassword, saltRounds);
+        req.authenticatedUser.save();
+        return res.status(200).json({ message: "Password has been successfully changed." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 async function loginUser(req, res, next) {
     const name = req.body?.name;
     const password = req.body?.password;
@@ -290,6 +310,7 @@ module.exports = {
     registerUser,
     verifyEmail,
     sendVerificationEmail,
+    changePassword,
     loginUser,
     logoutUser,
     getUser,

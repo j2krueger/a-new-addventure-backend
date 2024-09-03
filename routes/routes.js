@@ -52,6 +52,7 @@ router.delete('/user/:userId/follow', userAuth, userControllers.unFollowUser);
 router.get('/profile', userAuth, userControllers.getProfile);
 router.put('/profile', userAuth, userControllers.putProfile);
 router.post('/verify', userAuth, userControllers.sendVerificationEmail);
+router.post('/changepassword', userAuth, userControllers.changePassword);
 
 // unauthorized entry routes
 router.get('/entry', entryControllers.getEntryList);

@@ -1,6 +1,7 @@
 "use strict";
 
 import * as globals from './globals.mjs';
+import bcrypt from "bcrypt";
 const {
     // resources
     expect,
@@ -608,6 +609,87 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(404);
                     expect(res.body).to.deep.equal({ error: 'No follow to remove.' })
+                });
+            });
+        });
+    });
+
+    describe('Test the password changing routes', function () {
+        describe('Test the POST /changepassword route', function () {
+            let passwordTestUserId;
+
+            before('Setup user for /changepassword testing', async function () {
+                const res = await agent.post('/register')
+                    .send({ userName: 'changePassword-' + newUserName, email: 'changePassword-' + newEmail, password: newPassword });
+                shouldSendVerificationEmail();
+                passwordTestUserId = res.body.userId;
+            });
+
+            beforeEach('Make sure the test user\'s password is the default before each test', async function () {
+                await User.findByIdAndUpdate(passwordTestUserId, { passwordHash: await bcrypt.hash(newPassword, constants.saltRounds) });
+            });
+
+            after('Teardown user for /changepassword testing', async function () {
+                await User.findByIdAndDelete(passwordTestUserId);
+            })
+
+            describe('Happy paths', function () {
+                describe('Login and POST /changepassword with correct password and newPassword', function () {
+                    it('should return a 200 status and a success message and change the passwordHash in the database', async function () {
+                        await agent.post('/login').send({ name: 'changePassword-' + newUserName, password: newPassword });
+
+                        const res = await agent.post('/changepassword').send({ password: newPassword, newPassword: "2x" + newPassword });
+                        const user = await User.findById(passwordTestUserId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Password has been successfully changed." });
+                        expect(await bcrypt.compare("2x" + newPassword, user.passwordHash)).to.be.true;
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Logout and POST /changepassword', function () {
+                    it('should redirect to /login', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/changepassword').send({ password: newPassword, newPassword: "2x" + newPassword });
+
+                        expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
+                    });
+                });
+
+                describe('Login and POST /changepassword with incorrect password', function () {
+                    it('should return a 403 status and an error message', async function () {
+                        await agent.post('/login').send({ name: 'changePassword-' + newUserName, password: newPassword });
+
+                        const res = await agent.post('/changepassword').send({ password: "5x" + newPassword, newPassword: "2x" + newPassword });
+
+                        expect(res).to.have.status(403);
+                        expect(res.body).to.deep.equal({ error: "Incorrect password." });
+                    });
+                });
+
+                describe('Login and POST /changepassword with no password', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send({ name: 'changePassword-' + newUserName, password: newPassword });
+
+                        const res = await agent.post('/changepassword').send({ newPassword: "2x" + newPassword });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Missing password." });
+                    });
+                });
+
+                describe('Login and POST /changepassword with no newPassword', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send({ name: 'changePassword-' + newUserName, password: newPassword });
+
+                        const res = await agent.post('/changepassword').send({ password: newPassword });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Missing newPassword." });
+                    });
                 });
             });
         });

@@ -75,6 +75,46 @@ paths:
                   value: { "error": "Email already in use." }
         default:
           description: Default error sample response
+  /changepassword:
+    summary: Change the user's password.
+    post:
+      tags:
+        - User
+      summary: Change the user's password.
+      description:
+        Submit the user's current password and a new password. If the current password matches the one
+        the user submitted, set the new password as the user's password.
+      operationId: change_password
+      requestBody:
+        description: "Request to change the user's password"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePassword"
+            example:
+              { "password": "s33krit!", "newPassword": "s00per s33krit!" }
+      responses:
+        "200":
+          description: "Password successfully changed"
+          content:
+            application/json:
+              example: { "message": "Password has been successfully changed." }
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                missingPassword:
+                  value: { "error": "Missing password." }
+                missingNewPassword:
+                  value: { "error": "Missing newPassword." }
+        "403":
+          description: "Incorrect password."
+          content:
+            application/json:
+              example: { "error": "Incorrect password." }
+        default:
+          description: Default error sample response
   /login:
     summary: POST login
     post:
@@ -299,7 +339,7 @@ paths:
                 "publishEmail": true,
                 "bio": "This is a new bio.",
                 "darkMode": false,
-                "email": "newEmail@example.com"
+                "email": "newEmail@example.com",
               }
       responses:
         "200":
@@ -2196,6 +2236,15 @@ components:
         email:
           type: string
         password:
+          type: string
+    ChangePassword:
+      required:
+        - password
+        - newPassword
+      properties:
+        password:
+          type: string
+        newPassword:
           type: string
     Login:
       required:
