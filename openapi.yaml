@@ -764,7 +764,7 @@ paths:
         When a user is registered, or a user with an unverified email posts to the /verify route, an email is sent to
         the user's email address containing a link to the front end that contains their userId and emailVerificationKey.
         That page on the front end posts to this route with the userId and emailVerificationKey, setting the user's
-        emailVerified field to true.
+        emailVerified field to true. This route does not require the user to be logged in.
       operationId: verify_email
       parameters:
         - name: userId
