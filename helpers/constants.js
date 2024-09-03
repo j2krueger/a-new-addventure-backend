@@ -24,6 +24,7 @@ module.exports = {
 
     // Standardise these across the application
     loginExpirationTime: oneWeekInMilliseconds,
+    saltRounds: 10,
 
     // configuration values loaded from .env
     databaseURI: process.env.DATABASEURI,

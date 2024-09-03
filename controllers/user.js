@@ -2,7 +2,7 @@
 
 const constants = require('../helpers/constants');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const { saltRounds } = constants;
 const User = require('../models/user');
 const Follow = require('../models/follow');
 const jwt = require('jsonwebtoken');
@@ -42,7 +42,7 @@ async function sendVerificationEmailHelper(user) {
         from: constants.siteEmailAddress,
         to: email,
         subject: "Email Verification from QuiltedChronicles.org",
-        html: `Just a basic link: <a href="https://api.quiltedchronicles.org/verify/${userId}/${user.emailVerificationKey}">Click here to verify</a>
+        html: `Just a basic link: <a href="https://quiltedchronicles.org/verify/${userId}/${user.emailVerificationKey}">Click here to verify</a>
         UserName: ${user.userName}, email: ${user.email}`,
     });
 }
