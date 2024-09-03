@@ -47,7 +47,7 @@ paths:
                   "publishEmail": false,
                   "darkMode": false,
                   "locked": false,
-                  "emailVerified": true,
+                  "emailVerified": false,
                   "publishedEntries": [],
                   "followedAuthors": [],
                   "likedEntries": [],
