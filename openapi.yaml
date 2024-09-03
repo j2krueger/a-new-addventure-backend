@@ -286,7 +286,10 @@ paths:
       description: "If a user is logged in, put the changed settings to the server."
       operationId: put_profile
       requestBody:
-        description: "Submit a request to change some settings."
+        description:
+          Submit a request to change one or more settings. Changeable settings are publishEmail (boolean),
+          bio (string), darkmode (boolean), and email (string). If email is set, emailVerified is set to false,
+          and a verification email is sent to the new email address.
         content:
           application/json:
             schema:
@@ -296,6 +299,7 @@ paths:
                 "publishEmail": true,
                 "bio": "This is a new bio.",
                 "darkMode": false,
+                "email": "newEmail@example.com"
               }
       responses:
         "200":
@@ -2205,6 +2209,8 @@ components:
     Settings:
       properties:
         bio:
+          type: string
+        email:
           type: string
         publishEmail:
           type: boolean

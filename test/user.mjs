@@ -418,7 +418,7 @@ describe('Test the user handling routes', function () {
     describe('Test PUT /profile path', function () {
         describe('Happy paths', function () {
             describe('login and put profile', function () {
-                it('should return 200 OK and logged in users.privateProfile()', async function () {
+                it('should return 200 OK and logged in user\'s privateProfile()', async function () {
                     await agent.post('/login').send(testUserLogin);
 
                     const res = await agent.put('/profile').send({ darkMode: true });
@@ -429,6 +429,25 @@ describe('Test the user handling routes', function () {
                     expect(res.body).to.deep.equal(tempNewUserPrivateProfile);
 
                     await agent.put('/profile').send({ darkMode: false });
+                });
+            });
+
+            describe('Login and put profile with a new email', function () {
+                it('should return 200 status and logged in user\'s privateProfile(), and send a verification email, and set emailVerified to false', async function () {
+                    const userRes = await agent.post('/login').send(testUserLogin);
+                    await User.findByIdAndUpdate(userRes.body.userId, { emailVerified: true });
+
+                    const res = await agent.put('/profile').send({ email: "new" + newEmail });
+                    shouldSendVerificationEmail()
+                    const tempNewUserPrivateProfile = newUserPrivateProfile();
+                    tempNewUserPrivateProfile.email = "new" + newEmail;
+
+                    expect(res).to.have.status(200);
+                    expect(res.body.email).to.deep.equal("new" + newEmail);
+                    expect(res.body.emailVerified).to.be.false;
+
+                    await agent.put('/profile').send({ email: newEmail });
+                    shouldSendVerificationEmail();
                 });
             });
         });
@@ -452,6 +471,17 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Invalid request." });
+                });
+            });
+
+            describe('Login and change the email to a duplicate of an existing email', function () {
+                it('should return a 409 status and an error message', async function () {
+                    await agent.post('/login').send(testUserLogin);
+
+                    const res = await agent.put('/profile').send({ email: constants.testEmailAddress });
+
+                    expect(res).to.have.status(409);
+                    expect(res.body).to.deep.equal({ error: "Invalid request: That email is already in use." });
                 });
             });
         });

@@ -43,7 +43,7 @@ async function sendVerificationEmailHelper(user) {
         to: email,
         subject: "Email Verification from QuiltedChronicles.org",
         html: `Just a basic link: <a href="https://api.quiltedchronicles.org/verify/${userId}/${user.emailVerificationKey}">Click here to verify</a>
-        UserName: ${user.userName}`,
+        UserName: ${user.userName}, email: ${user.email}`,
     });
 }
 
@@ -183,11 +183,14 @@ async function getProfile(req, res) {
 async function putProfile(req, res, next) {
     try {
         const result = await req.authenticatedUser.applySettings(req.body);
+        if (req.body.email) {
+            sendVerificationEmailHelper(req.authenticatedUser);
+        }
         req.session.user = result;
         res.status(200).json(result.privateProfile());
     } catch (error) {
-        if (error.message == "Invalid request.") {
-            return res.status(400).json({ error: error.message });
+        if (error.code) {
+            return res.status(error.code).json({ error: error.message });
         } else {
             next(error);
         }

@@ -168,7 +168,7 @@ userSchema.methods.publicInfo = function publicInfo() {
   return {
     userId: this._id,
     userName: this.userName,
-    email: this.publishEmail ? this.email : "",
+    email: this.publishEmail && this.emailVerified ? this.email : "",
     bio: this.bio,
     publishedEntries: this.publishedEntries || [],
   };
@@ -180,6 +180,7 @@ userSchema.methods.basicInfo = function basicInfo() {
 
 
 const userSettable = {
+  email: "string",
   bio: "string",
   publishEmail: "boolean",
   darkMode: "boolean",
@@ -188,8 +189,19 @@ const userSettable = {
 userSchema.methods.applySettings = async function applySettings(settings) {
   for (const key in settings) {
     if (!(key in userSettable && typeof settings[key] == userSettable[key])) {
-      throw new Error("Invalid request.");
+      const error = new Error("Invalid request.");
+      error.code = 400;
+      throw error;
     }
+  }
+  if (settings.email) {
+    const result = await User.findOne({ email: settings.email });
+    if (result) {
+      const error = new Error("Invalid request: That email is already in use.");
+      error.code = 409;
+      throw error;
+    }
+    this.emailVerified = false;
   }
   for (const key in settings) {
     this[key] = settings[key];
