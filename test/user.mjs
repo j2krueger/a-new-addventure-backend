@@ -447,7 +447,7 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body.email).to.deep.equal("new" + newEmail);
                     expect(res.body.emailVerified).to.be.false;
-                    expect(user.emailVerificationKey).to.match(/^[0-9a-f]{20}$/);
+                    expect(user.emailVerificationKey).to.be.a('string').and.match(/^[0-9a-f]{20}$/);
 
                     await agent.put('/profile').send({ email: newEmail });
                     shouldSendEmail();
@@ -691,6 +691,110 @@ describe('Test the user handling routes', function () {
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Missing newPassword." });
+                    });
+                });
+            });
+        });
+
+        describe('Test the POST /resetpassword route', function () {
+            let resetPasswordUserId;
+            let resetPasswordUserEmail;
+            let resetPasswordUserName;
+
+            before('Setup user for /resetpassword tests', async function () {
+                const res = await agent.post('/register')
+                    .send({ userName: 'resetPassword-' + newUserName, email: 'resetPassword-' + newEmail, password: newPassword });
+                shouldSendEmail();
+                const user = await User.findById(res.body.userId);
+                user.emailVerified = true;
+                await user.save();
+                resetPasswordUserId = user._id;
+                resetPasswordUserName = user.userName;
+                resetPasswordUserEmail = user.email;
+            });
+
+            after('Teardown user for /resetpassword tests', async function () {
+                await User.findByIdAndDelete(resetPasswordUserId);
+            })
+
+            describe('Happy paths', function () {
+                describe('Logout and POST /resetpassword with { name: email }', function () {
+                    it('should return a 200 status + error message, send a reset password email, and set resetPasswordKey and resetPasswordTime', async function () {
+                        await agent.post('/logout');
+
+                        const before = new Date();
+                        const res = await agent.post('/resetpassword').send({ name: resetPasswordUserEmail });
+                        const after = new Date();
+                        const user = await User.findById(resetPasswordUserId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Password reset email has been sent." });
+                        expect(user.resetPasswordKey).to.be.a('string').and.match(/^[0-9a-f]{20}$/);
+                        expect(user.resetPasswordTime).to.be.within(before, after);
+                        shouldSendEmail();
+                    });
+                });
+
+                describe('Logout and POST /resetpassword with { name: userName }', function () {
+                    it('should return a 200 status + error message, send a reset password email, and set resetPasswordKey and resetPasswordTime', async function () {
+                        await agent.post('/logout');
+
+                        const before = new Date();
+                        const res = await agent.post('/resetpassword').send({ name: resetPasswordUserName });
+                        const after = new Date();
+                        const user = await User.findById(resetPasswordUserId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Password reset email has been sent." });
+                        expect(user.resetPasswordKey).to.be.a('string').and.match(/^[0-9a-f]{20}$/);
+                        expect(user.resetPasswordTime).to.be.within(before, after);
+                        shouldSendEmail();
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Logout and POST /resetpassword with { name: unverifiedEmail }', function () {
+                    it('should return a 403 status and an error message', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword').send({ name: newUserName });
+
+                        expect(res).to.have.status(403);
+                        expect(res.body).to.deep.equal({ error: "That account does not have a verified email address." });
+                    });
+                });
+
+                describe('Logout and POST /resetpassword with { name: unverifiedUserName }', function () {
+                    it('should return a 403 status and an error message', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword').send({ name: newEmail });
+
+                        expect(res).to.have.status(403);
+                        expect(res.body).to.deep.equal({ error: "That account does not have a verified email address." });
+                    });
+                });
+
+                describe('Logout and POST /resetpassword with { name: notFound }', function () {
+                    it('should return a 404 status and an error message', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword').send({ name: "Thisshouldntbeinthedatabase" + testString });
+
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.deep.equal({ error: "No account has that email or userName." });
+                    });
+                });
+
+                describe('Logout and POST /resetpassword with { name: notAString }', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword').send({ name: ["array"] });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Bad request." });
                     });
                 });
             });

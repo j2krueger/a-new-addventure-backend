@@ -3,6 +3,8 @@
 const constants = require('../helpers/constants');
 const bcrypt = require('bcrypt');
 const { saltRounds } = constants;
+const { randomBytes } = require('crypto');
+const { sendResetPasswordEmailHelper } = require('../helpers/mail');
 const User = require('../models/user');
 const Follow = require('../models/follow');
 const jwt = require('jsonwebtoken');
@@ -104,6 +106,29 @@ async function changePassword(req, res, next) {
         req.authenticatedUser.passwordHash = await bcrypt.hash(newPassword, saltRounds);
         req.authenticatedUser.save();
         return res.status(200).json({ message: "Password has been successfully changed." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+async function resetPassword(req, res, next) {
+    try {
+        const { name } = req.body;
+        if (typeof name != "string") {
+            return res.status(400).json({ error: "Bad request." });
+        }
+        const user = await User.findOne({ userName: name }) || await User.findOne({ email: name });
+        if (!user) {
+            return res.status(404).json({ error: "No account has that email or userName." });
+        }
+        if (!user.emailVerified) {
+            return res.status(403).json({ error: "That account does not have a verified email address." });
+        }
+        user.resetPasswordKey = randomBytes(10).toString('hex');
+        user.resetPasswordTime = new Date();
+        await user.save();
+        sendResetPasswordEmailHelper(user);
+        return res.status(200).json({ message: "Password reset email has been sent." });
     } catch (error) {
         return next(error);
     }
@@ -292,6 +317,7 @@ module.exports = {
     verifyEmail,
     sendVerificationEmail,
     changePassword,
+    resetPassword,
     loginUser,
     logoutUser,
     getUser,

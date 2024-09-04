@@ -66,7 +66,7 @@ export const mochaHooks = {
         await Like.deleteMany({ user: newUserBasicInfo().userId });
         await Flag.deleteMany({ reason: { $regex: testString } });
         mongoose.disconnect();
-        console.log(`A total of ${expectedNumberOfEmails()} verification emails should have reached your inbox.`);
+        console.log(`A total of ${expectedNumberOfEmails()} automatic emails should have reached your inbox.`);
     }
 };
 

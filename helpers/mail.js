@@ -24,7 +24,20 @@ async function sendVerificationEmailHelper(user) {
     });
 }
 
+async function sendResetPasswordEmailHelper(user) {
+    const userId = user._id;
+    const email = user.email.includes(constants.testString) ? constants.testEmailAddress : user.email;
+    await transporter.sendMail({
+        from: constants.siteEmailAddress,
+        to: email,
+        subject: "Password Reset from QuiltedChronicles.org",
+        html: `Just a basic link: <a href="https://quiltedchronicles.org/resetpassword/${userId}/${user.resetPasswordKey}">Click here to reset your password</a>
+        UserName: ${user.userName}, email: ${user.email}`,
+    });
+}
+
 module.exports = {
     transporter,
     sendVerificationEmailHelper,
+    sendResetPasswordEmailHelper,
 };

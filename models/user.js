@@ -53,6 +53,12 @@ const userSchema = new Schema({
   emailVerificationKey: {
     type: String,
   },
+  resetPasswordKey: {
+    type: String,
+  },
+  resetPasswordTime: {
+    type: Date,
+  },
 }, {
   toJSON: { virtuals: true },
   toObject: { virtuals: true },

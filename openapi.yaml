@@ -115,6 +115,53 @@ paths:
               example: { "error": "Incorrect password." }
         default:
           description: Default error sample response
+  /resetpassword:
+    summary: Send an email with a link that allows the user to reset their password.
+    post:
+      tags:
+        - User
+      summary: Send an email with a link that allows the user to reset their password.
+      description:
+        Submit a userName or an email, and if the corresponding user has a verified email, send an email
+        to the user's email with a link that will allow them to reset their password
+      operationId: send_reset_password_email
+      requestBody:
+        description: "Request to reset the user's password"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+            examples:
+              userName:
+                value: { "name": "Freddy" }
+              email:
+                value: { "name": "Freddy@example.com" }
+      responses:
+        "200":
+          description: "Password reset email sent"
+          content:
+            application/json:
+              example: { "message": "Password reset email has been sent." }
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              example: { "error": "Bad request." }
+        "403":
+          description: "No verified email."
+          content:
+            application/json:
+              example:
+                {
+                  "error": "That account does not have a verified email address.",
+                }
+        "404":
+          description: "No matching user."
+          content:
+            application/json:
+              example: { "error": "No account has that email or userName." }
+        default:
+          description: Default error sample response
   /login:
     summary: POST login
     post:
@@ -2245,6 +2292,12 @@ components:
         password:
           type: string
         newPassword:
+          type: string
+    ResetPassword:
+      required:
+        - name
+      properties:
+        name:
           type: string
     Login:
       required:
