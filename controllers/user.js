@@ -6,9 +6,6 @@ const { saltRounds } = constants;
 const User = require('../models/user');
 const Follow = require('../models/follow');
 const jwt = require('jsonwebtoken');
-const transporter = require('../helpers/mail');
-const { randomBytes } = require('node:crypto');
-
 
 async function paramUserId(req, res, next, value) {
     if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
@@ -34,19 +31,6 @@ async function paramEmailVerificationKey(req, res, next, value) {
     return next();
 }
 
-async function sendVerificationEmailHelper(user) {
-    user.emailVerificationKey = randomBytes(10).toString('hex');
-    const userId = user._id;
-    const email = user.email.includes(constants.testString) ? constants.testEmailAddress : user.email;
-    await transporter.sendMail({
-        from: constants.siteEmailAddress,
-        to: email,
-        subject: "Email Verification from QuiltedChronicles.org",
-        html: `Just a basic link: <a href="https://quiltedchronicles.org/verify/${userId}/${user.emailVerificationKey}">Click here to verify</a>
-        UserName: ${user.userName}, email: ${user.email}`,
-    });
-}
-
 async function registerUser(req, res) {
     if (!req.body?.password) {
         return res.status(400).json({ error: "Missing password." });
@@ -69,7 +53,7 @@ async function registerUser(req, res) {
             passwordHash: passwordHash,
         });
         try {
-            await sendVerificationEmailHelper(newUser);
+            await newUser.unverifyEmail();
             await newUser.save();
         } catch (error) {
             return res.status(500).json(error);
@@ -80,7 +64,7 @@ async function registerUser(req, res) {
 
 async function sendVerificationEmail(req, res, next) {
     try {
-        await sendVerificationEmailHelper(req.authenticatedUser);
+        await req.authenticatedUser.unverifyEmail();
         await req.authenticatedUser.save();
         res.status(200).json({ message: "Verification email sent." });
     } catch (error) {
@@ -203,9 +187,6 @@ async function getProfile(req, res) {
 async function putProfile(req, res, next) {
     try {
         const result = await req.authenticatedUser.applySettings(req.body);
-        if (req.body.email) {
-            sendVerificationEmailHelper(req.authenticatedUser);
-        }
         req.session.user = result;
         res.status(200).json(result.privateProfile());
     } catch (error) {

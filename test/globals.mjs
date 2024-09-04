@@ -49,11 +49,11 @@ function newUserBasicInfo() {
     return _newUserBasicInfo;
 }
 
-function shouldSendVerificationEmail() {
+function shouldSendEmail() {
     _verificationEmailCount++;
 }
 
-function expectedNumberOfVerificationEmails() {
+function expectedNumberOfEmails() {
     return _verificationEmailCount;
 }
 
@@ -83,8 +83,8 @@ export {
     newUserPrivateProfile,
     newUserPublicInfo,
     newUserBasicInfo,
-    shouldSendVerificationEmail,
-    expectedNumberOfVerificationEmails,
+    shouldSendEmail,
+    expectedNumberOfEmails,
     summaryKeys,
     // models
     User,

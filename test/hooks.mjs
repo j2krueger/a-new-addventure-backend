@@ -16,8 +16,8 @@ const {
     // newUserPrivateProfile,
     // newUserPublicInfo,
     newUserBasicInfo,
-    shouldSendVerificationEmail,
-    expectedNumberOfVerificationEmails,
+    shouldSendEmail,
+    expectedNumberOfEmails,
     // models
     User,
     Entry,
@@ -40,7 +40,7 @@ export const mochaHooks = {
             console.log("Database not conected: ", error)
         }
         const res = await agent.post('/register').send({ userName: newUserName, email: newEmail, password: newPassword });
-        shouldSendVerificationEmail();
+        shouldSendEmail();
 
         expect(res).to.have.status(201);
         expect(res.body).to.be.an('object');
@@ -66,7 +66,7 @@ export const mochaHooks = {
         await Like.deleteMany({ user: newUserBasicInfo().userId });
         await Flag.deleteMany({ reason: { $regex: testString } });
         mongoose.disconnect();
-        console.log(`A total of ${expectedNumberOfVerificationEmails()} verification emails should have reached your inbox.`);
+        console.log(`A total of ${expectedNumberOfEmails()} verification emails should have reached your inbox.`);
     }
 };
 

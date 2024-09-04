@@ -20,7 +20,7 @@ const {
     newUserPrivateProfile,
     newUserPublicInfo,
     // newUserBasicInfo,
-    shouldSendVerificationEmail,
+    shouldSendEmail,
     // summaryKeys,
     // models
     User,
@@ -44,7 +44,7 @@ describe('Test the user handling routes', function () {
             describe('POST /register with unique userName, unique email, and password', function () {
                 it('should return 201 status and the new user\'s privateProfile()', async function () {
                     const res = await agent.post('/register').send({ userName: 'test' + newUserName, email: 'test' + newEmail, password: newPassword });
-                    shouldSendVerificationEmail();
+                    shouldSendEmail();
 
                     expect(res).to.have.status(201);
                     expect(res.body.userName).to.equal('test' + newUserName);
@@ -113,7 +113,7 @@ describe('Test the user handling routes', function () {
             describe('Register user and logout and POST /verify/:userId/:emailVerificationKey', function () {
                 it('should return a 200 status and a success message, and set user\'s emailVerified field to true', async function () {
                     const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
-                    shouldSendVerificationEmail();
+                    shouldSendEmail();
                     await agent.post('/logout');
 
                     const user = await User.findById(userRes.body.userId);
@@ -133,7 +133,7 @@ describe('Test the user handling routes', function () {
             describe('POST /verify/:userId/:emailVerificationKey with the wrong key', function () {
                 it('should return a 403 status and an error message, and not set emailVerified to true', async function () {
                     const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
-                    shouldSendVerificationEmail();
+                    shouldSendEmail();
                     await agent.post('/logout');
 
                     const user = await User.findById(userRes.body.userId);
@@ -151,7 +151,7 @@ describe('Test the user handling routes', function () {
             describe('POST /verify/:userId/:emailVerificationKey with misformed key', function () {
                 it('should return a 400 status and an error message, and not set emailVerified to true', async function () {
                     const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
-                    shouldSendVerificationEmail();
+                    shouldSendEmail();
                     await agent.post('/logout');
 
                     const user = await User.findById(userRes.body.userId);
@@ -169,7 +169,7 @@ describe('Test the user handling routes', function () {
             describe('POST /verify/:userId/:emailVerificationKey with user whose email has already been verified', function () {
                 it('should return a 409 status and an error message', async function () {
                     const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
-                    shouldSendVerificationEmail();
+                    shouldSendEmail();
                     await agent.post('/logout');
 
                     const user = await User.findById(userRes.body.userId);
@@ -434,21 +434,23 @@ describe('Test the user handling routes', function () {
             });
 
             describe('Login and put profile with a new email', function () {
-                it('should return 200 status and logged in user\'s privateProfile(), and send a verification email, and set emailVerified to false', async function () {
+                it('should return 200 status and logged in user\'s privateProfile(), and send a verification email, and set emailVerified to false, and set emailVerificationKey', async function () {
                     const userRes = await agent.post('/login').send(testUserLogin);
                     await User.findByIdAndUpdate(userRes.body.userId, { emailVerified: true });
 
                     const res = await agent.put('/profile').send({ email: "new" + newEmail });
-                    shouldSendVerificationEmail()
+                    shouldSendEmail()
                     const tempNewUserPrivateProfile = newUserPrivateProfile();
                     tempNewUserPrivateProfile.email = "new" + newEmail;
+                    const user = await User.findById(res.body.userId);
 
                     expect(res).to.have.status(200);
                     expect(res.body.email).to.deep.equal("new" + newEmail);
                     expect(res.body.emailVerified).to.be.false;
+                    expect(user.emailVerificationKey).to.match(/^[0-9a-f]{20}$/);
 
                     await agent.put('/profile').send({ email: newEmail });
-                    shouldSendVerificationEmail();
+                    shouldSendEmail();
                 });
             });
         });
@@ -494,7 +496,7 @@ describe('Test the user handling routes', function () {
         before('Set up user for follow testing', async function () {
             const res = await agent.post('/register')
                 .send({ userName: 'followed-' + newUserName, email: 'followed-' + newEmail, password: newPassword });
-            shouldSendVerificationEmail();
+            shouldSendEmail();
             followedUserId = res.body.userId;
         });
 
@@ -558,7 +560,7 @@ describe('Test the user handling routes', function () {
             describe('Login, follow a user, then delete the user from the database, then GET /profile', function () {
                 it('should remove the broken follow from followedAuthors', async function () {
                     const userRes = await agent.post('/register').send({ userName: newUserName + '1', email: '1' + newEmail, password: 'password' });
-                    shouldSendVerificationEmail();
+                    shouldSendEmail();
                     await agent.post('/login').send(testUserLogin);
                     await agent.post('/user/' + userRes.body.userId + '/follow');
                     const follow = await Follow.findOne({ following: userRes.body.userId });
@@ -621,7 +623,7 @@ describe('Test the user handling routes', function () {
             before('Setup user for /changepassword testing', async function () {
                 const res = await agent.post('/register')
                     .send({ userName: 'changePassword-' + newUserName, email: 'changePassword-' + newEmail, password: newPassword });
-                shouldSendVerificationEmail();
+                shouldSendEmail();
                 passwordTestUserId = res.body.userId;
             });
 

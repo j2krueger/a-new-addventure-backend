@@ -20,7 +20,7 @@ const {
     // newUserPublicInfo,
     // newUserBasicInfo,
     // summaryKeys,
-    shouldSendVerificationEmail,
+    shouldSendEmail,
     // models
     User,
     Entry,
@@ -517,11 +517,11 @@ describe('Test the admin routes', function () {
             before('Set up users for lock testing', async function () {
                 const res = await agent.post('/register')
                     .send({ userName: 'unlocked' + newUserName, email: 'unlocked' + newEmail, password: newPassword });
-                shouldSendVerificationEmail();
+                shouldSendEmail();
                 unlockedUserId = res.body.userId;
                 const res2 = await agent.post('/register')
                     .send({ userName: 'locked' + newUserName, email: 'locked' + newEmail, password: newPassword });
-                shouldSendVerificationEmail();
+                shouldSendEmail();
                 lockedUserId = res2.body.userId;
             });
 
@@ -627,11 +627,11 @@ describe('Test the admin routes', function () {
             before('Set up users for lock testing', async function () {
                 const unlockedUserRes = await agent.post('/register')
                     .send({ userName: 'unlocked' + newUserName, email: 'unlocked' + newEmail, password: newPassword });
-                shouldSendVerificationEmail();
+                shouldSendEmail();
                 unlockedUserId = unlockedUserRes.body.userId;
                 const lockedUserRes = await agent.post('/register')
                     .send({ userName: 'locked' + newUserName, email: 'locked' + newEmail, password: newPassword });
-                shouldSendVerificationEmail();
+                shouldSendEmail();
                 lockedUserId = lockedUserRes.body.userId;
             });
 
@@ -742,11 +742,11 @@ describe('Test the admin routes', function () {
             before('Setup users for testing PUT /admin/user/:userId route', async function () {
                 const testUserRes = await agent.post('/register')
                     .send({ userName: 'testUser' + newUserName, email: 'testUser' + newEmail, password: newPassword });
-                shouldSendVerificationEmail();
+                shouldSendEmail();
                 testUserId = testUserRes.body.userId;
                 const testAdminRes = await agent.post('/register')
                     .send({ userName: 'testAdmin' + newUserName, email: 'testAdmin' + newEmail, password: newPassword });
-                shouldSendVerificationEmail();
+                shouldSendEmail();
                 testAdminId = testAdminRes.body.userId;
             });
 

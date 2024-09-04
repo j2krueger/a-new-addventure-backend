@@ -3,6 +3,8 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 const constants = require('../helpers/constants');
+const { randomBytes } = require('crypto');
+const { sendVerificationEmailHelper } = require('../helpers/mail');
 
 const userSchema = new Schema({
   userName: {
@@ -178,12 +180,17 @@ userSchema.methods.basicInfo = function basicInfo() {
   return { userId: this._id, userName: this.userName };
 }
 
-
 const userSettable = {
   email: "string",
   bio: "string",
   publishEmail: "boolean",
   darkMode: "boolean",
+}
+
+userSchema.methods.unverifyEmail = async function unverifyEmail() {
+  this.emailVerified = false;
+  this.emailVerificationKey = randomBytes(10).toString('hex');
+  await sendVerificationEmailHelper(this)
 }
 
 userSchema.methods.applySettings = async function applySettings(settings) {
@@ -201,7 +208,7 @@ userSchema.methods.applySettings = async function applySettings(settings) {
       error.code = 409;
       throw error;
     }
-    this.emailVerified = false;
+    this.unverifyEmail();
   }
   for (const key in settings) {
     this[key] = settings[key];
