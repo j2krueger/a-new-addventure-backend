@@ -14,7 +14,7 @@ async function paramMessageId(req, res, next, value) {
         if (!result) {
             return res.status(404).json({ error: "There is no message with that messageId." });
         }
-        req.foundMessageById = result;
+        req.paramMessage = result;
         return next()
     } catch (error) {
         return next(error);
@@ -58,7 +58,7 @@ async function getMessage(req, res) {
 
 async function putMessage(req, res, next) {
     try {
-        const result = await req.foundMessageById.applySettings(req.body);
+        const result = await req.paramMessage.applySettings(req.body);
         res.status(200).json(result);
     } catch (error) {
         if (error.message == "Invalid request.") {
@@ -71,7 +71,7 @@ async function putMessage(req, res, next) {
 
 async function deleteMessage(req, res, next) {
     try {
-        await Message.findByIdAndDelete(req.foundMessageById._id);
+        await Message.findByIdAndDelete(req.paramMessage._id);
         return res.status(204).end();
     } catch (error) {
         next(error);

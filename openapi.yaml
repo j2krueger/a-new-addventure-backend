@@ -130,7 +130,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ResetPassword"
+              $ref: "#/components/schemas/RequestResetPasswordEmail"
             examples:
               userName:
                 value: { "name": "Freddy" }
@@ -160,6 +160,78 @@ paths:
           content:
             application/json:
               example: { "error": "No account has that email or userName." }
+        default:
+          description: Default error sample response
+  /resetpassword/{userId}/{resetPasswordKey}:
+    summary: Reset the user's password.
+    post:
+      tags:
+        - User
+      summary: Reset the user's password.
+      description:
+        Reset the user's password, using the userId and resetPasswordKey to verify that the given user has requested
+        a password reset. The resetPasswordKey will only be made available through the user's verified email, to
+        maintain security of the user's acount. Must be used within 15 minutes of the reset password request, or the
+        user will have to start over.
+      operationId: reset_password
+      parameters:
+        - name: userId
+          in: path
+          description: the ID of the user
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+        - name: resetPasswordKey
+          in: path
+          description: reset password key
+          required: true
+          style: simple
+          explode: false
+          schema: {}
+      requestBody:
+        description: Reset the user's password
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+            example: { "password": "forgetmenot" }
+      responses:
+        "200":
+          description: "Password successfully reset"
+          content:
+            application/json:
+              example: { "message": "Password successfully reset." }
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                badPassword:
+                  value: { "error": "Password must be a string." }
+                badUserId:
+                  value: { "error": "That is not a properly formatted userId." }
+                badResetKey:
+                  value:
+                    {
+                      "error": "That is not a properly formatted reset password key.",
+                    }
+        "403":
+          description: "Security!"
+          content:
+            application/json:
+              examples:
+                expired:
+                  value: { "error": "Reset password key has expired." }
+                wrongKey:
+                  value: { "error": "Incorrect reset password key." }
+                noKey:
+                  value: { "error": "No resetPasswordKey set for that user." }
+        "404":
+          description: "No matching user."
+          content:
+            application/json:
+              example: { "error": "There is no user with that userId." }
         default:
           description: Default error sample response
   /login:
@@ -2016,9 +2088,9 @@ paths:
         - User
       summary: Alter a user
       description:
-        "Submit a JSON object containing one or more of the follwing fields with values of the apropriate type:\
-        \ admin: <boolean>, moderator: <boolean>, bio: <string>, publishEmail: <boolean>. The user's database entry will have\
-        \ it's corresponding entry set to the given value."
+        "Submit a JSON object containing one or more of the follwing fields with values of the apropriate type:
+        admin: boolean, moderator: boolean, bio: string, publishEmail: boolean, emailVerified: boolean.
+        The user's database entry will have it's corresponding entry set to the given value."
       operationId: alter_user
       parameters:
         - name: userId
@@ -2040,6 +2112,7 @@ paths:
                 "moderator": true,
                 "bio": "I am a doofus who put naughty words in my bio.",
                 "publishEmail": false,
+                "emailVerified": true,
               }
       responses:
         "200":
@@ -2293,11 +2366,17 @@ components:
           type: string
         newPassword:
           type: string
-    ResetPassword:
+    RequestResetPasswordEmail:
       required:
         - name
       properties:
         name:
+          type: string
+    ResetPassword:
+      required:
+        - password
+      properties:
+        password:
           type: string
     Login:
       required:
@@ -2327,6 +2406,8 @@ components:
         admin:
           type: boolean
         moderator:
+          type: boolean
+        emailVerified:
           type: boolean
     NewStory:
       required:

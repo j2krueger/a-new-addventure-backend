@@ -18,7 +18,7 @@ async function paramUserId(req, res, next, value) {
         if (!result) {
             return res.status(404).json({ error: "There is no user with that userId." });
         }
-        req.foundUserById = result;
+        req.paramUser = result;
         return next()
     } catch (error) {
         return next(error);
@@ -29,7 +29,15 @@ async function paramEmailVerificationKey(req, res, next, value) {
     if (typeof value != 'string' || !/^[0-9a-f]{20}$/.test(value)) {
         return res.status(400).json({ error: "That is not a properly formatted email verification key." });
     }
-    req.emailVerificationKey = value;
+    req.paramEmailVerificationKey = value;
+    return next();
+}
+
+async function paramResetPasswordKey(req, res, next, value) {
+    if (typeof value != 'string' || !/^[0-9a-f]{20}$/.test(value)) {
+        return res.status(400).json({ error: "That is not a properly formatted reset password key." });
+    }
+    req.paramResetPasswordKey = value;
     return next();
 }
 
@@ -76,15 +84,15 @@ async function sendVerificationEmail(req, res, next) {
 
 async function verifyEmail(req, res, next) {
     try {
-        if (req.foundUserById.emailVerified) {
+        if (req.paramUser.emailVerified) {
             return res.status(409).json({ error: "Email already verified." });
         }
-        if (req.foundUserById.emailVerificationKey != req.emailVerificationKey) {
+        if (req.paramUser.emailVerificationKey != req.paramEmailVerificationKey) {
             return res.status(403).json({ error: "Bad email verification key." });
         }
-        req.foundUserById.emailVerified = true;
-        await req.foundUserById.save();
-        await User.updateOne({ _id: req.foundUserById._id }, { $unset: { emailVerificationKey: 1 } });
+        req.paramUser.emailVerified = true;
+        req.paramUser.emailVerificationKey = undefined;
+        await req.paramUser.save();
         return res.status(200).json({ message: "Email successfully verified." });
     } catch (error) {
         return next(error);
@@ -111,7 +119,7 @@ async function changePassword(req, res, next) {
     }
 }
 
-async function resetPassword(req, res, next) {
+async function sendResetPasswordEmail(req, res, next) {
     try {
         const { name } = req.body;
         if (typeof name != "string") {
@@ -129,6 +137,31 @@ async function resetPassword(req, res, next) {
         await user.save();
         sendResetPasswordEmailHelper(user);
         return res.status(200).json({ message: "Password reset email has been sent." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+async function resetPassword(req, res, next) {
+    try {
+        const { password } = req.body;
+        if (typeof password != "string") {
+            return res.status(400).json({ error: "Password must be a string." });
+        }
+        if (!req.paramUser.resetPasswordKey) {
+            return res.status(403).json({ error: "No resetPasswordKey set for that user." });
+        }
+        if (req.paramUser.resetPasswordKey != req.paramResetPasswordKey) {
+            return res.status(403).json({ error: "Incorrect reset password key." });
+        }
+        if ((Date.now() - new Date(req.paramUser.resetPasswordTime)) >= constants.passwordResetTime) {
+            return res.status(403).json({ error: "Reset password key has expired." });
+        }
+        req.paramUser.passwordHash = await bcrypt.hash(password, saltRounds);
+        req.paramUser.resetPasswordKey = undefined;
+        req.paramUser.resetPasswordTime = undefined;
+        await req.paramUser.save();
+        return res.status(200).json({ message: "Password successfully reset." });
     } catch (error) {
         return next(error);
     }
@@ -202,7 +235,7 @@ async function getUser(req, res) {
 }
 
 async function getUserInfoById(req, res) {
-    return res.status(200).json(await req.foundUserById.publicInfo())
+    return res.status(200).json(await req.paramUser.publicInfo())
 }
 
 async function getProfile(req, res) {
@@ -224,7 +257,7 @@ async function putProfile(req, res, next) {
 }
 
 async function followUser(req, res, next) {
-    const query = { follower: req.authenticatedUser._id, following: req.foundUserById._id };
+    const query = { follower: req.authenticatedUser._id, following: req.paramUser._id };
     if (query.follower.equals(query.following)) {
         return res.status(409).json({ error: "Following yourself means you're going around in circles." });
     }
@@ -243,7 +276,7 @@ async function followUser(req, res, next) {
 
 async function unFollowUser(req, res, next) {
     try {
-        const query = { follower: req.authenticatedUser._id, following: req.foundUserById._id };
+        const query = { follower: req.authenticatedUser._id, following: req.paramUser._id };
         const result = await Follow.findOneAndDelete(query);
         if (result) {
             return res.status(200).json({ message: 'Author successfully unfollowed.' });
@@ -257,7 +290,7 @@ async function unFollowUser(req, res, next) {
 
 async function lockUser(req, res, next) {
     try {
-        const user = req.foundUserById;
+        const user = req.paramUser;
         if (user.locked) {
             return res.status(409).json({ error: "That user is already locked." });
         }
@@ -271,7 +304,7 @@ async function lockUser(req, res, next) {
 
 async function unlockUser(req, res, next) {
     try {
-        const user = req.foundUserById;
+        const user = req.paramUser;
         if (!user.locked) {
             return res.status(409).json({ error: "That user is not locked." });
         }
@@ -288,18 +321,18 @@ async function adminGetUser(req, res) {
         // eslint-disable-next-line no-unused-vars
         passwordHash,
         ...result
-    } = JSON.parse(JSON.stringify(req.foundUserById));
+    } = JSON.parse(JSON.stringify(req.paramUser));
     res.status(200).json(result);
 }
 
 async function alterUser(req, res, next) {
     try {
-        req.foundUserById = await req.foundUserById.adminApplySettings(req.body);
+        req.paramUser = await req.paramUser.adminApplySettings(req.body);
         const {
             // eslint-disable-next-line no-unused-vars
             passwordHash,
             ...result
-        } = JSON.parse(JSON.stringify(req.foundUserById));
+        } = JSON.parse(JSON.stringify(req.paramUser));
         return res.status(200).json(result);
     } catch (error) {
         if (error.message == "Invalid request.") {
@@ -313,10 +346,12 @@ async function alterUser(req, res, next) {
 module.exports = {
     paramUserId,
     paramEmailVerificationKey,
+    paramResetPasswordKey,
     registerUser,
     verifyEmail,
     sendVerificationEmail,
     changePassword,
+    sendResetPasswordEmail,
     resetPassword,
     loginUser,
     logoutUser,

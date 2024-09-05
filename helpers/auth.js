@@ -36,7 +36,7 @@ async function entryAuthorAuth(req, res, next) {
     }
     if (req?.session?.user?._id) {
         const user = await User.findByIdAndPopulate(req.session.user._id);
-        if (user && !user.locked && user.userName == req.foundEntryById.authorName) {
+        if (user && !user.locked && user.userName == req.paramEntry.authorName) {
             req.authenticatedUser = user;
             return next();
         }

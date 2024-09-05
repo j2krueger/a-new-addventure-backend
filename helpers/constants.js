@@ -24,6 +24,7 @@ module.exports = {
 
     // Standardise these across the application
     loginExpirationTime: oneWeekInMilliseconds,
+    passwordResetTime: 15 * oneMinuteInMilliseconds,
     saltRounds: 10,
 
     // configuration values loaded from .env

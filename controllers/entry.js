@@ -18,7 +18,7 @@ async function paramEntryId(req, res, next, value) {
   try {
     const result = await Entry.findByIdAndPopulate(entryId, req.session?.user?._id);
     if (result) {
-      req.foundEntryById = result;
+      req.paramEntry = result;
     } else {
       return res.status(404).json({ error: "There is no entry with that entryId." });
     }
@@ -36,7 +36,7 @@ async function paramFlagId(req, res, next, value) {
   try {
     const result = await Flag.findById(flagId, req.session?.user?._id);
     if (result) {
-      req.foundFlagById = result;
+      req.paramFlag = result;
     } else {
       return res.status(404).json({ error: "There is no flag with that flagId." });
     }
@@ -50,7 +50,7 @@ async function paramKeyword(req, res, next, value) {
   if (!isValidKeyword(value)) {
     return res.status(400).json({ error: "That is not a valid keyword." })
   }
-  req.keywordValue = value;
+  req.paramKeyword = value;
   return next();
 }
 
@@ -144,7 +144,7 @@ async function getEntryList(req, res) {
 }
 
 async function getEntryById(req, res) {
-  res.status(200).json(await req.foundEntryById.fullInfoWithContinuations());
+  res.status(200).json(await req.paramEntry.fullInfoWithContinuations());
 }
 
 // Potential approach for speed improvement:
@@ -154,7 +154,7 @@ async function getEntryById(req, res) {
 // implemented here becomes problematic.
 async function getChainById(req, res, next) {
   try {
-    const results = [await req.foundEntryById.fullInfoWithContinuations()];
+    const results = [await req.paramEntry.fullInfoWithContinuations()];
     while (results[0].previousEntry) {
       const nextPreviousEntry = await Entry.findByIdAndPopulate(results[0].previousEntry, req?.session?.user?._id);
       if (!nextPreviousEntry) {
@@ -171,7 +171,7 @@ async function getChainById(req, res, next) {
 async function flagEntry(req, res, next) {
   try {
     const user = req?.session?.user;
-    const entry = req.foundEntryById;
+    const entry = req.paramEntry;
     const reason = req.body?.reason;
 
     if (!reason || reason == "") {
@@ -187,7 +187,7 @@ async function flagEntry(req, res, next) {
 
 async function deleteFlag(req, res, next) {
   try {
-    const flag = req.foundFlagById;
+    const flag = req.paramFlag;
     await Flag.findByIdAndDelete(flag._id);
     return res.status(200).json({ message: "Flag successfully deleted." });
   } catch (error) {
@@ -262,15 +262,15 @@ async function createStory(req, res) {
 
 async function continueStory(req, res) {
   const { bodyText, entryTitle, keywords, } = req.body;
-  await createEntry(req.foundEntryById.storyTitle, entryTitle, bodyText, req.authenticatedUser.userName, keywords, req.foundEntryById._id, res);
+  await createEntry(req.paramEntry.storyTitle, entryTitle, bodyText, req.authenticatedUser.userName, keywords, req.paramEntry._id, res);
 }
 
 async function likeEntry(req, res, next) {
   try {
-    if (req.foundEntryById.authorId.equals(req.authenticatedUser._id)) {
+    if (req.paramEntry.authorId.equals(req.authenticatedUser._id)) {
       return res.status(409).json({ error: "You cannot like your own entries." });
     }
-    const likeQuery = { user: req.authenticatedUser._id, entry: req.foundEntryById._id };
+    const likeQuery = { user: req.authenticatedUser._id, entry: req.paramEntry._id };
     const found = await Like.findOne(likeQuery);
     if (found) {
       return res.status(409).json({ error: "You have already liked that entry." });
@@ -285,7 +285,7 @@ async function likeEntry(req, res, next) {
 
 async function unLikeEntry(req, res, next) {
   try {
-    const likeQuery = { user: req.authenticatedUser._id, entry: req.foundEntryById._id };
+    const likeQuery = { user: req.authenticatedUser._id, entry: req.paramEntry._id };
     const found = await Like.findOne(likeQuery);
     if (!found) {
       return res.status(404).json({ error: "You have not liked that entry." });
@@ -308,7 +308,7 @@ async function recursiveDeleteEntryById(id) {
 
 async function deleteEntryById(req, res, next) {
   try {
-    await recursiveDeleteEntryById(req.foundEntryById._id);
+    await recursiveDeleteEntryById(req.paramEntry._id);
     return res.status(200).json({ message: "Entry successfully deleted." });
   } catch (error) {
     return next(error);
@@ -317,7 +317,7 @@ async function deleteEntryById(req, res, next) {
 
 async function bookmarkEntry(req, res, next) {
   try {
-    const bookmarkQuery = { user: req.authenticatedUser._id, entry: req.foundEntryById._id };
+    const bookmarkQuery = { user: req.authenticatedUser._id, entry: req.paramEntry._id };
     const duplicateBookmark = await Bookmark.findOne(bookmarkQuery);
     if (duplicateBookmark) {
       return res.status(409).json({ error: "You have already liked that bookmark." })
@@ -332,7 +332,7 @@ async function bookmarkEntry(req, res, next) {
 
 async function unBookmarkEntry(req, res, next) {
   try {
-    const result = await Bookmark.findOne({ user: req.authenticatedUser._id, entry: req.foundEntryById._id });
+    const result = await Bookmark.findOne({ user: req.authenticatedUser._id, entry: req.paramEntry._id });
     if (result) {
       await Bookmark.findByIdAndDelete(result._id);
       return res.status(200).json({ message: "Bookmark successfully deleted." });
@@ -378,8 +378,8 @@ async function addKeywords(req, res, next) {
     if (!isValidKeywordArray(req.body)) {
       return res.status(400).json({ error: "Request body must be an array of strings." });
     }
-    req.foundEntryById.keywords = Array.from(new Set([...req.body, ...req.foundEntryById.keywords]));
-    await req.foundEntryById.save();
+    req.paramEntry.keywords = Array.from(new Set([...req.body, ...req.paramEntry.keywords]));
+    await req.paramEntry.save();
     return res.status(200).json({ message: "Keywords successfully added." });
   } catch (error) {
     return next(error);
@@ -388,13 +388,13 @@ async function addKeywords(req, res, next) {
 
 async function deleteKeyword(req, res, next) {
   try {
-    const entryKeywordSet = new Set(req.foundEntryById.keywords);
-    const deleteKeywordSet = new Set([req.keywordValue]);
+    const entryKeywordSet = new Set(req.paramEntry.keywords);
+    const deleteKeywordSet = new Set([req.paramKeyword]);
     if (!entryKeywordSet.isSupersetOf(deleteKeywordSet)) {
       return res.status(404).json({ error: "Keyword not found in entry." });
     }
-    req.foundEntryById.keywords = Array.from(entryKeywordSet.difference(deleteKeywordSet));
-    req.foundEntryById.save();
+    req.paramEntry.keywords = Array.from(entryKeywordSet.difference(deleteKeywordSet));
+    req.paramEntry.save();
     return res.status(200).json({ message: "Keyword successfully deleted." });
   } catch (error) {
     return next(error);

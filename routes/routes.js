@@ -21,6 +21,7 @@ router.param('flagId', entryControllers.paramFlagId);
 router.param('keywordValue', entryControllers.paramKeyword);
 router.param('messageId', miscControllers.paramMessageId);
 router.param('emailVerificationKey', userControllers.paramEmailVerificationKey);
+router.param('resetPasswordKey', userControllers.paramResetPasswordKey);
 
 // All routes starting with /admin are restricted to logged in admins
 router.use('/admin', adminAuth);
@@ -46,7 +47,8 @@ router.post('/logout', userControllers.logoutUser);
 router.get('/user', userControllers.getUser);
 router.get('/user/:userId', userControllers.getUserInfoById);
 router.post('/verify/:userId/:emailVerificationKey', userControllers.verifyEmail);
-router.post('/resetpassword', userControllers.resetPassword);
+router.post('/resetpassword', userControllers.sendResetPasswordEmail);
+router.post('/resetpassword/:userId/:resetPasswordKey', userControllers.resetPassword);
 // authorized user related routes
 router.post('/user/:userId/follow', userAuth, userControllers.followUser);
 router.delete('/user/:userId/follow', userAuth, userControllers.unFollowUser);

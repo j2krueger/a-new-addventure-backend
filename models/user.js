@@ -227,6 +227,7 @@ const adminSettable = {
   moderator: "boolean",
   bio: "string",
   publishEmail: "boolean",
+  emailVerified: "boolean",
 }
 
 userSchema.methods.adminApplySettings = async function adminApplySettings(settings) {

@@ -123,6 +123,7 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Email successfully verified." });
                     expect(reUser.emailVerified).to.be.true;
+                    expect(reUser.emailVerificationKey).to.be.undefined;
 
                     await User.findByIdAndDelete(user._id);
                 });
@@ -795,6 +796,114 @@ describe('Test the user handling routes', function () {
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Bad request." });
+                    });
+                });
+            });
+        });
+
+        describe('Test the POST /resetpassword/:userId/:resetPasswordKey', function () {
+            let resetPasswordUserId;
+            let resetPasswordUserName;
+            let resetPasswordUserKey;
+
+            before('Setup user for testing POST /resetpassword/:userId/:resetPasswordKey', async function () {
+                const userRes = await agent.post('/register')
+                    .send({ userName: "resetPassword-" + newUserName, email: "resetPassword-" + newEmail, password: newPassword });
+                shouldSendEmail();
+                resetPasswordUserId = userRes.body.userId;
+                resetPasswordUserName = userRes.body.userName;
+                const user = await User.findById(resetPasswordUserId);
+                user.emailVerified = true;
+                await user.save();
+            });
+
+            beforeEach('Make sure the test user is ready for the second stage of password recovery', async function () {
+                await agent.post('/resetpassword').send({ name: resetPasswordUserName });
+                const user = await User.findById(resetPasswordUserId);
+                user.passwordHash = await bcrypt.hash(newPassword, constants.saltRounds);
+                resetPasswordUserKey = user.resetPasswordKey;
+                await user.save();
+                shouldSendEmail();
+            });
+
+            after('Teardown user for testing POST /resetpassword/:userId/:resetPasswordKey', async function () {
+                await User.findByIdAndDelete(resetPasswordUserId);
+            })
+
+            describe('Happy paths', function () {
+                describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with { newPassword: "newPassword" }', function () {
+                    it('should return a 200 status and a success message and reset the password', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword/' + resetPasswordUserId + '/' + resetPasswordUserKey).send({ password: "2x" + newPassword });
+                        const reUser = await User.findById(resetPasswordUserId);
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.deep.equal({ message: "Password successfully reset." });
+                        expect(await bcrypt.compare("2x" + newPassword, reUser.passwordHash)).to.be.true;
+                        expect(reUser.resetPasswordKey).to.be.undefined;
+                        expect(reUser.resetPasswordTime).to.be.undefined;
+                    });
+                });
+            });
+
+            describe('Sad paths', function () {
+                describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with { newPassword: "newPassword" } with user with no resetPasswordKey', function () {
+                    it('should return a 403 status and an error message', async function () {
+                        await agent.post('/logout');
+                        const user = await User.findOne({ userName: newUserName });
+
+                        const res = await agent.post('/resetpassword/' + user._id + '/' + resetPasswordUserKey).send({ password: "2x" + newPassword });
+
+                        expect(res).to.have.status(403);
+                        expect(res.body).to.deep.equal({ error: "No resetPasswordKey set for that user." });
+                    });
+                });
+
+                describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with { newPassword: "newPassword" } after resetPasswordKey expires', function () {
+                    it('should return a 403 status and an error message', async function () {
+                        await agent.post('/logout');
+                        const user = await User.findById(resetPasswordUserId);
+                        user.resetPasswordTime = new Date(new Date(user.resetPasswordTime) - (constants.passwordResetTime + 1));
+                        user.save();
+
+                        const res = await agent.post('/resetpassword/' + resetPasswordUserId + '/' + resetPasswordUserKey).send({ password: "2x" + newPassword });
+
+                        expect(res).to.have.status(403);
+                        expect(res.body).to.deep.equal({ error: "Reset password key has expired." });
+                    });
+                });
+
+                describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with { newPassword: "newPassword" } with an incorrect key', function () {
+                    it('should return a 403 status and an error message', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword/' + resetPasswordUserId + '/00000000000000000000').send({ password: "2x" + newPassword });
+
+                        expect(res).to.have.status(403);
+                        expect(res.body).to.deep.equal({ error: "Incorrect reset password key." });
+                    });
+                });
+
+                describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with { newPassword: "newPassword" } with a misformed key', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword/' + resetPasswordUserId + '/0').send({ password: ["2x" + newPassword] });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "That is not a properly formatted reset password key." });
+                    });
+                });
+
+                describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with { newPassword: ["newPassword"] }', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword/' + resetPasswordUserId + '/' + resetPasswordUserKey).send({ password: ["2x" + newPassword] });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: "Password must be a string." });
                     });
                 });
             });
