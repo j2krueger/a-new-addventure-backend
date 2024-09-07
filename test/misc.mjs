@@ -19,7 +19,7 @@ const {
     // newUserBasicInfo,
     // models
     // User,
-    // Entry,
+    // Chapter,
     // Follow,
     Message,
     // functions
@@ -137,7 +137,7 @@ describe('Test miscelaneous routes', function () {
                 expect(res).to.have.status(200);
                 expect(res.body.users).to.be.a('number');
                 expect(res.body.stories).to.be.a('number');
-                expect(res.body.entries).to.be.a('number');
+                expect(res.body.chapters).to.be.a('number');
             });
         });
 
@@ -150,7 +150,7 @@ describe('Test miscelaneous routes', function () {
                 expect(res).to.have.status(200);
                 expect(res.body.users).to.be.a('number');
                 expect(res.body.stories).to.be.a('number');
-                expect(res.body.entries).to.be.a('number');
+                expect(res.body.chapters).to.be.a('number');
             });
         });
     });

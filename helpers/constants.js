@@ -37,7 +37,7 @@ module.exports = {
     localDeploy: process.env.LOCALDEPLOY,
     testing: process.env.TESTING,
     mochaTestingUrl: process.env.MOCHA_TESTING_URL,
-    entriesPerPage: Number(process.env.ENTRIES_PER_PAGE),
+    resultsPerPage: Number(process.env.RESULTS_PER_PAGE),
     adminPassword: process.env.ADMIN_PASSWORD,
     siteEmailAddress: process.env.EMAIL_ADDRESS,
     siteEmailPassword: process.env.EMAIL_PASSWORD,

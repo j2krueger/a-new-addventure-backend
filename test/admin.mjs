@@ -15,7 +15,7 @@ const {
     testUserLogin,
     adminLogin,
     testStory,
-    testEntry,
+    testChapter,
     newUserPrivateProfile,
     // newUserPublicInfo,
     // newUserBasicInfo,
@@ -23,7 +23,7 @@ const {
     shouldSendEmail,
     // models
     User,
-    Entry,
+    Chapter,
     // Follow,
     Message,
     Like,
@@ -35,110 +35,110 @@ const {
 } = globals;
 
 describe('Test the admin routes', function () {
-    describe('Test the DELETE /admin/entry/:entryId route', function () {
+    describe('Test the DELETE /admin/chapter/:chapterId route', function () {
         describe('Happy paths', function () {
-            describe('Login as admin and delete an entry', function () {
-                it('should return a 200 status and a success message and delete the entry from the database', async function () {
+            describe('Login as admin and delete a chapter', function () {
+                it('should return a 200 status and a success message and delete the chapter from the database', async function () {
                     await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
+                    const storyRes = await agent.post('/chapter').send(testStory);
                     await agent.post('/login').send(adminLogin);
 
-                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
-                    const reEntry = await Entry.findById(storyRes.body.entryId);
+                    const res = await agent.delete('/admin/chapter/' + storyRes.body.chapterId);
+                    const reChapter = await Chapter.findById(storyRes.body.chapterId);
 
                     expect(res).to.have.status(200);
-                    expect(res.body).to.deep.equal({ message: "Entry successfully deleted." });
-                    expect(reEntry).to.be.null;
+                    expect(res.body).to.deep.equal({ message: "Chapter successfully deleted." });
+                    expect(reChapter).to.be.null;
                 });
             });
 
-            describe('Like an entry, then DELETE /admin/entry/:entryId', function () {
+            describe('Like a chapter, then DELETE /admin/chapter/:chapterId', function () {
                 it('should delete the like from the database', async function () {
                     await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
+                    const storyRes = await agent.post('/chapter').send(testStory);
                     await agent.post('/login').send(adminLogin);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/like');
+                    await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
 
-                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
-                    const like = await Like.findOne({ entry: storyRes.body.entryId });
+                    const res = await agent.delete('/admin/chapter/' + storyRes.body.chapterId);
+                    const like = await Like.findOne({ chapter: storyRes.body.chapterId });
 
                     expect(res).to.have.status(200);
                     expect(like).to.be.null;
                 });
             });
 
-            describe('Bookmark an entry, then DELETE /admin/entry/:entryId', function () {
+            describe('Bookmark a chapter, then DELETE /admin/chapter/:chapterId', function () {
                 it('should delete the bookmark from the database', async function () {
                     await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
+                    const storyRes = await agent.post('/chapter').send(testStory);
+                    await agent.post('/chapter/' + storyRes.body.chapterId + '/bookmark');
 
-                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
-                    const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
+                    const res = await agent.delete('/admin/chapter/' + storyRes.body.chapterId);
+                    const bookmark = await Bookmark.findOne({ chapter: storyRes.body.chapterId });
 
                     expect(res).to.have.status(200);
                     expect(bookmark).to.be.null;
                 });
             });
 
-            describe('Flag an entry, then DELETE /admin/entry/:entryId', function () {
+            describe('Flag a chapter, then DELETE /admin/chapter/:chapterId', function () {
                 it('should delete the flag from the database', async function () {
                     await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
+                    const storyRes = await agent.post('/chapter').send(testStory);
+                    await agent.post('/chapter/' + storyRes.body.chapterId + '/flag').send({ reason: testString });
 
-                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
-                    const flag = await Flag.findOne({ entry: storyRes.body.entryId });
+                    const res = await agent.delete('/admin/chapter/' + storyRes.body.chapterId);
+                    const flag = await Flag.findOne({ chapter: storyRes.body.chapterId });
 
                     expect(res).to.have.status(200);
                     expect(flag).to.be.null;
                 });
             });
 
-            describe('Continue an entry, then delete the entry', function () {
-                it('should also delete the continuation entry', async function () {
+            describe('Continue a chapter, then delete the chapter', function () {
+                it('should also delete the continuation chapter', async function () {
                     await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    const entryRes = await agent.post('/entry/' + storyRes.body.entryId).send(testEntry);
+                    const storyRes = await agent.post('/chapter').send(testStory);
+                    const chapterRes = await agent.post('/chapter/' + storyRes.body.chapterId).send(testChapter);
                     await agent.post('/login').send(adminLogin);
 
-                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
-                    const entry = await Entry.findById(entryRes.body.entryId);
+                    const res = await agent.delete('/admin/chapter/' + storyRes.body.chapterId);
+                    const chapter = await Chapter.findById(chapterRes.body.chapterId);
 
                     expect(res).to.have.status(200);
-                    expect(entry).to.be.null;
+                    expect(chapter).to.be.null;
 
-                    await Entry.findByIdAndDelete(entryRes.body.entryId);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    await Chapter.findByIdAndDelete(chapterRes.body.chapterId);
+                    await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                 });
             });
         });
 
         describe('Sad paths', function () {
-            describe('Login as non-admin and delete an entry', function () {
+            describe('Login as non-admin and delete a chapter', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
+                    const storyRes = await agent.post('/chapter').send(testStory);
 
-                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
+                    const res = await agent.delete('/admin/chapter/' + storyRes.body.chapterId);
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                 });
             });
 
-            describe('Logout and delete an entry', function () {
+            describe('Logout and delete a chapter', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
+                    const storyRes = await agent.post('/chapter').send(testStory);
                     await agent.post('/logout');
 
-                    const res = await agent.delete('/admin/entry/' + storyRes.body.entryId);
+                    const res = await agent.delete('/admin/chapter/' + storyRes.body.chapterId);
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                 });
             });
         });
@@ -149,9 +149,9 @@ describe('Test the admin routes', function () {
             describe('Login as admin and delete a flag', function () {
                 it('should return a 200 status and a success message, and delete the flag from the database', async function () {
                     await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
-                    const flag = await Flag.findOne({ entry: storyRes.body.entryId });
+                    const storyRes = await agent.post('/chapter').send(testStory);
+                    await agent.post('/chapter/' + storyRes.body.chapterId + '/flag').send({ reason: testString });
+                    const flag = await Flag.findOne({ chapter: storyRes.body.chapterId });
 
                     const res = await agent.delete('/admin/flag/' + flag._id);
                     const checkFlag = await Flag.findById(flag._id);
@@ -160,7 +160,7 @@ describe('Test the admin routes', function () {
                     expect(res.body).to.deep.equal({ message: "Flag successfully deleted." });
                     expect(checkFlag).to.be.null;
 
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                 });
             });
         });
@@ -169,9 +169,9 @@ describe('Test the admin routes', function () {
             describe('Logout and DELETE', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
-                    const flag = await Flag.findOne({ entry: storyRes.body.entryId });
+                    const storyRes = await agent.post('/chapter').send(testStory);
+                    await agent.post('/chapter/' + storyRes.body.chapterId + '/flag').send({ reason: testString });
+                    const flag = await Flag.findOne({ chapter: storyRes.body.chapterId });
                     await agent.post('/logout');
 
                     const res = await agent.delete('/admin/flag/' + flag._id);
@@ -179,23 +179,23 @@ describe('Test the admin routes', function () {
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
                     await Flag.findByIdAndDelete(flag._id);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                 });
             });
 
             describe('Login as non-admin and DELETE', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/login').send(testUserLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
-                    const flag = await Flag.findOne({ entry: storyRes.body.entryId });
+                    const storyRes = await agent.post('/chapter').send(testStory);
+                    await agent.post('/chapter/' + storyRes.body.chapterId + '/flag').send({ reason: testString });
+                    const flag = await Flag.findOne({ chapter: storyRes.body.chapterId });
                     await agent.post('/login').send(testUserLogin);
 
                     const res = await agent.delete('/admin/flag/' + flag._id);
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
 
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                     await Flag.findByIdAndDelete(flag._id);
                 });
             });
@@ -227,23 +227,23 @@ describe('Test the admin routes', function () {
             describe('Login as admin and GET /admin/flag', function () {
                 it('should return a 200 status and a list of flags', async function () {
                     await agent.post('/login').send(adminLogin);
-                    const storyRes = await agent.post('/entry').send(testStory);
-                    await agent.post('/entry/' + storyRes.body.entryId + '/flag').send({ reason: testString });
-                    const flag = await Flag.findOne({ entry: storyRes.body.entryId });
+                    const storyRes = await agent.post('/chapter').send(testStory);
+                    await agent.post('/chapter/' + storyRes.body.chapterId + '/flag').send({ reason: testString });
+                    const flag = await Flag.findOne({ chapter: storyRes.body.chapterId });
 
                     const res = await agent.get('/admin/flag');
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an('array').with.lengthOf.at.least(1);
                     for (const currentFlag of res.body) {
-                        expect(currentFlag).to.include.all.keys('user', 'entry', 'reason');
-                        expect(currentFlag.entry).to.not.be.null;
+                        expect(currentFlag).to.include.all.keys('user', 'chapter', 'reason');
+                        expect(currentFlag.chapter).to.not.be.null;
                         expect(currentFlag.reason).to.be.a('string').with.lengthOf.at.least(1);
                     }
                     expect(res.body.some(f => (f._id == flag._id))).to.be.true;
 
                     await Flag.findByIdAndDelete(flag._id);
-                    await Entry.findByIdAndDelete(storyRes.body.entryId);
+                    await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                 });
             });
         });
@@ -541,7 +541,7 @@ describe('Test the admin routes', function () {
 
             describe('Happy paths', function () {
                 describe('Login as admin and lock an unlocked user', function () {
-                    it('should return a 200 status and a success message and set the field locked to true in the user\'s database entry', async function () {
+                    it('should return a 200 status and a success message and set the field locked to true in the user\'s database chapter', async function () {
                         await agent.post('/login').send(adminLogin);
 
                         const res = await agent.post('/admin/user/' + unlockedUserId + '/lock');
@@ -563,24 +563,24 @@ describe('Test the admin routes', function () {
                     });
                 });
 
-                describe('Login as locked user and POST /entry', function () {
+                describe('Login as locked user and POST /chapter', function () {
                     it('should redirect to login', async function () {
                         await agent.post('/login').send({ name: 'locked' + newUserName, password: newPassword });
 
-                        const res = await agent.post('/entry').send(testEntry);
+                        const res = await agent.post('/chapter').send(testChapter);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
                 });
 
-                describe('Login as unlocked user, lock user, and POST /entry', function () {
+                describe('Login as unlocked user, lock user, and POST /chapter', function () {
                     it('should redirect to login', async function () {
                         const loginRes = await agent.post('/login').send({ name: 'unlocked' + newUserName, password: newPassword });
                         const user = await User.findById(loginRes.body.userId);
                         user.locked = true;
                         user.save();
 
-                        const res = await agent.post('/entry').send(testEntry);
+                        const res = await agent.post('/chapter').send(testChapter);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
@@ -862,29 +862,29 @@ describe('Test the admin routes', function () {
     describe('Test the keyword modification routes', function () {
         let story;
 
-        beforeEach('Setup entry for keyword testing', async function () {
+        beforeEach('Setup chapter for keyword testing', async function () {
             await agent.post('/login').send(testUserLogin);
-            const storyRes = await agent.post('/entry').send(testStory);
+            const storyRes = await agent.post('/chapter').send(testStory);
             story = storyRes.body;
         });
 
-        afterEach('Teardown entry for keyword testing', async function () {
-            await Entry.findByIdAndDelete(story.entryId);
+        afterEach('Teardown chapter for keyword testing', async function () {
+            await Chapter.findByIdAndDelete(story.chapterId);
         });
 
-        describe('Test the PUT /admin/entry/:entryId/keyword route', function () {
+        describe('Test the PUT /admin/chapter/:chapterId/keyword route', function () {
             describe('Happy paths', function () {
                 describe('Login as admin and add a keyword', function () {
-                    it('should return a 200 status and a success message, and add the keyword to the entry in the database.', async function () {
+                    it('should return a 200 status and a success message, and add the keyword to the chapter in the database.', async function () {
                         await agent.post('/login').send(adminLogin);
 
-                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send(["silly"]);
-                        const entry = await Entry.findById(story.entryId);
+                        const res = await agent.put('/admin/chapter/' + story.chapterId + '/keyword').send(["silly"]);
+                        const chapter = await Chapter.findById(story.chapterId);
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.deep.equal({ message: "Keywords successfully added." });
-                        expect(entry.keywords).to.be.an('array');
-                        expect(entry.keywords).to.include("silly");
+                        expect(chapter.keywords).to.be.an('array');
+                        expect(chapter.keywords).to.include("silly");
                     });
                 });
             });
@@ -894,7 +894,7 @@ describe('Test the admin routes', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/login').send(testUserLogin);
 
-                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send(["silly"]);
+                        const res = await agent.put('/admin/chapter/' + story.chapterId + '/keyword').send(["silly"]);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
@@ -904,7 +904,7 @@ describe('Test the admin routes', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/logout');
 
-                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send(["silly"]);
+                        const res = await agent.put('/admin/chapter/' + story.chapterId + '/keyword').send(["silly"]);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
@@ -914,7 +914,7 @@ describe('Test the admin routes', function () {
                     it('should return a 400 status and an error message', async function () {
                         await agent.post('/login').send(adminLogin);
 
-                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send("silly");
+                        const res = await agent.put('/admin/chapter/' + story.chapterId + '/keyword').send("silly");
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
@@ -925,7 +925,7 @@ describe('Test the admin routes', function () {
                     it('should return a 400 status and an error message', async function () {
                         await agent.post('/login').send(adminLogin);
 
-                        const res = await agent.put('/admin/entry/' + story.entryId + '/keyword').send(["silly?"]);
+                        const res = await agent.put('/admin/chapter/' + story.chapterId + '/keyword').send(["silly?"]);
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
@@ -934,18 +934,18 @@ describe('Test the admin routes', function () {
             });
         });
 
-        describe('Test the DELETE /admin/entry/:entryId/keyword route', function () {
+        describe('Test the DELETE /admin/chapter/:chapterId/keyword route', function () {
             describe('Happy paths', function () {
                 describe('Login as admin and delete a keyword', function () {
-                    it('should return a 200 status and a success message, and remove the keyword from the entry', async function () {
+                    it('should return a 200 status and a success message, and remove the keyword from the chapter', async function () {
                         await agent.post('/login').send(adminLogin);
 
-                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword/' + story.keywords[2]);
-                        const entry = await Entry.findById(story.entryId);
+                        const res = await agent.delete('/admin/chapter/' + story.chapterId + '/keyword/' + story.keywords[2]);
+                        const chapter = await Chapter.findById(story.chapterId);
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.deep.equal({ message: "Keyword successfully deleted." });
-                        expect(entry.keywords).to.not.include(story.keywords[2]);
+                        expect(chapter.keywords).to.not.include(story.keywords[2]);
                     });
                 });
             });
@@ -955,7 +955,7 @@ describe('Test the admin routes', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/login').send(testUserLogin);
 
-                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword/' + story.keywords[2]);
+                        const res = await agent.delete('/admin/chapter/' + story.chapterId + '/keyword/' + story.keywords[2]);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
@@ -965,7 +965,7 @@ describe('Test the admin routes', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/logout');
 
-                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword/' + story.keywords[2]);
+                        const res = await agent.delete('/admin/chapter/' + story.chapterId + '/keyword/' + story.keywords[2]);
 
                         expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                     });
@@ -975,21 +975,21 @@ describe('Test the admin routes', function () {
                     it('should return a 400 status and an error message', async function () {
                         await agent.post('/login').send(adminLogin);
 
-                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword/silly!');
+                        const res = await agent.delete('/admin/chapter/' + story.chapterId + '/keyword/silly!');
 
                         expect(res).to.have.status(400);
                         expect(res.body).to.deep.equal({ error: "That is not a valid keyword." });
                     });
                 });
 
-                describe('Login as admin and DELETE with a keyword that the entry doesn\'t have', function () {
+                describe('Login as admin and DELETE with a keyword that the chapter doesn\'t have', function () {
                     it('should return a 404 status and an error message', async function () {
                         await agent.post('/login').send(adminLogin);
 
-                        const res = await agent.delete('/admin/entry/' + story.entryId + '/keyword/silly');
+                        const res = await agent.delete('/admin/chapter/' + story.chapterId + '/keyword/silly');
 
                         expect(res).to.have.status(404);
-                        expect(res.body).to.deep.equal({ error: "Keyword not found in entry." });
+                        expect(res.body).to.deep.equal({ error: "Keyword not found in chapter." });
                     });
                 });
             });

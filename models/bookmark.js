@@ -10,10 +10,10 @@ const bookmarkSchema = new Schema({
         ref: mongoose.model('User'),
         requred: ['Needs a user'],
     },
-    entry: {
+    chapter: {
         type: ObjectId,
-        ref: mongoose.model('Entry'),
-        required: ["Needs an entry"],
+        ref: mongoose.model('Chapter'),
+        required: ["Needs a chapter"],
     },
     createDate: {
         type: Date,

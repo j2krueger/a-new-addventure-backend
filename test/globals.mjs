@@ -8,7 +8,7 @@ const mongoose = (await import("mongoose")).default;
 const agent = chai.request.agent(constants.mochaTestingUrl);
 
 import User from '../models/user.js';
-import Entry from '../models/entry.js';
+import Chapter from '../models/chapter.js';
 import Follow from '../models/follow.js';
 import Message from '../models/message.js';
 import Like from '../models/like.js';
@@ -24,21 +24,21 @@ const adminLogin = { name: "Freddy", password: constants.adminPassword };
 const testStory = { storyTitle: testString, bodyText: testString, keywords: ["testStory", testString, newUserName] };
 const testStory1 = { storyTitle: "Test story 1", bodyText: testString, keywords: ["testStory", testString, newUserName] };
 const testStory2 = { storyTitle: "Test story 2", bodyText: testString, keywords: ["testStory", testString, newUserName] };
-const testEntry = { entryTitle: testString + "1", bodyText: testString, keywords: ["testEntry", testString, newUserName] };
-const testEntry1a = { entryTitle: "Test entry 1A", bodyText: testString, keywords: ["testEntry", testString, newUserName] };
-const testEntry1b = { entryTitle: "Test entry 1B", bodyText: testString, keywords: ["testEntry", testString, newUserName] };
-const testEntry1aa = { entryTitle: "Test entry 1AA", bodyText: testString, keywords: ["testEntry", testString, newUserName] };
+const testChapter = { chapterTitle: testString + "1", bodyText: testString, keywords: ["testChapter", testString, newUserName] };
+const testChapter1a = { chapterTitle: "Test chapter 1A", bodyText: testString, keywords: ["testChapter", testString, newUserName] };
+const testChapter1b = { chapterTitle: "Test chapter 1B", bodyText: testString, keywords: ["testChapter", testString, newUserName] };
+const testChapter1aa = { chapterTitle: "Test chapter 1AA", bodyText: testString, keywords: ["testChapter", testString, newUserName] };
 let _newUserPrivateProfile;
 let _newUserPublicInfo;
 let _newUserBasicInfo;
 let _verificationEmailCount = 0;
 
-const summaryKeys = ['storyId', 'entryId', 'storyTitle', 'entryTitle', 'authorName', 'authorId', 'previousEntry', 'likes', 'keywords'];
+const summaryKeys = ['storyId', 'chapterId', 'storyTitle', 'chapterTitle', 'authorName', 'authorId', 'previousChapter', 'likes', 'keywords'];
 
 function populateUserInfo(newUser) {
     _newUserPrivateProfile = JSON.parse(JSON.stringify(newUser));
-    const { userId, userName, email, publishEmail, bio, publishedEntries } = newUser;
-    _newUserPublicInfo = { userId, userName, email: publishEmail ? email : "", bio, publishedEntries };
+    const { userId, userName, email, publishEmail, bio, publishedChapters } = newUser;
+    _newUserPublicInfo = { userId, userName, email: publishEmail ? email : "", bio, publishedChapters };
     _newUserBasicInfo = { userId, userName };
 }
 
@@ -86,10 +86,10 @@ export {
     testStory,
     testStory1,
     testStory2,
-    testEntry,
-    testEntry1a,
-    testEntry1b,
-    testEntry1aa,
+    testChapter,
+    testChapter1a,
+    testChapter1b,
+    testChapter1aa,
     newUserPrivateProfile,
     newUserPublicInfo,
     newUserBasicInfo,
@@ -98,7 +98,7 @@ export {
     summaryKeys,
     // models
     User,
-    Entry,
+    Chapter,
     Follow,
     Message,
     Like,

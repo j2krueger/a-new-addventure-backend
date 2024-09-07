@@ -21,14 +21,14 @@ const followSchema = new Schema({
 followSchema.statics.getFollowers = async function getFollowers(followingId) {
     const followersList = await Follow.find({ following: followingId }).populate('follower');
     return followersList
-        .map(entry => { return { userId: entry.follower._id, userName: entry.follower.userName } })
+        .map(chapter => { return { userId: chapter.follower._id, userName: chapter.follower.userName } })
         .sort((a, b) => { return (a.userName.toLowerCase() < b.userName.toLowerCase()) ? -1 : (a.userName.toLowerCase() > b.userName.toLowerCase()) ? 1 : 0 });
 }
 
 followSchema.statics.getFollowedAuthors = async function getFollowedAuthors(followerId) {
     const followedAuthorsList = await Follow.find({ follower: followerId }).populate({ path: 'following' });
     return followedAuthorsList
-        .map(entry => { return { userId: entry.following._id, userName: entry.following.userName } })
+        .map(chapter => { return { userId: chapter.following._id, userName: chapter.following.userName } })
         .sort((a, b) => { return (a.userName.toLowerCase() < b.userName.toLowerCase()) ? -1 : (a.userName.toLowerCase() > b.userName.toLowerCase()) ? 1 : 0 });
 }
 

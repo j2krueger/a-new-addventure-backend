@@ -1,12 +1,12 @@
 "use strict";
 
 const constants = require('../helpers/constants');
-const { userAuth, unlockedUserAuth, entryAuthorAuth, adminAuth } = require('../helpers/auth');
+const { userAuth, unlockedUserAuth, chapterAuthorAuth, adminAuth } = require('../helpers/auth');
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
 const userControllers = require('../controllers/user');
-const entryControllers = require('../controllers/entry');
+const chapterControllers = require('../controllers/chapter');
 const miscControllers = require('../controllers/misc');
 
 router.use(cors({
@@ -16,9 +16,9 @@ router.use(cors({
 
 // All param middleware goes here
 router.param('userId', userControllers.paramUserId);
-router.param('entryId', entryControllers.paramEntryId);
-router.param('flagId', entryControllers.paramFlagId);
-router.param('keywordValue', entryControllers.paramKeyword);
+router.param('chapterId', chapterControllers.paramChapterId);
+router.param('flagId', chapterControllers.paramFlagId);
+router.param('keywordValue', chapterControllers.paramKeyword);
 router.param('messageId', miscControllers.paramMessageId);
 router.param('emailVerificationKey', userControllers.paramEmailVerificationKey);
 router.param('resetPasswordKey', userControllers.paramResetPasswordKey);
@@ -27,9 +27,9 @@ router.param('resetPasswordKey', userControllers.paramResetPasswordKey);
 router.use('/admin', adminAuth);
 
 // All admin routes go here
-router.delete('/admin/entry/:entryId', entryControllers.deleteEntryById);
-router.delete('/admin/flag/:flagId', entryControllers.deleteFlag);
-router.get('/admin/flag', entryControllers.getFlagList);
+router.delete('/admin/chapter/:chapterId', chapterControllers.deleteChapterById);
+router.delete('/admin/flag/:flagId', chapterControllers.deleteFlag);
+router.get('/admin/flag', chapterControllers.getFlagList);
 router.get('/admin/message', miscControllers.getMessage);
 router.put('/admin/message/:messageId', miscControllers.putMessage);
 router.delete('/admin/message/:messageId', miscControllers.deleteMessage);
@@ -37,8 +37,8 @@ router.post('/admin/user/:userId/lock', userControllers.lockUser);
 router.delete('/admin/user/:userId/lock', userControllers.unlockUser);
 router.get('/admin/user/:userId', userControllers.adminGetUser);
 router.put('/admin/user/:userId', userControllers.alterUser);
-router.put('/admin/entry/:entryId/keyword', entryControllers.addKeywords);
-router.delete('/admin/entry/:entryId/keyword/:keywordValue', entryControllers.deleteKeyword);
+router.put('/admin/chapter/:chapterId/keyword', chapterControllers.addKeywords);
+router.delete('/admin/chapter/:chapterId/keyword/:keywordValue', chapterControllers.deleteKeyword);
 
 // user related routes
 router.post('/register', userControllers.registerUser);
@@ -57,21 +57,21 @@ router.put('/profile', userAuth, userControllers.putProfile);
 router.post('/verify', userAuth, userControllers.sendVerificationEmail);
 router.post('/changepassword', userAuth, userControllers.changePassword);
 
-// unauthorized entry routes
-router.get('/entry', entryControllers.getEntryList);
-router.get('/entry/:entryId', entryControllers.getEntryById);
-router.post('/entry/:entryId/flag', entryControllers.flagEntry);
-router.get('/chain/:entryId', entryControllers.getChainById);
-router.get('/keyword', entryControllers.getKeywordList);
-// authorized entry related routes
-router.post('/entry', unlockedUserAuth, entryControllers.createStory);
-router.post('/entry/:entryId', unlockedUserAuth, entryControllers.continueStory);
-router.post('/entry/:entryId/like', userAuth, entryControllers.likeEntry);
-router.delete('/entry/:entryId/like', userAuth, entryControllers.unLikeEntry);
-router.post('/entry/:entryId/bookmark', userAuth, entryControllers.bookmarkEntry);
-router.delete('/entry/:entryId/bookmark', userAuth, entryControllers.unBookmarkEntry);
-router.put('/entry/:entryId/keyword', entryAuthorAuth, entryControllers.addKeywords);
-router.delete('/entry/:entryId/keyword/:keywordValue', entryAuthorAuth, entryControllers.deleteKeyword);
+// unauthorized chapter routes
+router.get('/chapter', chapterControllers.getChapterList);
+router.get('/chapter/:chapterId', chapterControllers.getChapterById);
+router.post('/chapter/:chapterId/flag', chapterControllers.flagChapter);
+router.get('/chain/:chapterId', chapterControllers.getChainById);
+router.get('/keyword', chapterControllers.getKeywordList);
+// authorized chapter related routes
+router.post('/chapter', unlockedUserAuth, chapterControllers.createStory);
+router.post('/chapter/:chapterId', unlockedUserAuth, chapterControllers.continueStory);
+router.post('/chapter/:chapterId/like', userAuth, chapterControllers.likeChapter);
+router.delete('/chapter/:chapterId/like', userAuth, chapterControllers.unLikeChapter);
+router.post('/chapter/:chapterId/bookmark', userAuth, chapterControllers.bookmarkChapter);
+router.delete('/chapter/:chapterId/bookmark', userAuth, chapterControllers.unBookmarkChapter);
+router.put('/chapter/:chapterId/keyword', chapterAuthorAuth, chapterControllers.addKeywords);
+router.delete('/chapter/:chapterId/keyword/:keywordValue', chapterAuthorAuth, chapterControllers.deleteKeyword);
 
 // miscellaneous routes
 router.post('/message', miscControllers.postMessage);

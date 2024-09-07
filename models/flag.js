@@ -4,7 +4,7 @@ const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const User = require('./user');
-const Entry = require('./entry');
+const Chapter = require('./chapter');
 
 const flagSchema = new Schema({
     user: {
@@ -12,10 +12,10 @@ const flagSchema = new Schema({
         ref: User,
         default: null,
     },
-    entry: {
+    chapter: {
         type: ObjectId,
-        ref: Entry,
-        required: ["Needs an entry"],
+        ref: Chapter,
+        required: ["Needs a chapter"],
     },
     reason: {
         type: String,

@@ -64,8 +64,8 @@ const userSchema = new Schema({
   toObject: { virtuals: true },
 });
 
-userSchema.virtual('publishedEntries', {
-  ref: 'Entry',
+userSchema.virtual('publishedChapters', {
+  ref: 'Chapter',
   localField: 'userName',
   foreignField: 'authorName'
 })
@@ -76,13 +76,13 @@ userSchema.virtual('followedAuthors', {
   foreignField: 'follower',
 })
 
-userSchema.virtual('likedEntries', {
+userSchema.virtual('likedChapters', {
   ref: 'Like',
   localField: '_id',
   foreignField: 'user'
 })
 
-userSchema.virtual('bookmarkedEntries', {
+userSchema.virtual('bookmarkedChapters', {
   ref: 'Bookmark',
   localField: '_id',
   foreignField: 'user'
@@ -102,28 +102,28 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
       },
     })
     .populate({
-      path: 'publishedEntries',
-      limit: constants.entriesPerPage,
+      path: 'publishedChapters',
+      limit: constants.resultsPerPage,
       options: { sort: { createDate: -1 } },
-      transform: entry => entry.summary(),
+      transform: chapter => chapter.summary(),
     })
     .populate({
-      path: 'likedEntries',
-      populate: { path: 'entry', populate: { path: 'authorId' } },
+      path: 'likedChapters',
+      populate: { path: 'chapter', populate: { path: 'authorId' } },
       transform: like => {
-        if (like?.entry) {
-          const summary = like.entry?.summary(); summary.authorId = summary?.authorId?._id; return summary;
+        if (like?.chapter) {
+          const summary = like.chapter?.summary(); summary.authorId = summary?.authorId?._id; return summary;
         } else {
           return null;
         }
       }
     })
     .populate({
-      path: 'bookmarkedEntries',
-      populate: { path: 'entry', populate: { path: 'authorId' } },
+      path: 'bookmarkedChapters',
+      populate: { path: 'chapter', populate: { path: 'authorId' } },
       transform: bookmark => {
-        if (bookmark?.entry) {
-          const summary = bookmark.entry.summary(); summary.authorId = summary.authorId._id; return summary;
+        if (bookmark?.chapter) {
+          const summary = bookmark.chapter.summary(); summary.authorId = summary.authorId._id; return summary;
         } else {
           return null;
         }
@@ -145,10 +145,10 @@ userSchema.statics.findAndPopulate = async function findAndPopulate(query, skip,
     .skip(skip)
     .limit(limit)
     .populate({
-      path: 'publishedEntries',
-      limit: constants.entriesPerPage,
+      path: 'publishedChapters',
+      limit: constants.resultsPerPage,
       options: { sort: { createDate: -1 } },
-      transform: entry => entry.summary(),
+      transform: chapter => chapter.summary(),
     });
   return result;
 }
@@ -165,10 +165,10 @@ userSchema.methods.privateProfile = function privateProfile() {
     darkMode: this.darkMode,
     locked: this.locked,
     emailVerified: this.emailVerified,
-    publishedEntries: this.publishedEntries || [],
+    publishedChapters: this.publishedChapters || [],
     followedAuthors: this.followedAuthors || [],
-    likedEntries: this.likedEntries || [],
-    bookmarkedEntries: this.bookmarkedEntries || [],
+    likedChapters: this.likedChapters || [],
+    bookmarkedChapters: this.bookmarkedChapters || [],
   };
 }
 
@@ -178,7 +178,7 @@ userSchema.methods.publicInfo = function publicInfo() {
     userName: this.userName,
     email: this.publishEmail && this.emailVerified ? this.email : "",
     bio: this.bio,
-    publishedEntries: this.publishedEntries || [],
+    publishedChapters: this.publishedChapters || [],
   };
 }
 

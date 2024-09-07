@@ -3,7 +3,7 @@
 // const constants = require('../helpers/constants');
 const Message = require('../models/message');
 const User = require('../models/user');
-const Entry = require('../models/entry');
+const Chapter = require('../models/chapter');
 
 async function paramMessageId(req, res, next, value) {
     if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
@@ -82,8 +82,8 @@ async function getStats(req, res, next) {
     try {
         const result = {};
         result.users = await User.countDocuments();
-        result.stories = await Entry.countDocuments({ previousEntry: null })
-        result.entries = await Entry.countDocuments();
+        result.stories = await Chapter.countDocuments({ previousChapter: null })
+        result.chapters = await Chapter.countDocuments();
         return res.status(200).json(result);
     } catch (error) {
         return next(error);

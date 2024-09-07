@@ -48,10 +48,10 @@ paths:
                   "darkMode": false,
                   "locked": false,
                   "emailVerified": false,
-                  "publishedEntries": [],
+                  "publishedChapters": [],
                   "followedAuthors": [],
-                  "likedEntries": [],
-                  "bookmarkedEntries": [],
+                  "likedChapters": [],
+                  "bookmarkedChapters": [],
                 }
         "400":
           description: "If any of the fields are missing, return an error."
@@ -269,10 +269,10 @@ paths:
                   "darkMode": false,
                   "locked": false,
                   "emailVerified": true,
-                  "publishedEntries": [],
+                  "publishedChapters": [],
                   "followedAuthors": [],
-                  "likedEntries": [],
-                  "bookmarkedEntries": [],
+                  "likedChapters": [],
+                  "bookmarkedChapters": [],
                 }
         "400":
           description: "Missing field."
@@ -341,33 +341,33 @@ paths:
                   "darkMode": true,
                   "locked": false,
                   "emailVerified": true,
-                  "publishedEntries":
+                  "publishedChapters":
                     [
                       {
                         "storyId": "6695b2573550c66db1ab9106",
-                        "entryId": "66a7fd2095206fecbb52c189",
+                        "chapterId": "66a7fd2095206fecbb52c189",
                         "storyTitle": "In the beginning...",
-                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                         "authorName": "Freddy",
-                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "previousChapter": "6695b2573550c66db1ab9106",
                         "keywords": [],
                       },
                       {
                         "storyId": "6695b2573550c66db1ab9106",
-                        "entryId": "6695b2573550c66db1ab9106",
+                        "chapterId": "6695b2573550c66db1ab9106",
                         "storyTitle": "In the beginning...",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "Freddy",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668d51e61be56166aaaa6cc2",
+                        "chapterId": "668d51e61be56166aaaa6cc2",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "chapterTitle": "Suddenly, a wild accountant appears!",
                         "authorName": "Freddy",
-                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
                       },
                     ],
@@ -394,39 +394,39 @@ paths:
                         "userId": "668ee23ce1dcd980cf0739f9",
                       },
                     ],
-                  "likedEntries":
+                  "likedChapters":
                     [
                       {
                         "storyId": "66a5a2ab375bbb2298ff7420",
-                        "entryId": "66a5a2ab375bbb2298ff7420",
+                        "chapterId": "66a5a2ab375bbb2298ff7420",
                         "storyTitle": "7th newest ",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "apmanager",
                         "authorId": "667b294248b8805d71a96a03",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                     ],
-                  "bookmarkedEntries":
+                  "bookmarkedChapters":
                     [
                       {
                         "storyId": "6695b2573550c66db1ab9106",
-                        "entryId": "66a7fd2095206fecbb52c189",
+                        "chapterId": "66a7fd2095206fecbb52c189",
                         "storyTitle": "In the beginning...",
-                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                         "authorName": "Freddy",
                         "authorId": "668490250029a28118a8d1be",
-                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "previousChapter": "6695b2573550c66db1ab9106",
                         "keywords": [],
                       },
                       {
                         "storyId": "66a5a2ab375bbb2298ff7420",
-                        "entryId": "66a5a2ab375bbb2298ff7420",
+                        "chapterId": "66a5a2ab375bbb2298ff7420",
                         "storyTitle": "7th newest ",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "apmanager",
                         "authorId": "667b294248b8805d71a96a03",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                     ],
@@ -477,33 +477,33 @@ paths:
                   "darkMode": true,
                   "locked": false,
                   "emailVerified": true,
-                  "publishedEntries":
+                  "publishedChapters":
                     [
                       {
                         "storyId": "6695b2573550c66db1ab9106",
-                        "entryId": "66a7fd2095206fecbb52c189",
+                        "chapterId": "66a7fd2095206fecbb52c189",
                         "storyTitle": "In the beginning...",
-                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                         "authorName": "Freddy",
-                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "previousChapter": "6695b2573550c66db1ab9106",
                         "keywords": [],
                       },
                       {
                         "storyId": "6695b2573550c66db1ab9106",
-                        "entryId": "6695b2573550c66db1ab9106",
+                        "chapterId": "6695b2573550c66db1ab9106",
                         "storyTitle": "In the beginning...",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "Freddy",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668d51e61be56166aaaa6cc2",
+                        "chapterId": "668d51e61be56166aaaa6cc2",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "chapterTitle": "Suddenly, a wild accountant appears!",
                         "authorName": "Freddy",
-                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
                       },
                     ],
@@ -530,39 +530,39 @@ paths:
                         "userId": "668ee23ce1dcd980cf0739f9",
                       },
                     ],
-                  "likedEntries":
+                  "likedChapters":
                     [
                       {
                         "storyId": "66a5a2ab375bbb2298ff7420",
-                        "entryId": "66a5a2ab375bbb2298ff7420",
+                        "chapterId": "66a5a2ab375bbb2298ff7420",
                         "storyTitle": "7th newest ",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "apmanager",
                         "authorId": "667b294248b8805d71a96a03",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                     ],
-                  "bookmarkedEntries":
+                  "bookmarkedChapters":
                     [
                       {
                         "storyId": "6695b2573550c66db1ab9106",
-                        "entryId": "66a7fd2095206fecbb52c189",
+                        "chapterId": "66a7fd2095206fecbb52c189",
                         "storyTitle": "In the beginning...",
-                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                         "authorName": "Freddy",
                         "authorId": "668490250029a28118a8d1be",
-                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "previousChapter": "6695b2573550c66db1ab9106",
                         "keywords": [],
                       },
                       {
                         "storyId": "66a5a2ab375bbb2298ff7420",
-                        "entryId": "66a5a2ab375bbb2298ff7420",
+                        "chapterId": "66a5a2ab375bbb2298ff7420",
                         "storyTitle": "7th newest ",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "apmanager",
                         "authorId": "667b294248b8805d71a96a03",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                     ],
@@ -614,33 +614,33 @@ paths:
                     "userName": "Freddy",
                     "email": "Freddy@example.com",
                     "bio": "I'm not particularly good at bio. I'm really more of a math/physics/computers kinda guy.",
-                    "publishedEntries":
+                    "publishedChapters":
                       [
                         {
                           "storyId": "6695b2573550c66db1ab9106",
-                          "entryId": "66a7fd2095206fecbb52c189",
+                          "chapterId": "66a7fd2095206fecbb52c189",
                           "storyTitle": "In the beginning...",
-                          "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                          "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                           "authorName": "Freddy",
-                          "previousEntry": "6695b2573550c66db1ab9106",
+                          "previousChapter": "6695b2573550c66db1ab9106",
                           "keywords": [],
                         },
                         {
                           "storyId": "6695b2573550c66db1ab9106",
-                          "entryId": "6695b2573550c66db1ab9106",
+                          "chapterId": "6695b2573550c66db1ab9106",
                           "storyTitle": "In the beginning...",
-                          "entryTitle": null,
+                          "chapterTitle": null,
                           "authorName": "Freddy",
-                          "previousEntry": null,
+                          "previousChapter": null,
                           "keywords": [],
                         },
                         {
                           "storyId": "6688142fb004b799a5a29d03",
-                          "entryId": "668d51e61be56166aaaa6cc2",
+                          "chapterId": "668d51e61be56166aaaa6cc2",
                           "storyTitle": "Random Title",
-                          "entryTitle": "Suddenly, a wild accountant appears!",
+                          "chapterTitle": "Suddenly, a wild accountant appears!",
                           "authorName": "Freddy",
-                          "previousEntry": "6688142fb004b799a5a29d03",
+                          "previousChapter": "6688142fb004b799a5a29d03",
                           "keywords": [],
                         },
                       ],
@@ -650,21 +650,21 @@ paths:
                     "userName": "FreddyCallisto",
                     "email": "",
                     "bio": "I haven't decided what to put in my bio yet.",
-                    "publishedEntries": [],
+                    "publishedChapters": [],
                   },
                   {
                     "userId": "668ee24be1dcd980cf0739fe",
                     "userName": "FreddyCeres",
                     "email": "",
                     "bio": "I haven't decided what to put in my bio yet.",
-                    "publishedEntries": [],
+                    "publishedChapters": [],
                   },
                   {
                     "userId": "668ee1b6e1dcd980cf0739d1",
                     "userName": "FreddyEarth",
                     "email": "",
                     "bio": "I haven't decided what to put in my bio yet.",
-                    "publishedEntries": [],
+                    "publishedChapters": [],
                   },
                 ]
         "404":
@@ -682,7 +682,7 @@ paths:
       summary: Get a user's public profile.
       description:
         Get the user's public information by userId, including userName, bio, email if they have set publishEmail to true, and links to their
-        published entries.
+        published chapters.
       operationId: get_public_profile
       parameters:
         - name: userId
@@ -703,69 +703,69 @@ paths:
                   "userName": "Freddy",
                   "email": "Freddy@example.com",
                   "bio": "I'm not particularly good at bio. I'm really more of a math/physics/computers kinda guy.",
-                  "publishedEntries":
+                  "publishedChapters":
                     [
                       {
                         "storyId": "6695b2573550c66db1ab9106",
-                        "entryId": "66a7fd2095206fecbb52c189",
+                        "chapterId": "66a7fd2095206fecbb52c189",
                         "storyTitle": "In the beginning...",
-                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                         "authorName": "Freddy",
-                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "previousChapter": "6695b2573550c66db1ab9106",
                         "keywords": [],
                       },
                       {
                         "storyId": "6695b2573550c66db1ab9106",
-                        "entryId": "6695b2573550c66db1ab9106",
+                        "chapterId": "6695b2573550c66db1ab9106",
                         "storyTitle": "In the beginning...",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "Freddy",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668d51e61be56166aaaa6cc2",
+                        "chapterId": "668d51e61be56166aaaa6cc2",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "chapterTitle": "Suddenly, a wild accountant appears!",
                         "authorName": "Freddy",
-                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
                       },
                       {
                         "storyId": "66885d8e6715f290d4ce03a9",
-                        "entryId": "66885d8e6715f290d4ce03a9",
+                        "chapterId": "66885d8e6715f290d4ce03a9",
                         "storyTitle": "Random Title",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "Freddy",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                       {
                         "storyId": "668857a03f120ae7785257d4",
-                        "entryId": "668857a03f120ae7785257d4",
+                        "chapterId": "668857a03f120ae7785257d4",
                         "storyTitle": "Random Title",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "Freddy",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668820191cb99dfdc244c23c",
+                        "chapterId": "668820191cb99dfdc244c23c",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the first",
+                        "chapterTitle": "Chapter the first",
                         "authorName": "Freddy",
-                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "6688142fb004b799a5a29d03",
+                        "chapterId": "6688142fb004b799a5a29d03",
                         "storyTitle": "Random Title",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "authorName": "Freddy",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "keywords": [],
                       },
                     ],
@@ -935,8 +935,8 @@ paths:
               example: { "error": "Email already verified." }
         default:
           description: Default error sample response
-  /entry:
-    summary: GET/POST entries
+  /chapter:
+    summary: GET/POST chapters
     get:
       parameters:
         - in: query
@@ -948,7 +948,7 @@ paths:
           name: storiesOnly
           schema:
             type: boolean
-          description: "If true, only returns stories, i.e. entries that have storyId equal to entryId and previousEntry equal to null"
+          description: "If true, only returns stories, i.e. chapters that have storyId equal to chapterId and previousChapter equal to null"
         - in: query
           name: search
           schema:
@@ -956,34 +956,34 @@ paths:
           description:
             A string submitted by the user that specifies what to search for, in which fields, and what order the results should
             be returned in. The string must consist of 0 or more white space separated tokens. The string may contain 0 or 1 tokens
-            matching the regular expression "o:[sealcSEALC]+", which specifies the sort order of the results. The letters after the
-            "o:" specify the fields to sort by, "s:storyTitle", "e:entryTitle", "a:author", "l:likes", "c:createDate" with the
+            matching the regular expression "o:[scaldSCALD]+", which specifies the sort order of the results. The letters after the
+            "o:" specify the fields to sort by, "s:storyTitle", "c:chapterTitle", "a:author", "l:likes", "d:createDate" with the
             earlier letters having higher priority than the later letters, and captial letters indicating descending order rather
-            than ascending. If no sort order specification is given, the sort order defaults to "o:C". All other tokens must match
-            the regular expression "([seabkSEAK]+:)?[\\w.-]+". The optional prefix terminating with the colon specifies the fields
-            ("s:storyTitle" "e:entryTitle" "a:authorName" "b:bodyText" "k:keywords", captials indicate the word given must match
+            than ascending. If no sort order specification is given, the sort order defaults to "o:D". All other tokens must match
+            the regular expression "([scabkSCAK]+:)?[\\w.-]+". The optional prefix terminating with the colon specifies the fields
+            ("s:storyTitle" "c:chapterTitle" "a:authorName" "b:bodyText" "k:keywords", captials indicate the word given must match
             the whole field and be case insensitive) in which to search for the word that makes up the rest of the token. Tokens
-            that don't include the optional prefix are treated as if they had the prefix "seabK:".
+            that don't include the optional prefix are treated as if they had the prefix "scabK:".
       tags:
-        - Entry
-      summary: GET a list of recent entries
-      description: "Gets a list of [constants.entriesPerPage] recent entries, newest first. Get more by setting query string to 'page=2', etc."
-      operationId: get_entry_list
+        - Chapter
+      summary: GET a list of recent chapters
+      description: "Gets a list of [constants.resultsPerPage] recent chapters, newest first. Get more by setting query string to 'page=2', etc."
+      operationId: get_chapter_list
       responses:
         "200":
-          description: "Successfully found entries."
+          description: "Successfully found chapters."
           content:
             application/json:
               example:
                 [
                   {
                     "storyId": "6695b2573550c66db1ab9106",
-                    "entryId": "66a7fd2095206fecbb52c189",
+                    "chapterId": "66a7fd2095206fecbb52c189",
                     "storyTitle": "In the beginning...",
-                    "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                    "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                     "authorName": "Freddy",
                     "authorId": "668490250029a28118a8d1be",
-                    "previousEntry": "6695b2573550c66db1ab9106",
+                    "previousChapter": "6695b2573550c66db1ab9106",
                     "keywords": [],
                     "likes": 0,
                     "likedByUser": false,
@@ -991,12 +991,12 @@ paths:
                   },
                   {
                     "storyId": "66c6570904c7e9974e060273",
-                    "entryId": "66c6570904c7e9974e060273",
+                    "chapterId": "66c6570904c7e9974e060273",
                     "storyTitle": "In the beginnning...",
-                    "entryTitle": null,
+                    "chapterTitle": null,
                     "authorName": "Freddy",
                     "authorId": "668490250029a28118a8d1be",
-                    "previousEntry": null,
+                    "previousChapter": null,
                     "keywords": ["drama", "sad"],
                     "likes": 0,
                     "likedByUser": false,
@@ -1004,12 +1004,12 @@ paths:
                   },
                   {
                     "storyId": "66c6570904c7e9974e060273",
-                    "entryId": "66c6578d04c7e9974e060287",
+                    "chapterId": "66c6578d04c7e9974e060287",
                     "storyTitle": "In the beginnning...",
-                    "entryTitle": "In the beginnning...",
+                    "chapterTitle": "In the beginnning...",
                     "authorName": "Freddy",
                     "authorId": "668490250029a28118a8d1be",
-                    "previousEntry": "66c6570904c7e9974e060273",
+                    "previousChapter": "66c6570904c7e9974e060273",
                     "keywords": ["drama", "sad"],
                     "likes": 0,
                     "likedByUser": false,
@@ -1020,10 +1020,10 @@ paths:
           description: Default error sample response
     post:
       tags:
-        - Entry
+        - Chapter
         - Story
       summary: Post a new story
-      description: "Post the story title, entry title, and text of an entry to start a new story."
+      description: "Post the story title, chapter title, and text of a chapter to start a new story."
       operationId: post_story
       requestBody:
         description: "Post a new story."
@@ -1039,19 +1039,19 @@ paths:
               }
       responses:
         "201":
-          description: "Successfully created entry."
+          description: "Successfully created chapter."
           content:
             application/json:
               example:
                 {
                   "storyId": "66c6570904c7e9974e060273",
-                  "entryId": "66c6570904c7e9974e060273",
+                  "chapterId": "66c6570904c7e9974e060273",
                   "storyTitle": "In the beginnning...",
-                  "entryTitle": null,
+                  "chapterTitle": null,
                   "authorName": "Freddy",
                   "authorId": "668490250029a28118a8d1be",
                   "bodyText": "testkurmdlqazsvnepyhs",
-                  "previousEntry": null,
+                  "previousChapter": null,
                   "createDate": "2024-08-21T21:07:21.032Z",
                   "keywords": ["drama", "sad"],
                   "likes": 0,
@@ -1069,69 +1069,69 @@ paths:
                   value: { "error": "keywords must be an array of strings." }
         default:
           description: Default error sample response
-  /entry/{entryId}:
-    summary: GET/POST/PUT/DELETE a particular entry
+  /chapter/{chapterId}:
+    summary: GET/POST/PUT/DELETE a particular chapter
     get:
       tags:
-        - Entry
-      summary: GET a particular entry by ID
-      description: "Gets entry data, and an array named continuationEntries containing entryIds and entry titles from continuation entries."
-      operationId: get_entry_by_id
+        - Chapter
+      summary: GET a particular chapter by ID
+      description: "Gets chapter data, and an array named continuationChapters containing chapterIds and chapter titles from continuation chapters."
+      operationId: get_chapter_by_id
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
           schema: {}
       responses:
         "200":
-          description: "Entry found"
+          description: "Chapter found"
           content:
             application/json:
               example:
                 {
                   "storyId": "6688142fb004b799a5a29d03",
-                  "entryId": "6688142fb004b799a5a29d03",
+                  "chapterId": "6688142fb004b799a5a29d03",
                   "authorName": "Freddy",
                   "authorId": "668490250029a28118a8d1be",
-                  "entryTitle": null,
+                  "chapterTitle": null,
                   "storyTitle": "Random Title",
                   "bodyText": "Genji no monogatari",
-                  "previousEntry": null,
+                  "previousChapter": null,
                   "createDate": "2024-07-05T15:41:35.510Z",
                   "keywords": ["sad"],
                   "likes": 0,
                   "likedByUser": false,
                   "bookmarkedByUser": false,
-                  "continuationEntries":
+                  "continuationChapters":
                     [
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668820191cb99dfdc244c23c",
+                        "chapterId": "668820191cb99dfdc244c23c",
                         "storyTitle": "Random Title",
-                        "entryTitle": "Chapter the first",
+                        "chapterTitle": "Chapter the first",
                         "authorName": "Freddy",
-                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": ["happy", "cat"],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668c4771e0989ccd9cd6ec8a",
+                        "chapterId": "668c4771e0989ccd9cd6ec8a",
                         "storyTitle": "Random Title",
-                        "entryTitle": "adding to this entries list of sub entries",
+                        "chapterTitle": "adding to this chapters list of sub chapters",
                         "authorName": "apmanager",
-                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668c47c3e0989ccd9cd6eca8",
+                        "chapterId": "668c47c3e0989ccd9cd6eca8",
                         "storyTitle": "Random Title",
-                        "entryTitle": "adding another to list of entries",
+                        "chapterTitle": "adding another to list of chapters",
                         "authorName": "apmanager",
-                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
                       },
                     ],
@@ -1150,15 +1150,15 @@ paths:
           description: Default error sample response
     post:
       tags:
-        - Entry
+        - Chapter
         - Story
       summary: Post a new story
-      description: "Post the entry title and text of an entry to continue a story."
+      description: "Post the chapter title and text of a chapter to continue a story."
       operationId: continue_story
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
@@ -1177,19 +1177,19 @@ paths:
               }
       responses:
         "201":
-          description: "Successfully created entry."
+          description: "Successfully created chapter."
           content:
             application/json:
               example:
                 {
                   "storyId": "66ce142dc538303360039d3b",
-                  "entryId": "66ce142dc538303360039d3b",
+                  "chapterId": "66ce142dc538303360039d3b",
                   "storyTitle": "Once upon a time...",
-                  "entryTitle": null,
+                  "chapterTitle": null,
                   "authorName": "Freddy",
                   "authorId": "668490250029a28118a8d1be",
                   "bodyText": "Once upon a time, there were there were 92 little pigs. The first little pig built his house out of hydrogen, which was really dificult.",
-                  "previousEntry": null,
+                  "previousChapter": null,
                   "createDate": "2024-08-27T18:00:13.862Z",
                   "keywords": ["drama", "sad"],
                   "likes": 0,
@@ -1200,25 +1200,25 @@ paths:
             application/json:
               examples:
                 missingStoryTitle:
-                  value: { "error": "Missing entry title." }
+                  value: { "error": "Missing chapter title." }
                 missingBodyText:
                   value: { "error": "Missing story text." }
                 badKeywords:
                   value: { "error": "keywords must be an array of strings." }
         default:
           description: Default error sample response
-  /entry/{entryId}/like:
-    summary: POST or DELETE a like to an entry
+  /chapter/{chapterId}/like:
+    summary: POST or DELETE a like to a chapter
     post:
       tags:
-        - Entry
-      summary: Like an entry
-      description: "Like an entry. You cannot like your own entries, or like an entry multiple times."
-      operationId: like_entry
+        - Chapter
+      summary: Like a chapter
+      description: "Like a chapter. You cannot like your own chapters, or like a chapter multiple times."
+      operationId: like_chapter
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
@@ -1228,38 +1228,38 @@ paths:
           description: Like successfully posted.
           content:
             application/json:
-              example: { "message": "Entry liked." }
+              example: { "message": "Chapter liked." }
         "400":
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted entryId." }
+              example: { "error": "That is not a properly formatted chapterId." }
         "404":
-          description: entryId not found."
+          description: chapterId not found."
           content:
             application/json:
-              example: { "error": "There is no entry with that entryId." }
+              example: { "error": "There is no chapter with that chapterId." }
         "409":
           description: Conflict
           content:
             application/json:
               examples:
                 duplicateLike:
-                  value: { "error": "You have already liked that entry." }
-                likeOwnEntry:
-                  value: { "error": "You cannot like your own entries." }
+                  value: { "error": "You have already liked that chapter." }
+                likeOwnChapter:
+                  value: { "error": "You cannot like your own chapters." }
         default:
           description: Default error sample response
     delete:
       tags:
-        - Entry
-      summary: Remove a like from an entry
-      description: "Remove a like from an entry."
-      operationId: unlike_entry
+        - Chapter
+      summary: Remove a like from a chapter
+      description: "Remove a like from a chapter."
+      operationId: unlike_chapter
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
@@ -1274,37 +1274,37 @@ paths:
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted entryId." }
+              example: { "error": "That is not a properly formatted chapterId." }
         "404":
-          description: entryId not found."
+          description: chapterId not found."
           content:
             application/json:
               examples:
                 notLiked:
-                  value: { error: "You have not liked that entry." }
-                entryIdNotFound:
-                  value: { "error": "There is no entry with that entryId." }
+                  value: { error: "You have not liked that chapter." }
+                chapterIdNotFound:
+                  value: { "error": "There is no chapter with that chapterId." }
         default:
           description: Default error sample response
-  /entry/{entryId}/flag:
-    summary: POST a flag for review on the entry
+  /chapter/{chapterId}/flag:
+    summary: POST a flag for review on the chapter
     post:
       tags:
-        - Entry
+        - Chapter
         - Flag
-      summary: Flag an entry for review
+      summary: Flag a chapter for review
       description: "Post a flag for review, to be entered into a moderation queue. Must include reason for flagging."
-      operationId: flag_entry
+      operationId: flag_chapter
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
           schema: {}
       requestBody:
-        description: Flag an entry
+        description: Flag a chapter
         content:
           application/json:
             schema:
@@ -1312,40 +1312,40 @@ paths:
             example: { "reason": "Spam" }
       responses:
         "200":
-          description: Entry successfully flagged.
+          description: Chapter successfully flagged.
           content:
             application/json:
-              example: { "message": "Entry successfully flagged." }
+              example: { "message": "Chapter successfully flagged." }
         "400":
           description: Bad request.
           content:
             application/json:
               examples:
                 noReason:
-                  value: { "error": "Flagging an entry needs a reason." }
-                badEntryId:
+                  value: { "error": "Flagging a chapter needs a reason." }
+                badChapterId:
                   value:
-                    { "error": "That is not a properly formatted entryId." }
+                    { "error": "That is not a properly formatted chapterId." }
         "404":
-          description: Entry not found.
+          description: Chapter not found.
           content:
             application/json:
-              example: { "error": "There is no entry with that entryId." }
+              example: { "error": "There is no chapter with that chapterId." }
         default:
           description: Default error sample response
-  /entry/{entryId}/bookmark:
+  /chapter/{chapterId}/bookmark:
     summary: POST or DELETE bookmarks
     post:
       tags:
-        - Entry
+        - Chapter
         - Bookmark
       summary: Bookmark a page
-      description: If there is a logged in user, set a bookmark for that user on that entry.
-      operationId: bookmark_entry
+      description: If there is a logged in user, set a bookmark for that user on that chapter.
+      operationId: bookmark_chapter
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
@@ -1355,19 +1355,19 @@ paths:
           description: Successfully created bookmark.
           content:
             application/json:
-              example: { "message": "Entry bookmarked." }
+              example: { "message": "Chapter bookmarked." }
         "400":
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted entryId." }
+              example: { "error": "That is not a properly formatted chapterId." }
         "404":
-          description: Entry not found
+          description: Chapter not found
           content:
             application/json:
-              example: { "error": "There is no entry with that entryId." }
+              example: { "error": "There is no chapter with that chapterId." }
         "409":
-          description: User has already bookmarked that entry.
+          description: User has already bookmarked that chapter.
           content:
             application/json:
               example: { "error": "You have already liked that bookmark." }
@@ -1375,15 +1375,15 @@ paths:
           description: Default error sample response
     delete:
       tags:
-        - Entry
+        - Chapter
         - Bookmark
       summary: Unbookmark a page
-      description: If there is a logged in user that has bookmarked the given entry, remove the bookmark.
-      operationId: unbookmark_entry
+      description: If there is a logged in user that has bookmarked the given chapter, remove the bookmark.
+      operationId: unbookmark_chapter
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
@@ -1398,38 +1398,38 @@ paths:
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted entryId." }
+              example: { "error": "That is not a properly formatted chapterId." }
         "404":
-          description: Entry not found
+          description: Chapter not found
           content:
             application/json:
               examples:
                 notBookmarked:
-                  value: { "error": "You don't have that entry bookmarked." }
+                  value: { "error": "You don't have that chapter bookmarked." }
 
                 missingKeyword:
-                  value: { "error": "There is no entry with that entryId." }
+                  value: { "error": "There is no chapter with that chapterId." }
         default:
           description: Default error sample response
-  /entry/{entryId}/keyword:
-    summary: Add one or more keywords to an entry
+  /chapter/{chapterId}/keyword:
+    summary: Add one or more keywords to a chapter
     put:
       tags:
-        - Entry
+        - Chapter
         - Keyword
-      summary: Apply new keywords to an entry
-      description: "Adds one or more keywords to an existing entry. Only the post's author can use this route."
+      summary: Apply new keywords to a chapter
+      description: "Adds one or more keywords to an existing chapter. Only the post's author can use this route."
       operationId: put_new_keywords
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
           schema: {}
       requestBody:
-        description: "Array of keywords to add to an entry"
+        description: "Array of keywords to add to a chapter"
         content:
           application/json:
             schema:
@@ -1446,32 +1446,32 @@ paths:
           content:
             application/json:
               examples:
-                badEntryId:
+                badChapterId:
                   value:
-                    { "error": "That is not a properly formatted entryId." }
+                    { "error": "That is not a properly formatted chapterId." }
                 badKeywords:
                   value:
                     { "error": "Request body must be an array of strings." }
         "404":
-          description: "Entry not found"
+          description: "Chapter not found"
           content:
             application/json:
-              example: { "error": "There is no entry with that entryId." }
+              example: { "error": "There is no chapter with that chapterId." }
         default:
           description: Default error sample response
-  /entry/{entryId}/keyword/{keywordValue}:
-    summary: Delete a keyword from an entry
+  /chapter/{chapterId}/keyword/{keywordValue}:
+    summary: Delete a keyword from a chapter
     delete:
       tags:
-        - Entry
+        - Chapter
         - Keyword
-      summary: Delete keywords from an entry.
-      description: "Delete one or more keywords from an entry. Only the entry's author can use this route."
+      summary: Delete keywords from a chapter.
+      description: "Delete one or more keywords from a chapter. Only the chapter's author can use this route."
       operationId: delete_keyword
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: The ID of the entry
+          description: The ID of the chapter
           required: true
           style: simple
           explode: false
@@ -1494,9 +1494,9 @@ paths:
           content:
             application/json:
               examples:
-                badEntryId:
+                badChapterId:
                   value:
-                    { "error": "That is not a properly formatted entryId." }
+                    { "error": "That is not a properly formatted chapterId." }
                 badKeyword:
                   value: { "error": "That is not a valid keyword." }
         "404":
@@ -1504,10 +1504,10 @@ paths:
           content:
             application/json:
               examples:
-                missingEntry:
-                  value: { "error": "There is no entry with that entryId." }
+                missingChapter:
+                  value: { "error": "There is no chapter with that chapterId." }
                 missingKeyword:
-                  value: { "error": "Keyword not found in entry." }
+                  value: { "error": "Keyword not found in chapter." }
         default:
           description: Default error sample response
   /message:
@@ -1727,15 +1727,15 @@ paths:
                         "emailVerified": true,
                         "id": "667b294248b8805d71a96a03",
                       },
-                    "entry":
+                    "chapter":
                       {
                         "keywords": [],
                         "_id": "6688142fb004b799a5a29d03",
                         "authorName": "Freddy",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "storyTitle": "Random Title",
                         "bodyText": "Genji no monogatari",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "createDate": "2024-07-05T15:41:35.510Z",
                         "storyId": "6688142fb004b799a5a29d03",
                         "__v": 0,
@@ -1761,14 +1761,14 @@ paths:
                         "emailVerified": true,
                         "id": "667b294248b8805d71a96a03",
                       },
-                    "entry":
+                    "chapter":
                       {
                         "keywords": [],
                         "_id": "66a7fd2095206fecbb52c189",
                         "authorName": "Freddy",
-                        "entryTitle": "Lerrald and Vred sought the Cartesian Bear",
+                        "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                         "bodyText": "Lerrald and Vred set forth to find the greatest mapmaker in all the land, the Cartesian Bear. This meant that they were going south, because the Cartesian Bear was well known to dislike Polar Bears, and stay as far away from them as possible.\n\n\"So,\" spake Vred, as they travelled, \"do you think the whole story is going to be full of referential humor and obscure math jokes like this?\"\n\n\"Indeed,\" replied Lerrald, \"for the author art a nerd of the greatest magnitude. Also, the breaking of the fourth wall shalt most likely continue unabated.\"\n\nWhereupon Vred stopped walking for a moment, frowned, exclaimed \"Dang it!\" and hurried to catch up with Lerrald.",
-                        "previousEntry": "6695b2573550c66db1ab9106",
+                        "previousChapter": "6695b2573550c66db1ab9106",
                         "createDate": "2024-07-29T20:35:44.858Z",
                         "storyId": "6695b2573550c66db1ab9106",
                         "storyTitle": "In the beginning...",
@@ -1792,7 +1792,7 @@ paths:
       parameters:
         - name: flagId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
@@ -1815,55 +1815,55 @@ paths:
               example: { "error": "There is no flag with that flagId." }
         default:
           description: Default error sample response
-  /admin/entry/{entryId}:
-    summary: Delete an entry
+  /admin/chapter/{chapterId}:
+    summary: Delete a chapter
     delete:
       tags:
         - Admin
-        - Entry
-      summary: Delete an entry
-      description: "Delete an entry."
-      operationId: delete_entry
+        - Chapter
+      summary: Delete a chapter
+      description: "Delete a chapter."
+      operationId: delete_chapter
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
           schema: {}
       responses:
         "200":
-          description: Successfully deleted entry.
+          description: Successfully deleted chapter.
           content:
             application/json:
-              example: { "message": "Entry successfully deleted." }
+              example: { "message": "Chapter successfully deleted." }
         "400":
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted entryId." }
+              example: { "error": "That is not a properly formatted chapterId." }
         "404":
-          description: Entry not found.
+          description: Chapter not found.
           content:
             application/json:
-              example: { "error": "There is no entry with that entryId." }
+              example: { "error": "There is no chapter with that chapterId." }
         default:
           description: Default error sample response
-  /admin/entry/{entryId}/keyword:
-    summary: Add one or more keywords to an entry
+  /admin/chapter/{chapterId}/keyword:
+    summary: Add one or more keywords to a chapter
     put:
       tags:
-        - Entry
+        - Chapter
         - Keyword
         - Admin
-      summary: Apply new keywords to an entry
-      description: "Adds one or more keywords to an existing entry. Only admins can use this route."
+      summary: Apply new keywords to a chapter
+      description: "Adds one or more keywords to an existing chapter. Only admins can use this route."
       operationId: admin_put_new_keywords
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
@@ -1886,40 +1886,40 @@ paths:
           content:
             application/json:
               examples:
-                badEntryId:
+                badChapterId:
                   value:
-                    { "error": "That is not a properly formatted entryId." }
+                    { "error": "That is not a properly formatted chapterId." }
                 badKeywords:
                   value:
                     { "error": "Request body must be an array of strings." }
         "404":
-          description: "Entry not found"
+          description: "Chapter not found"
           content:
             application/json:
-              example: { "error": "There is no entry with that entryId." }
+              example: { "error": "There is no chapter with that chapterId." }
         default:
           description: Default error sample response
-  /admin/entry/{entryId}/keyword/{keywordValue}:
-    summary: Delete a keyword from an entry
+  /admin/chapter/{chapterId}/keyword/{keywordValue}:
+    summary: Delete a keyword from a chapter
     delete:
       tags:
-        - Entry
+        - Chapter
         - Keyword
         - Admin
-      summary: Delete keywords from an entry.
-      description: "Delete one or more keywords from an entry. Only admins can use this route."
+      summary: Delete keywords from a chapter.
+      description: "Delete one or more keywords from a chapter. Only admins can use this route."
       operationId: admin_delete_keyword
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: The ID of the entry
+          description: The ID of the chapter
           required: true
           style: simple
           explode: false
           schema: {}
         - name: keywordValue
           in: path
-          description: The keyword to delete from the entry
+          description: The keyword to delete from the chapter
           required: true
           style: simple
           explode: false
@@ -1935,9 +1935,9 @@ paths:
           content:
             application/json:
               examples:
-                badEntryId:
+                badChapterId:
                   value:
-                    { "error": "That is not a properly formatted entryId." }
+                    { "error": "That is not a properly formatted chapterId." }
                 badKeywords:
                   value: { "error": "That is not a valid keyword." }
         "404":
@@ -1945,10 +1945,10 @@ paths:
           content:
             application/json:
               examples:
-                missingEntry:
-                  value: { "error": "There is no entry with that entryId." }
+                missingChapter:
+                  value: { "error": "There is no chapter with that chapterId." }
                 missingKeyword:
-                  value: { "error": "Keyword not found in entry." }
+                  value: { "error": "Keyword not found in chapter." }
         default:
           description: Default error sample response
   /admin/user/{userId}/lock:
@@ -1980,7 +1980,7 @@ paths:
             application/json:
               example: { "error": "That is not a properly formatted userId." }
         "404":
-          description: Entry not found.
+          description: Chapter not found.
           content:
             application/json:
               example: { "error": "There is no user with that userId." }
@@ -2018,7 +2018,7 @@ paths:
             application/json:
               example: { "error": "That is not a properly formatted userId." }
         "404":
-          description: Entry not found.
+          description: Chapter not found.
           content:
             application/json:
               example: { "error": "There is no user with that userId." }
@@ -2064,10 +2064,10 @@ paths:
                   "__v": 0,
                   "locked": false,
                   "emailVerified": true,
-                  "publishedEntries": [],
+                  "publishedChapters": [],
                   "followedAuthors": [],
-                  "likedEntries": [],
-                  "bookmarkedEntries": [],
+                  "likedChapters": [],
+                  "bookmarkedChapters": [],
                   "id": "668ee23ce1dcd980cf0739f9",
                 }
         "400":
@@ -2090,7 +2090,7 @@ paths:
       description:
         "Submit a JSON object containing one or more of the follwing fields with values of the apropriate type:
         admin: boolean, moderator: boolean, bio: string, publishEmail: boolean, emailVerified: boolean.
-        The user's database entry will have it's corresponding entry set to the given value."
+        The user's database chapter will have it's corresponding chapter set to the given value."
       operationId: alter_user
       parameters:
         - name: userId
@@ -2132,10 +2132,10 @@ paths:
                   "__v": 0,
                   "locked": false,
                   "emailVerified": true,
-                  "publishedEntries": [],
+                  "publishedChapters": [],
                   "followedAuthors": [],
-                  "likedEntries": [],
-                  "bookmarkedEntries": [],
+                  "likedChapters": [],
+                  "bookmarkedChapters": [],
                   "id": "668ee23ce1dcd980cf0739f9",
                 }
         "400":
@@ -2154,20 +2154,20 @@ paths:
               example: { "error": "There is no user with that userId." }
         default:
           description: Default error sample response
-  /chain/{entryId}:
-    summary: GET the entry chain ending at the specified entry
+  /chain/{chapterId}:
+    summary: GET the chapter chain ending at the specified chapter
     get:
       tags:
         - Chain
-      summary: Get the entry chain ending at the specified entry.
+      summary: Get the chapter chain ending at the specified chapter.
       description:
-        "Returns an array of entries with the last one being the entry with the given entryId, and every other entry in the array having the\
-        \ entryId equal to previousEntry of the next array entry, and the first array entry being the beginning of the story."
+        "Returns an array of chapters with the last one being the chapter with the given chapterId, and every other chapter in the array having the\
+        \ chapterId equal to previousChapter of the next array chapter, and the first array chapter being the beginning of the story."
       operationId: get_chain
       parameters:
-        - name: entryId
+        - name: chapterId
           in: path
-          description: the ID of the entry
+          description: the ID of the chapter
           required: true
           style: simple
           explode: false
@@ -2183,55 +2183,55 @@ paths:
                     [
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "6688142fb004b799a5a29d03",
+                        "chapterId": "6688142fb004b799a5a29d03",
                         "authorName": "Freddy",
                         "authorId": "668490250029a28118a8d1be",
-                        "entryTitle": null,
+                        "chapterTitle": null,
                         "storyTitle": "Random Title",
                         "bodyText": "Genji no monogatari",
-                        "previousEntry": null,
+                        "previousChapter": null,
                         "createDate": "2024-07-05T15:41:35.510Z",
                         "keywords": [],
                         "likes": 0,
                         "likedByUser": false,
                         "bookmarkedByUser": false,
-                        "continuationEntries":
+                        "continuationChapters":
                           [
                             {
                               "storyId": "6688142fb004b799a5a29d03",
-                              "entryId": "668820191cb99dfdc244c23c",
+                              "chapterId": "668820191cb99dfdc244c23c",
                               "storyTitle": "Random Title",
-                              "entryTitle": "Chapter the first",
+                              "chapterTitle": "Chapter the first",
                               "authorName": "Freddy",
-                              "previousEntry": "6688142fb004b799a5a29d03",
+                              "previousChapter": "6688142fb004b799a5a29d03",
                               "keywords": [],
                             },
                             {
                               "storyId": "6688142fb004b799a5a29d03",
-                              "entryId": "668c4771e0989ccd9cd6ec8a",
+                              "chapterId": "668c4771e0989ccd9cd6ec8a",
                               "storyTitle": "Random Title",
-                              "entryTitle": "adding to this entries list of sub entries",
+                              "chapterTitle": "adding to this chapters list of sub chapters",
                               "authorName": "apmanager",
-                              "previousEntry": "6688142fb004b799a5a29d03",
+                              "previousChapter": "6688142fb004b799a5a29d03",
                               "keywords": [],
                             },
                           ],
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
-                        "entryId": "668d51e61be56166aaaa6cc2",
+                        "chapterId": "668d51e61be56166aaaa6cc2",
                         "authorName": "Freddy",
                         "authorId": "668490250029a28118a8d1be",
-                        "entryTitle": "Suddenly, a wild accountant appears!",
+                        "chapterTitle": "Suddenly, a wild accountant appears!",
                         "storyTitle": "Random Title",
                         "bodyText": "It throws a bundle of tax forms at our hero, Bob, stunning him! The existential dread is almost enough to keep him from dodging the subsequent thrown calculator, but he manages to roll out of the way in time, and retaliate with a well-swung Swingline stapler!",
-                        "previousEntry": "6688142fb004b799a5a29d03",
+                        "previousChapter": "6688142fb004b799a5a29d03",
                         "createDate": "2024-07-09T15:06:14.267Z",
                         "keywords": [],
                         "likes": 0,
                         "likedByUser": false,
                         "bookmarkedByUser": false,
-                        "continuationEntries": [],
+                        "continuationChapters": [],
                       },
                     ]
                 brokenChain:
@@ -2239,53 +2239,53 @@ paths:
                     [
                       {
                         "storyId": "66bd0377fd83fe5734584642",
-                        "entryId": "66bd0378fd83fe5734584651",
+                        "chapterId": "66bd0378fd83fe5734584651",
                         "authorName": "testkurmdlqazsvnepyhs0.7645244396758495",
                         "authorId": "66bd0374fd83fe5734584612",
-                        "entryTitle": "testkurmdlqazsvnepyhs1",
+                        "chapterTitle": "testkurmdlqazsvnepyhs1",
                         "storyTitle": "testkurmdlqazsvnepyhs",
                         "bodyText": "testkurmdlqazsvnepyhs2",
-                        "previousEntry": "66bd0377fd83fe5734584642",
+                        "previousChapter": "66bd0377fd83fe5734584642",
                         "createDate": "2024-08-14T19:20:24.445Z",
                         "keywords": [],
                         "likes": 0,
-                        "continuationEntries":
+                        "continuationChapters":
                           [
                             {
                               "storyId": "66bd0377fd83fe5734584642",
-                              "entryId": "66bd0379fd83fe5734584660",
+                              "chapterId": "66bd0379fd83fe5734584660",
                               "storyTitle": "testkurmdlqazsvnepyhs",
-                              "entryTitle": "testkurmdlqazsvnepyhs1",
+                              "chapterTitle": "testkurmdlqazsvnepyhs1",
                               "authorName": "testkurmdlqazsvnepyhs0.7645244396758495",
-                              "previousEntry": "66bd0378fd83fe5734584651",
+                              "previousChapter": "66bd0378fd83fe5734584651",
                             },
                           ],
                       },
                       {
                         "storyId": "66bd0377fd83fe5734584642",
-                        "entryId": "66bd0379fd83fe5734584660",
+                        "chapterId": "66bd0379fd83fe5734584660",
                         "authorName": "testkurmdlqazsvnepyhs0.7645244396758495",
                         "authorId": "66bd0374fd83fe5734584612",
-                        "entryTitle": "testkurmdlqazsvnepyhs1",
+                        "chapterTitle": "testkurmdlqazsvnepyhs1",
                         "storyTitle": "testkurmdlqazsvnepyhs",
                         "bodyText": "testkurmdlqazsvnepyhs2",
-                        "previousEntry": "66bd0378fd83fe5734584651",
+                        "previousChapter": "66bd0378fd83fe5734584651",
                         "createDate": "2024-08-14T19:20:25.135Z",
                         "keywords": [],
                         "likes": 0,
-                        "continuationEntries": [],
+                        "continuationChapters": [],
                       },
                     ]
         "400":
           description: "malformed request."
           content:
             application/json:
-              example: { "error": "That is not a properly formatted entryId." }
+              example: { "error": "That is not a properly formatted chapterId." }
         "404":
-          description: "entryId does not exist."
+          description: "chapterId does not exist."
           content:
             application/json:
-              example: { "error": "There is no entry with that entryId." }
+              example: { "error": "There is no chapter with that chapterId." }
         default:
           description: Default error sample response
   /stats:
@@ -2294,14 +2294,14 @@ paths:
       tags:
         - Statistics
       summary: Get some basic site statistics
-      description: Get the number of users, stories, and entries currently on the site.
+      description: Get the number of users, stories, and chapters currently on the site.
       operationId: get_stats
       responses:
         "200":
           description: Successfully got site statistics.
           content:
             application/json:
-              example: { "users": 36, "stories": 9, "entries": 17 }
+              example: { "users": 36, "stories": 9, "chapters": 17 }
         default:
           description: Default error sample response
   /keywords:
@@ -2424,10 +2424,10 @@ components:
             type: string
     ContinueStory:
       required:
-        - entryTitle
+        - chapterTitle
         - bodyText
       properties:
-        entryTitle:
+        chapterTitle:
           type: string
         bodyText:
           type: string

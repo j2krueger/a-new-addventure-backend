@@ -224,7 +224,7 @@ async function getUser(req, res) {
             mongoQuery.userName["$options"] = 'i';
         }
     }
-    const userList = await User.findAndPopulate(mongoQuery, zPage * constants.entriesPerPage, constants.entriesPerPage);
+    const userList = await User.findAndPopulate(mongoQuery, zPage * constants.resultsPerPage, constants.resultsPerPage);
     const result = await Promise.all(userList.map(async user => user.publicInfo()));
     if (result.length) {
         return res.status(200).json(result);

@@ -12,21 +12,21 @@ Below this point are a slightly longer description of what I want the website to
 
 ---
 
-The idea behind the website is that any logged in user can post an entry. An entry can be either the start of a new story, or a continuation of an existing story, regardless of who posted the entry being continued from or whether the entry being continued from has any existing continuations. Each continuation will have to include a piece of "choice text", which will be used at the end of the post they are continuing to indicate options to future readers.
+The idea behind the website is that any logged in user can post a chapter. A chapter can be either the start of a new story, or a continuation of an existing story, regardless of who posted the chapter being continued from or whether the chapter being continued from has any existing continuations. Each continuation will have to include a piece of "choice text", which will be used at the end of the post they are continuing to indicate options to future readers.
 
 For example, suppose user Alice starts a new story called "Jerry's Journey" with the following text:
 
 >Jerry was walking along a road, when he came to a fork in the road.
 
-Alice can then post another entry continuing the story with the choice text "Jerry followed the left path" and the text
+Alice can then post another chapter continuing the story with the choice text "Jerry followed the left path" and the text
 
 >Jerry walked another mile along the left path, when a moose came out of nowhere and tried to bite him!
 
-Bob can also continue from Alice's initial entry with the choice text "Jerry looked more closely at the fork in the road." and the text
+Bob can also continue from Alice's initial chapter with the choice text "Jerry looked more closely at the fork in the road." and the text
 
 > The fork looked like it was made out of gold! He picked it up and put it in his pocket, then walked to the next village where he sold it.
 
-At this point the original entry would look something like this:
+At this point the original chapter would look something like this:
 
 ---
  **Jerry's Journey** by *Alice*
@@ -44,21 +44,21 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 ---
 ## Intended Capabilities:
 - Anyone can read, only logged in users can post/edit/delete
-- post an entry that starts a story
+- post a chapter that starts a story
 	- story title
-	- entry title
+	- chapter title
 	- author by login 
 	- keywords
 	- body
-- post an entry that continues a story
-	- entry title
+- post a chapter that continues a story
+	- chapter title
 	- author
 	- keywords
 	- body
-- edit an entry (creator/mod/admin only) (keep all versions?, only display last)
-- delete an entry (mod/admin only)
-- flag an entry
-- edit keywords for an entry (author/mods/admins can add keywords)
+- edit a chapter (creator/mod/admin only) (keep all versions?, only display last)
+- delete a chapter (mod/admin only)
+- flag a chapter
+- edit keywords for a chapter (author/mods/admins can add keywords)
 	- the keywords "NSFW", "SEX", "GORE", and "FF.(title)":
 		- Must be marked when applicable
 		- are automatically propagated to all continuations
@@ -79,13 +79,13 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 	- comment viewing options
 	- store all relevant settings (light/dark mode, etc) in localStorage for everyone
 	- store all settings on server for logged in users
-- show an entry
-- show a chain of entries up to a specified endpoint
+- show a chapter
+- show a chain of chapters up to a specified endpoint
 - search by:
 	- all
 	- author
 	- keywords
-	- (story/branch/entry) title text
+	- (story/branch/chapter) title text
 	- body text
 	- choice text
 	- order by:
@@ -99,7 +99,7 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 		 - popularity?
 		 - rating?
 - Flag:
-	- entry
+	- chapter
 - timeout on email validation
 
 
@@ -125,7 +125,7 @@ I'm leaning towards an MIT license for the code, but initial collaborators will 
 
 ```
 created indices:
-collection: entries
+collection: chapters
 {
   	authorName: "hashed"
 }
@@ -133,7 +133,7 @@ collection: entries
 	storyId: "hashed"
 }
 {
-	previousEntry: "hashed"
+	previousChapter: "hashed"
 }
 
 collection: users
@@ -157,7 +157,7 @@ collection: likes
 	user: "hashed"
 }
 {
-	entry: "hashed"
+	chapter: "hashed"
 }
 
 collection users: {
@@ -173,14 +173,14 @@ collection users: {
   darkMode: Boolean,
 }
 
-collection entries: {
+collection chapters: {
   _id: ObjectId,
-  storyId: ObjectId,	// references collection entries
+  storyId: ObjectId,	// references collection chapters
   authorName: String,
-  entryTitle: String,
+  chapterTitle: String,
   storyTitle: String,
   bodyText: String,
-  previousEntry: ObjectId,	// references collection entries
+  previousChapter: ObjectId,	// references collection chapters
   keywords: [String],	// New field, needs multikey index <=========================
   createDate: Date,
 }
@@ -188,14 +188,14 @@ collection entries: {
 collection bookmarks: {
 	_id: ObjectId,
 	user: ObjectId,	// references collection users
-	entry: ObjectId,	// references collection entries
+	chapter: ObjectId,	// references collection chapters
 	createDate: Date,
 }
 
 collection flags: {
 	_id: ObjectId,
 	user: ObjectId,	// references collection users
-	entry: ObjectId,	// references collection entries
+	chapter: ObjectId,	// references collection chapters
 	reason: String,
 	createDate: Date,
 }
@@ -209,7 +209,7 @@ collection follows: {
 collection likes: {
 	_id: ObjectId,
 	user: ObjectId,	// references collection users
-	entry: ObjectId,	// references collection entries
+	chapter: ObjectId,	// references collection chapters
 }
 
 collection messages: {
@@ -228,36 +228,36 @@ sessions - managed entirely by express-session
 
 ---
 
-## Entry Search (GET /entry?search="...")
+## Chapter Search (GET /chapter?search="...")
 
-When searching for an entry, for the most part you should just need to enter one or more search words and the site should return all of the entries that include each search word in at least one of the following places: the body text of the entry, the entry title, the story title, the author name, or keywords.
+When searching for a chapter, for the most part you should just need to enter one or more search words and the site should return all of the chapters that include each search word in at least one of the following places: the body text of the chapter, the chapter title, the story title, the author name, or keywords.
 
-For more control over where a search word should be searched for, you can prefix that particular word with one or more field specifiers and a colon. For example, if you know the name of the author of the entry you're looking for is ***Freddy***, you can include the term `A:Freddy`, and the search will only match entries written by the user ***Freddy***, but not the users ***freddy***, ***FreddyMercury***, or ***GetFreddyGetSetGo***. If you only know or remember part of the author's name, you can include the term `a:Freddy`, and the search can match entries by any of the above users, but not by ***Fredy*** or ***Fred-dy***. Neither term will match against an entry written by the user ***Michael*** even if it has the name ***Freddy*** in the body text.
+For more control over where a search word should be searched for, you can prefix that particular word with one or more field specifiers and a colon. For example, if you know the name of the author of the chapter you're looking for is ***Freddy***, you can include the term `A:Freddy`, and the search will only match chapters written by the user ***Freddy***, but not the users ***freddy***, ***FreddyMercury***, or ***GetFreddyGetSetGo***. If you only know or remember part of the author's name, you can include the term `a:Freddy`, and the search can match chapters by any of the above users, but not by ***Fredy*** or ***Fred-dy***. Neither term will match against a chapter written by the user ***Michael*** even if it has the name ***Freddy*** in the body text.
 
-You can also combine multiple field specifiers in one search term, and the term will match as long as the word is in one of the fields specified. The term `Ab:Freddy`, for example, will match any entry written by the user ***Freddy***, as well as any entry containing ***Freddy***, ***freddy***, ***FREDDY***, or ***getfreddygetsetgo*** in the body text. Any word with no field specifier prefix acts exactly as if it were prefixed with `seabK:`.
+You can also combine multiple field specifiers in one search term, and the term will match as long as the word is in one of the fields specified. The term `Ab:Freddy`, for example, will match any chapter written by the user ***Freddy***, as well as any chapter containing ***Freddy***, ***freddy***, ***FREDDY***, or ***getfreddygetsetgo*** in the body text. Any word with no field specifier prefix acts exactly as if it were prefixed with `seabK:`.
 
 Specifies a case insensitive match to any part of the field:
  - s: story title
- - e: entry title
+ - e: chapter title
  - a: author name
  - b: body text
  - k: keywords
 
 Specifies a case sensitive match to the entire field:
  - S: story title
- - E: entry title
+ - E: chapter title
  - A: author name
  - K: keywords
 
 
-By default, the returned entries are sorted with the newest ones first and the oldest ones last, but you can also specify the sort order of the list of returned entries by adding a term starting with `o:`, followed by one or more of the following field specifiers:
+By default, the returned chapters are sorted with the newest ones first and the oldest ones last, but you can also specify the sort order of the list of returned chapters by adding a term starting with `o:`, followed by one or more of the following field specifiers:
 
  - s: story title
- - e: entry title
+ - e: chapter title
  - a: author name
  - l: number of likes
- - c: creation date of the entry
+ - c: creation date of the chapter
 
- If multiple field specifiers are used, earlier ones will always have priority over later ones. For example, `o:aC` will put all entries written by ***ABBA*** before any entries by ***Freddy***, but all of ***ABBA***'s entries will be sorted newest first, and so will all of ***Freddy***'s entries.
+ If multiple field specifiers are used, earlier ones will always have priority over later ones. For example, `o:aC` will put all chapters written by ***ABBA*** before any chapters by ***Freddy***, but all of ***ABBA***'s chapters will be sorted newest first, and so will all of ***Freddy***'s chapters.
 
 If a field specifier is lowercase, then that field will be sorted in ascending order (a to z, lower numbers before higher numbers, earliest/oldest to latest/newest), and if the field specifier is uppercase, that field will be sorted in decending order (z to a, higher numbers before lower numbers, latest/newest to earliest/oldest). Text is always sorted in a case insensitive way, so ***ABBA*** and ***anonymouse*** will both be before ***ZZZ*** and ***zzz***. 

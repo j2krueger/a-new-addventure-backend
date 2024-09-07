@@ -16,7 +16,7 @@ const {
     testUserLogin,
     // adminLogin,
     // testStory,
-    // testEntry,
+    // testChapter,
     newUserPrivateProfile,
     newUserPublicInfo,
     // newUserBasicInfo,
@@ -24,7 +24,7 @@ const {
     // summaryKeys,
     // models
     User,
-    // Entry,
+    // Chapter,
     Follow,
     // Message,
     // Like,
@@ -53,7 +53,7 @@ describe('Test the user handling routes', function () {
                     expect(res.body.bio).to.equal("I haven't decided what to put in my bio yet.");
                     expect(res.body.publishEmail).to.equal(false);
                     expect(res.body.darkMode).to.equal(false);
-                    expect(res.body.publishedEntries).to.be.an('array').with.lengthOf(0);
+                    expect(res.body.publishedChapters).to.be.an('array').with.lengthOf(0);
 
                     await User.findByIdAndDelete(res.userId);
                 });
@@ -264,17 +264,17 @@ describe('Test the user handling routes', function () {
     describe('Test the GET /users route', function () {
         describe('Happy paths', function () {
             describe('get users', function () {
-                it('should return a 200 OK and an array of users.publicInfo() with no more than constants.entriesPerPage entries', async function () {
+                it('should return a 200 OK and an array of users.publicInfo() with no more than constants.resultsPerPage chapters', async function () {
                     const res = await agent.get('/user');
 
                     expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.entriesPerPage);
+                    expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                     for (const user of res.body) {
                         expectMongoObjectId(user.userId);
                         expect(user.userName).to.be.a('string');
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
-                        expect(user.publishedEntries).to.be.an('array')
+                        expect(user.publishedChapters).to.be.an('array')
                     }
                 })
             })
@@ -290,7 +290,7 @@ describe('Test the user handling routes', function () {
                         expect(user.userName).to.be.a('string').that.matches(/F/);
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
-                        expect(user.publishedEntries).to.be.an('array')
+                        expect(user.publishedChapters).to.be.an('array')
                     }
                 })
             })
@@ -306,7 +306,7 @@ describe('Test the user handling routes', function () {
                         expect(user.userName).to.be.a('string').which.matches(/f/i);
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
-                        expect(user.publishedEntries).to.be.an('array')
+                        expect(user.publishedChapters).to.be.an('array')
                     }
                 })
             })
@@ -322,7 +322,7 @@ describe('Test the user handling routes', function () {
                         expect(user.userName).to.be.a('string');
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
-                        expect(user.publishedEntries).to.be.an('array')
+                        expect(user.publishedChapters).to.be.an('array')
                     }
                 })
             })
@@ -394,10 +394,10 @@ describe('Test the user handling routes', function () {
                     const res = await agent.get('/profile');
 
                     expect(res).to.have.status(200);
-                    expect(res.body.publishedEntries).to.be.an('array');
+                    expect(res.body.publishedChapters).to.be.an('array');
                     expect(res.body.followedAuthors).to.be.an('array');
-                    expect(res.body.likedEntries).to.be.an('array');
-                    expect(res.body.bookmarkedEntries).to.be.an('array');
+                    expect(res.body.likedChapters).to.be.an('array');
+                    expect(res.body.bookmarkedChapters).to.be.an('array');
                     expect(res.body).to.deep.equal(newUserPrivateProfile());
                 });
             });

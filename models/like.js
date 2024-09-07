@@ -4,7 +4,7 @@ const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const User = require('./user');
-const Entry = require('./entry');
+const Chapter = require('./chapter');
 
 const likeSchema = new Schema({
     user: {
@@ -12,10 +12,10 @@ const likeSchema = new Schema({
         ref: User,
         required: ["Needs a user"],
     },
-    entry: {
+    chapter: {
         type: ObjectId,
-        ref: Entry,
-        required: ["Needs an entry"],
+        ref: Chapter,
+        required: ["Needs a chapter"],
     },
 });
 

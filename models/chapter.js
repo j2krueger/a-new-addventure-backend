@@ -4,16 +4,16 @@ const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const entrySchema = new Schema({
+const chapterSchema = new Schema({
     storyId: {
         type: ObjectId,
-        required: ["Needs the 1st entry in this story"],
+        required: ["Needs the 1st chapter in this story"],
     },
     authorName: {
         type: String,
         required: ["Author is needed"],
     },
-    entryTitle: {
+    chapterTitle: {
         type: String,
         default: null,
     },
@@ -25,7 +25,7 @@ const entrySchema = new Schema({
         type: String,
         required: ['The body is needed'],
     },
-    previousEntry: {
+    previousChapter: {
         type: ObjectId,
         default: null,
     },
@@ -42,50 +42,50 @@ const entrySchema = new Schema({
     toObject: { virtuals: true },
 });
 
-entrySchema.virtual('authorId', {
+chapterSchema.virtual('authorId', {
     ref: 'User',
     localField: 'authorName',
     foreignField: 'userName',
     justOne: true,
 })
 
-entrySchema.virtual('continuationEntries', {
-    ref: 'Entry',
+chapterSchema.virtual('continuationChapters', {
+    ref: 'Chapter',
     localField: '_id',
-    foreignField: 'previousEntry',
+    foreignField: 'previousChapter',
 })
 
-entrySchema.virtual('likes', {
+chapterSchema.virtual('likes', {
     ref: 'Like',
     localField: '_id',
-    foreignField: 'entry',
+    foreignField: 'chapter',
     count: true,
 })
 
-entrySchema.methods.setLikedByUser = async function setLikedByUser(userId) {
+chapterSchema.methods.setLikedByUser = async function setLikedByUser(userId) {
     if (userId) {
-        const result = await mongoose.model('Like').findOne({ user: userId, entry: this._id });
+        const result = await mongoose.model('Like').findOne({ user: userId, chapter: this._id });
         this.likedByUser = !!result;
     }
 }
 
-entrySchema.methods.setBookmarkedByUser = async function setBookmarkedByUser(userId) {
+chapterSchema.methods.setBookmarkedByUser = async function setBookmarkedByUser(userId) {
     if (userId) {
-        const result = await mongoose.model('Bookmark').findOne({ user: userId, entry: this._id });
+        const result = await mongoose.model('Bookmark').findOne({ user: userId, chapter: this._id });
         this.bookmarkedByUser = !!result;
     }
 }
 
-entrySchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id, userId) {
-    const result = await Entry.findById(id)
+chapterSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id, userId) {
+    const result = await Chapter.findById(id)
         .populate('likes')
         .populate({
             path: 'authorId',
             transform: auth => auth._id,
         })
         .populate({
-            path: 'continuationEntries',
-            transform: entry => entry.summary(),
+            path: 'continuationChapters',
+            transform: chapter => chapter.summary(),
         });
     if (result) {
         await result.setLikedByUser(userId);
@@ -94,8 +94,8 @@ entrySchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id,
     return result;
 }
 
-entrySchema.statics.findAndPopulate = async function findAndPopulate(entryQuery, sortQuery, skip, limit, userId) {
-    const result = await Entry.find(entryQuery, null, {
+chapterSchema.statics.findAndPopulate = async function findAndPopulate(chapterQuery, sortQuery, skip, limit, userId) {
+    const result = await Chapter.find(chapterQuery, null, {
         collation: { locale: 'en' },
         sort: sortQuery,
         skip: skip,
@@ -106,12 +106,12 @@ entrySchema.statics.findAndPopulate = async function findAndPopulate(entryQuery,
             path: 'authorId',
             transform: auth => auth._id,
         });
-    await Promise.all(result.map(entry => entry.setLikedByUser(userId)));
-    await Promise.all(result.map(entry => entry.setBookmarkedByUser(userId)));
+    await Promise.all(result.map(chapter => chapter.setLikedByUser(userId)));
+    await Promise.all(result.map(chapter => chapter.setBookmarkedByUser(userId)));
     return result;
 }
 
-entrySchema.methods.saveNewStory = async function saveNewStory() {
+chapterSchema.methods.saveNewStory = async function saveNewStory() {
     this.storyId = this._id;
     await this.save();
     await this.populate('likes');
@@ -121,9 +121,9 @@ entrySchema.methods.saveNewStory = async function saveNewStory() {
     });
 }
 
-entrySchema.methods.saveContinuationEntry = async function saveContinuationEntry(prevEntry) {
-    this.storyId = prevEntry.storyId;
-    this.storyTitle = prevEntry.storyTitle;
+chapterSchema.methods.saveContinuationChapter = async function saveContinuationChapter(prevChapter) {
+    this.storyId = prevChapter.storyId;
+    this.storyTitle = prevChapter.storyTitle;
     await this.save();
     await this.populate('likes');
     await this.populate({
@@ -132,15 +132,15 @@ entrySchema.methods.saveContinuationEntry = async function saveContinuationEntry
     });
 }
 
-entrySchema.methods.summary = function summary() {
+chapterSchema.methods.summary = function summary() {
     return {
         storyId: this.storyId,
-        entryId: this._id,
+        chapterId: this._id,
         storyTitle: this.storyTitle,
-        entryTitle: this.entryTitle,
+        chapterTitle: this.chapterTitle,
         authorName: this.authorName,
         authorId: this.authorId,
-        previousEntry: this.previousEntry,
+        previousChapter: this.previousChapter,
         keywords: this.keywords,
         likes: this.likes,
         likedByUser: this.likedByUser,
@@ -148,16 +148,16 @@ entrySchema.methods.summary = function summary() {
     };
 }
 
-entrySchema.methods.fullInfo = async function fullInfo() {
+chapterSchema.methods.fullInfo = async function fullInfo() {
     return {
         storyId: this.storyId,
-        entryId: this._id,
+        chapterId: this._id,
         storyTitle: this.storyTitle,
-        entryTitle: this.entryTitle,
+        chapterTitle: this.chapterTitle,
         authorName: this.authorName,
         authorId: this.authorId,
         bodyText: this.bodyText,
-        previousEntry: this.previousEntry,
+        previousChapter: this.previousChapter,
         createDate: this.createDate,
         keywords: this.keywords,
         likes: this.likes,
@@ -166,25 +166,25 @@ entrySchema.methods.fullInfo = async function fullInfo() {
     };
 }
 
-entrySchema.methods.fullInfoWithContinuations = async function fullInfoWithContinuations() {
+chapterSchema.methods.fullInfoWithContinuations = async function fullInfoWithContinuations() {
     return {
         storyId: this.storyId,
-        entryId: this._id,
+        chapterId: this._id,
         authorName: this.authorName,
         authorId: this.authorId,
-        entryTitle: this.entryTitle,
+        chapterTitle: this.chapterTitle,
         storyTitle: this.storyTitle,
         bodyText: this.bodyText,
-        previousEntry: this.previousEntry,
+        previousChapter: this.previousChapter,
         createDate: this.createDate,
         keywords: this.keywords,
         likes: this.likes,
         likedByUser: this.likedByUser,
         bookmarkedByUser: this.bookmarkedByUser,
-        continuationEntries: this.continuationEntries,
+        continuationChapters: this.continuationChapters,
     };
 }
 
-const Entry = mongoose.model("Entry", entrySchema);
+const Chapter = mongoose.model("Chapter", chapterSchema);
 
-module.exports = Entry;
+module.exports = Chapter;

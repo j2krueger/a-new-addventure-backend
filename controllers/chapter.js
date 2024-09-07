@@ -1,7 +1,7 @@
 "use strict";
 
 const constants = require('../helpers/constants');
-const Entry = require('../models/entry');
+const Chapter = require('../models/chapter');
 const Like = require('../models/like');
 const Flag = require('../models/flag');
 const Bookmark = require('../models/bookmark');
@@ -10,17 +10,17 @@ const {
   isValidKeywordArray
 } = require('../helpers/validation');
 
-async function paramEntryId(req, res, next, value) {
+async function paramChapterId(req, res, next, value) {
   if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
-    return res.status(400).json({ error: "That is not a properly formatted entryId." })
+    return res.status(400).json({ error: "That is not a properly formatted chapterId." })
   }
-  const entryId = value;
+  const chapterId = value;
   try {
-    const result = await Entry.findByIdAndPopulate(entryId, req.session?.user?._id);
+    const result = await Chapter.findByIdAndPopulate(chapterId, req.session?.user?._id);
     if (result) {
-      req.paramEntry = result;
+      req.paramChapter = result;
     } else {
-      return res.status(404).json({ error: "There is no entry with that entryId." });
+      return res.status(404).json({ error: "There is no chapter with that chapterId." });
     }
     return next();
   } catch (error) {
@@ -54,26 +54,26 @@ async function paramKeyword(req, res, next, value) {
   return next();
 }
 
-async function getEntryList(req, res) {
+async function getChapterList(req, res) {
   const orderLookup = {
     s: ['storyTitle', 1],
-    e: ['entryTitle', 1],
+    c: ['chapterTitle', 1],
     a: ['authorName', 1],
     l: ['likes', 1],
-    c: ['createDate', 1],
+    d: ['createDate', 1],
     S: ['storyTitle', -1],
-    E: ['entryTitle', -1],
+    C: ['chapterTitle', -1],
     A: ['authorName', -1],
     L: ['likes', -1],
-    C: ['createDate', -1],
+    D: ['createDate', -1],
   }
   const { page, storiesOnly, search, } = req.query;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
 
   // Validate and separate tokens
-  const tokenList = search ? search.split(/\s+/).filter(x => x) : "o:C".split(/\s+/).filter(x => x);
-  const searchREString = '^((?<fields>[seabkSEAK]+):)?(?<word>[\\w.-]+)$'
-  const sortREString = '^o:(?<sort>[sealcSEALC]+)$'
+  const tokenList = search ? search.split(/\s+/).filter(x => x) : "o:D".split(/\s+/).filter(x => x);
+  const searchREString = '^((?<fields>[scabkSCAK]+):)?(?<word>[\\w.-]+)$'
+  const sortREString = '^o:(?<sort>[scaldSCALD]+)$'
   const searchRE = new RegExp(searchREString);
   const sortRE = new RegExp(sortREString);
   const tokenRE = new RegExp(searchREString + '|' + sortREString);
@@ -85,7 +85,7 @@ async function getEntryList(req, res) {
   if (sortList.length > 1) {
     return res.status(400).json({ error: "Misformed query string." });
   }
-  const sortTerm = sortList.length ? sortRE.exec(sortList[0]).groups.sort : 'C'; // default to latest first
+  const sortTerm = sortList.length ? sortRE.exec(sortList[0]).groups.sort : 'D'; // default to latest first
   if (/([sealc]).*\1/i.test(sortTerm)) {
     return res.status(400).json({ error: "Misformed query string." });
   }
@@ -104,20 +104,20 @@ async function getEntryList(req, res) {
 
   // Construct the search query
   const termArray = [];
-  const searchQuery = storiesOnly ? { previousEntry: null } : {};
+  const searchQuery = storiesOnly ? { previousChapter: null } : {};
   for (const searchTerm of searchList) {
     const groups = searchRE.exec(searchTerm).groups;
-    const fields = groups.fields ?? "seabK";
+    const fields = groups.fields ?? "scabK";
     const word = groups.word;
 
     const fieldLookup = {
       s: { storyTitle: { $regex: word, $options: 'i' } },
-      e: { entryTitle: { $regex: word, $options: 'i' } },
+      c: { chapterTitle: { $regex: word, $options: 'i' } },
       a: { authorName: { $regex: word, $options: 'i' } },
       b: { bodyText: { $regex: word, $options: 'i' } },
       k: { keywords: { $regex: word, $options: 'i' } },
       S: { storyTitle: word },
-      E: { entryTitle: word },
+      C: { chapterTitle: word },
       A: { authorName: word },
       K: { keywords: word },
     }
@@ -132,35 +132,35 @@ async function getEntryList(req, res) {
     searchQuery["$and"] = termArray;
   }
 
-  const entryList = await Entry.findAndPopulate(
+  const chapterList = await Chapter.findAndPopulate(
     searchQuery,
     sortQuery,
-    zPage * constants.entriesPerPage,
-    constants.entriesPerPage,
+    zPage * constants.resultsPerPage,
+    constants.resultsPerPage,
     req.session?.user?._id
   );
-  const result = entryList.map(entry => entry.summary());
+  const result = chapterList.map(chapter => chapter.summary());
   res.status(200).json(result);
 }
 
-async function getEntryById(req, res) {
-  res.status(200).json(await req.paramEntry.fullInfoWithContinuations());
+async function getChapterById(req, res) {
+  res.status(200).json(await req.paramChapter.fullInfoWithContinuations());
 }
 
 // Potential approach for speed improvement:
-// grab all entries with the same storyId all in one query, and chain them together locally
+// grab all chapters with the same storyId all in one query, and chain them together locally
 // Since this is one big query, it may be considerably faster than repeated queries for one
-// entry at a time, but at the cost of more memory usage. Don't implement until the version
+// chapter at a time, but at the cost of more memory usage. Don't implement until the version
 // implemented here becomes problematic.
 async function getChainById(req, res, next) {
   try {
-    const results = [await req.paramEntry.fullInfoWithContinuations()];
-    while (results[0].previousEntry) {
-      const nextPreviousEntry = await Entry.findByIdAndPopulate(results[0].previousEntry, req?.session?.user?._id);
-      if (!nextPreviousEntry) {
+    const results = [await req.paramChapter.fullInfoWithContinuations()];
+    while (results[0].previousChapter) {
+      const nextPreviousChapter = await Chapter.findByIdAndPopulate(results[0].previousChapter, req?.session?.user?._id);
+      if (!nextPreviousChapter) {
         break;
       }
-      results.unshift(await nextPreviousEntry.fullInfoWithContinuations());
+      results.unshift(await nextPreviousChapter.fullInfoWithContinuations());
     }
     return res.status(200).json(results);
   } catch (error) {
@@ -168,18 +168,18 @@ async function getChainById(req, res, next) {
   }
 }
 
-async function flagEntry(req, res, next) {
+async function flagChapter(req, res, next) {
   try {
     const user = req?.session?.user;
-    const entry = req.paramEntry;
+    const chapter = req.paramChapter;
     const reason = req.body?.reason;
 
     if (!reason || reason == "") {
-      return res.status(400).json({ error: "Flagging an entry needs a reason." });
+      return res.status(400).json({ error: "Flagging a chapter needs a reason." });
     }
-    const flag = new Flag({ user: user?._id, entry: entry._id, reason });
+    const flag = new Flag({ user: user?._id, chapter: chapter._id, reason });
     await flag.save();
-    return res.status(200).json({ message: "Entry successfully flagged." });
+    return res.status(200).json({ message: "Chapter successfully flagged." });
   } catch (error) {
     return next(error);
   }
@@ -201,31 +201,31 @@ async function getFlagList(req, res, next) {
       .find()
       .populate('user', '-passwordHash')
       .populate({
-        path: 'entry',
-        transform: entry => {
-          if (entry?._id) {
-            return entry;
+        path: 'chapter',
+        transform: chapter => {
+          if (chapter?._id) {
+            return chapter;
           } else {
             return null;
           }
         }
       });
-    const filteredFlagArray = flagArray.filter(e => e.entry);
+    const filteredFlagArray = flagArray.filter(e => e.chapter);
     return res.status(200).json(filteredFlagArray);
   } catch (error) {
     return next(error);
   }
 }
 
-async function createEntry(storyTitle, entryTitle, bodyText, authorName, keywords, previousEntry, res) {
+async function createChapter(storyTitle, chapterTitle, bodyText, authorName, keywords, previousChapter, res) {
   if (typeof bodyText != 'string') {
     return res.status(400).json({ error: "Missing story text." });
   }
   if (typeof storyTitle != 'string') {
     return res.status(400).json({ error: "Missing story title." });
   }
-  if (previousEntry != null && typeof entryTitle != 'string') {
-    return res.status(400).json({ error: "Missing entry title." });
+  if (previousChapter != null && typeof chapterTitle != 'string') {
+    return res.status(400).json({ error: "Missing chapter title." });
   }
   if (keywords && !isValidKeywordArray(keywords)) {
     return res.status(400).json({ error: "Request body must be an array of strings." });
@@ -234,21 +234,21 @@ async function createEntry(storyTitle, entryTitle, bodyText, authorName, keyword
   keywords = Array.from(new Set(keywords));
 
   try {
-    const entry = new Entry({
+    const chapter = new Chapter({
       storyTitle,
-      entryTitle,
+      chapterTitle,
       bodyText,
-      previousEntry,
+      previousChapter,
       authorName,
       keywords,
     });
-    if (previousEntry === null) {
-      await entry.saveNewStory();
+    if (previousChapter === null) {
+      await chapter.saveNewStory();
     } else {
-      await entry.saveContinuationEntry({ storyId: previousEntry, storyTitle });
+      await chapter.saveContinuationChapter({ storyId: previousChapter, storyTitle });
     }
 
-    return res.status(201).json(await entry.fullInfo());
+    return res.status(201).json(await chapter.fullInfo());
   } catch (error) {
     return res.status(500).json(error);
   }
@@ -257,38 +257,38 @@ async function createEntry(storyTitle, entryTitle, bodyText, authorName, keyword
 
 async function createStory(req, res) {
   const { storyTitle, bodyText, keywords, } = req.body;
-  await createEntry(storyTitle, null, bodyText, req.authenticatedUser.userName, keywords, null, res);
+  await createChapter(storyTitle, null, bodyText, req.authenticatedUser.userName, keywords, null, res);
 }
 
 async function continueStory(req, res) {
-  const { bodyText, entryTitle, keywords, } = req.body;
-  await createEntry(req.paramEntry.storyTitle, entryTitle, bodyText, req.authenticatedUser.userName, keywords, req.paramEntry._id, res);
+  const { bodyText, chapterTitle, keywords, } = req.body;
+  await createChapter(req.paramChapter.storyTitle, chapterTitle, bodyText, req.authenticatedUser.userName, keywords, req.paramChapter._id, res);
 }
 
-async function likeEntry(req, res, next) {
+async function likeChapter(req, res, next) {
   try {
-    if (req.paramEntry.authorId.equals(req.authenticatedUser._id)) {
-      return res.status(409).json({ error: "You cannot like your own entries." });
+    if (req.paramChapter.authorId.equals(req.authenticatedUser._id)) {
+      return res.status(409).json({ error: "You cannot like your own chapters." });
     }
-    const likeQuery = { user: req.authenticatedUser._id, entry: req.paramEntry._id };
+    const likeQuery = { user: req.authenticatedUser._id, chapter: req.paramChapter._id };
     const found = await Like.findOne(likeQuery);
     if (found) {
-      return res.status(409).json({ error: "You have already liked that entry." });
+      return res.status(409).json({ error: "You have already liked that chapter." });
     }
     const like = new Like(likeQuery);
     await like.save();
-    res.status(200).json({ message: "Entry liked." });
+    res.status(200).json({ message: "Chapter liked." });
   } catch (error) {
     return next(error);
   }
 }
 
-async function unLikeEntry(req, res, next) {
+async function unLikeChapter(req, res, next) {
   try {
-    const likeQuery = { user: req.authenticatedUser._id, entry: req.paramEntry._id };
+    const likeQuery = { user: req.authenticatedUser._id, chapter: req.paramChapter._id };
     const found = await Like.findOne(likeQuery);
     if (!found) {
-      return res.status(404).json({ error: "You have not liked that entry." });
+      return res.status(404).json({ error: "You have not liked that chapter." });
     }
     await Like.findByIdAndDelete(found._id);
     res.status(200).json({ message: "Like successfully removed." });
@@ -297,47 +297,47 @@ async function unLikeEntry(req, res, next) {
   }
 }
 
-async function recursiveDeleteEntryById(id) {
-  const continuations = await Entry.find({ previousEntry: id });
-  continuations.forEach(entry => recursiveDeleteEntryById(entry._id));
-  await Bookmark.deleteMany({ entry: id });
-  await Flag.deleteMany({ entry: id });
-  await Like.deleteMany({ entry: id });
-  await Entry.findByIdAndDelete(id);
+async function recursiveDeleteChapterById(id) {
+  const continuations = await Chapter.find({ previousChapter: id });
+  continuations.forEach(chapter => recursiveDeleteChapterById(chapter._id));
+  await Bookmark.deleteMany({ chapter: id });
+  await Flag.deleteMany({ chapter: id });
+  await Like.deleteMany({ chapter: id });
+  await Chapter.findByIdAndDelete(id);
 }
 
-async function deleteEntryById(req, res, next) {
+async function deleteChapterById(req, res, next) {
   try {
-    await recursiveDeleteEntryById(req.paramEntry._id);
-    return res.status(200).json({ message: "Entry successfully deleted." });
+    await recursiveDeleteChapterById(req.paramChapter._id);
+    return res.status(200).json({ message: "Chapter successfully deleted." });
   } catch (error) {
     return next(error);
   }
 }
 
-async function bookmarkEntry(req, res, next) {
+async function bookmarkChapter(req, res, next) {
   try {
-    const bookmarkQuery = { user: req.authenticatedUser._id, entry: req.paramEntry._id };
+    const bookmarkQuery = { user: req.authenticatedUser._id, chapter: req.paramChapter._id };
     const duplicateBookmark = await Bookmark.findOne(bookmarkQuery);
     if (duplicateBookmark) {
       return res.status(409).json({ error: "You have already liked that bookmark." })
     }
     const bookmark = new Bookmark(bookmarkQuery);
     await bookmark.save();
-    return res.status(200).json({ message: "Entry bookmarked." });
+    return res.status(200).json({ message: "Chapter bookmarked." });
   } catch (error) {
     return next(error);
   }
 }
 
-async function unBookmarkEntry(req, res, next) {
+async function unBookmarkChapter(req, res, next) {
   try {
-    const result = await Bookmark.findOne({ user: req.authenticatedUser._id, entry: req.paramEntry._id });
+    const result = await Bookmark.findOne({ user: req.authenticatedUser._id, chapter: req.paramChapter._id });
     if (result) {
       await Bookmark.findByIdAndDelete(result._id);
       return res.status(200).json({ message: "Bookmark successfully deleted." });
     }
-    return res.status(404).json({ error: "You don't have that entry bookmarked." });
+    return res.status(404).json({ error: "You don't have that chapter bookmarked." });
   } catch (error) {
     return next(error);
   }
@@ -347,7 +347,7 @@ async function getKeywordList(req, res, next) {
   try {
     const { regex } = req.query;
     const query = regex ? { $match: { keywords: { $regex: regex, $options: 'i' } } } : null;
-    const result = await Entry.aggregate([
+    const result = await Chapter.aggregate([
       {
         $match: {
           keywords: { $not: { $size: 0 } },
@@ -378,8 +378,8 @@ async function addKeywords(req, res, next) {
     if (!isValidKeywordArray(req.body)) {
       return res.status(400).json({ error: "Request body must be an array of strings." });
     }
-    req.paramEntry.keywords = Array.from(new Set([...req.body, ...req.paramEntry.keywords]));
-    await req.paramEntry.save();
+    req.paramChapter.keywords = Array.from(new Set([...req.body, ...req.paramChapter.keywords]));
+    await req.paramChapter.save();
     return res.status(200).json({ message: "Keywords successfully added." });
   } catch (error) {
     return next(error);
@@ -388,13 +388,13 @@ async function addKeywords(req, res, next) {
 
 async function deleteKeyword(req, res, next) {
   try {
-    const entryKeywordSet = new Set(req.paramEntry.keywords);
+    const chapterKeywordSet = new Set(req.paramChapter.keywords);
     const deleteKeywordSet = new Set([req.paramKeyword]);
-    if (!entryKeywordSet.isSupersetOf(deleteKeywordSet)) {
-      return res.status(404).json({ error: "Keyword not found in entry." });
+    if (!chapterKeywordSet.isSupersetOf(deleteKeywordSet)) {
+      return res.status(404).json({ error: "Keyword not found in chapter." });
     }
-    req.paramEntry.keywords = Array.from(entryKeywordSet.difference(deleteKeywordSet));
-    req.paramEntry.save();
+    req.paramChapter.keywords = Array.from(chapterKeywordSet.difference(deleteKeywordSet));
+    req.paramChapter.save();
     return res.status(200).json({ message: "Keyword successfully deleted." });
   } catch (error) {
     return next(error);
@@ -402,20 +402,20 @@ async function deleteKeyword(req, res, next) {
 }
 
 module.exports = {
-  paramEntryId,
+  paramChapterId,
   paramFlagId,
   paramKeyword,
-  getEntryList,
-  getEntryById,
+  getChapterList,
+  getChapterById,
   getChainById,
-  flagEntry,
+  flagChapter,
   createStory,
   continueStory,
-  likeEntry,
-  unLikeEntry,
-  bookmarkEntry,
-  unBookmarkEntry,
-  deleteEntryById,
+  likeChapter,
+  unLikeChapter,
+  bookmarkChapter,
+  unBookmarkChapter,
+  deleteChapterById,
   deleteFlag,
   getFlagList,
   getKeywordList,
