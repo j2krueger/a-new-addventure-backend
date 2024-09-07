@@ -197,7 +197,6 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res).to.have.cookie('connect.sid');
                     expect(res).to.have.cookie('token');
-
                     expect(res.body).to.deep.equal(newUserPrivateProfile());
                 })
             })
@@ -439,14 +438,12 @@ describe('Test the user handling routes', function () {
                     const userRes = await agent.post('/login').send(testUserLogin);
                     await User.findByIdAndUpdate(userRes.body.userId, { emailVerified: true });
 
-                    const res = await agent.put('/profile').send({ email: "new" + newEmail });
+                    const res = await agent.put('/profile').send({ email: "putProfile" + newEmail });
                     shouldSendEmail()
-                    const tempNewUserPrivateProfile = newUserPrivateProfile();
-                    tempNewUserPrivateProfile.email = "new" + newEmail;
                     const user = await User.findById(res.body.userId);
 
                     expect(res).to.have.status(200);
-                    expect(res.body.email).to.deep.equal("new" + newEmail);
+                    expect(res.body.email).to.deep.equal("putProfile" + newEmail);
                     expect(res.body.emailVerified).to.be.false;
                     expect(user.emailVerificationKey).to.be.a('string').and.match(/^[0-9a-f]{20}$/);
 
@@ -498,6 +495,7 @@ describe('Test the user handling routes', function () {
             const res = await agent.post('/register')
                 .send({ userName: 'followed-' + newUserName, email: 'followed-' + newEmail, password: newPassword });
             shouldSendEmail();
+            expect(res).to.have.status(201);
             followedUserId = res.body.userId;
         });
 
@@ -560,11 +558,11 @@ describe('Test the user handling routes', function () {
 
             describe('Login, follow a user, then delete the user from the database, then GET /profile', function () {
                 it('should remove the broken follow from followedAuthors', async function () {
-                    const userRes = await agent.post('/register').send({ userName: newUserName + '1', email: '1' + newEmail, password: 'password' });
+                    const userRes = await agent.post('/register').send({ userName: 'followDel-' + newUserName, email: 'followDel-' + newEmail, password: 'password' });
                     shouldSendEmail();
+                    expect(userRes).to.have.status(201);
                     await agent.post('/login').send(testUserLogin);
                     await agent.post('/user/' + userRes.body.userId + '/follow');
-                    const follow = await Follow.findOne({ following: userRes.body.userId });
                     await User.findByIdAndDelete(userRes.body.userId);
 
                     const res = await agent.get('/profile');
@@ -572,20 +570,36 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res.body.followedAuthors).to.be.an('array').with.lengthOf(0);
 
-                    await Follow.findByIdAndDelete(follow._id);
+                    await Follow.findOneAndDelete({ following: userRes.body.userId });
                 });
             });
         });
     });
 
-    describe('Test the DELETE /user/:userId/follow rout', function () {
+    describe('Test the DELETE /user/:userId/follow route', function () {
+        let followedUserId;
+
+        before('Setup userId for testing /user/:userId/follow route', async function () {
+            const user = await User.findOne({ userName: 0 + newUserName });
+            followedUserId = user._id;
+        });
+
+        beforeEach('Setup follow for testing /user/:userId/follow route', async function () {
+            await agent.post('/login').send(testUserLogin);
+
+            await agent.post('/user/' + followedUserId + '/follow');
+        });
+
+        after('Teardown follow for testing /user/:userId/follow route', async function () {
+            await agent.delete('/user/' + followedUserId + '/follow');
+        });
+
         describe('Happy paths', function () {
             describe('Login, follow a user, and unfollow the user', function () {
                 it('should return a 200 status and return a success message.', async function () {
                     await agent.post('/login').send(testUserLogin);
-                    await agent.post('/user/668ee23ce1dcd980cf0739f9/follow');
 
-                    const res = await agent.delete('/user/668ee23ce1dcd980cf0739f9/follow');
+                    const res = await agent.delete('/user/' + followedUserId + '/follow');
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Author successfully unfollowed." });
@@ -598,7 +612,7 @@ describe('Test the user handling routes', function () {
                 it('should redirect to /login', async function () {
                     await agent.post('/logout');
 
-                    const res = await agent.delete('/user/668490250029a28118a8d1be/follow');
+                    const res = await agent.delete('/user/' + followedUserId + '/follow');
 
                     expect(res).to.redirectTo(constants.mochaTestingUrl + '/login');
                 });
@@ -608,7 +622,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 404 status and an error message', async function () {
                     await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent.delete('/user/668ee24be1dcd980cf0739fe/follow');
+                    const res = await agent.delete('/user/' + newUserPrivateProfile().userId + '/follow');
 
                     expect(res).to.have.status(404);
                     expect(res.body).to.deep.equal({ error: 'No follow to remove.' })

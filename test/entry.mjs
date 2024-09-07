@@ -847,7 +847,7 @@ describe('Test the entry handling routes', function () {
                         const loginRes = await agent.post('/login').send(testUserLogin);
                         await agent.post('/entry/' + storyRes.body.entryId + '/like');
 
-                        const entryIdRes = await agent.get('/entry').query({ search: testString });
+                        const entryIdRes = await agent.get('/entry').query({ search: "s:" + testString });
 
                         expect(entryIdRes.body).to.be.an('array').with.lengthOf(1);
                         expect(entryIdRes.body[0].likedByUser).to.be.true;
@@ -1156,7 +1156,7 @@ describe('Test the entry handling routes', function () {
                         await agent.post('/entry/' + storyRes.body.entryId + '/bookmark');
                         const bookmark = await Bookmark.findOne({ entry: storyRes.body.entryId });
 
-                        const res = await agent.get('/entry').query({ search: testString, });
+                        const res = await agent.get('/entry').query({ search: "s:" + testString });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf(1);
@@ -1164,7 +1164,6 @@ describe('Test the entry handling routes', function () {
 
                         await Bookmark.findByIdAndDelete(bookmark._id);
                         await Entry.findByIdAndDelete(storyRes.body.entryId);
-
                     });
                 });
             });

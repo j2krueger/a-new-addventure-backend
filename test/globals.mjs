@@ -22,7 +22,12 @@ const newPassword = Math.random() + "-" + Math.random();
 const testUserLogin = { name: newUserName, password: newPassword };
 const adminLogin = { name: "Freddy", password: constants.adminPassword };
 const testStory = { storyTitle: testString, bodyText: testString, keywords: ["testStory", testString, newUserName] };
-const testEntry = { entryTitle: testString + "1", bodyText: testString + "2", keywords: ["testEntry", testString, newUserName] };
+const testStory1 = { storyTitle: "Test story 1", bodyText: testString, keywords: ["testStory", testString, newUserName] };
+const testStory2 = { storyTitle: "Test story 2", bodyText: testString, keywords: ["testStory", testString, newUserName] };
+const testEntry = { entryTitle: testString + "1", bodyText: testString, keywords: ["testEntry", testString, newUserName] };
+const testEntry1a = { entryTitle: "Test entry 1A", bodyText: testString, keywords: ["testEntry", testString, newUserName] };
+const testEntry1b = { entryTitle: "Test entry 1B", bodyText: testString, keywords: ["testEntry", testString, newUserName] };
+const testEntry1aa = { entryTitle: "Test entry 1AA", bodyText: testString, keywords: ["testEntry", testString, newUserName] };
 let _newUserPrivateProfile;
 let _newUserPublicInfo;
 let _newUserBasicInfo;
@@ -79,7 +84,12 @@ export {
     testUserLogin,
     adminLogin,
     testStory,
+    testStory1,
+    testStory2,
     testEntry,
+    testEntry1a,
+    testEntry1b,
+    testEntry1aa,
     newUserPrivateProfile,
     newUserPublicInfo,
     newUserBasicInfo,
