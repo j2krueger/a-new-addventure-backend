@@ -33,7 +33,8 @@ let _newUserPublicInfo;
 let _newUserBasicInfo;
 let _verificationEmailCount = 0;
 
-const summaryKeys = ['storyId', 'chapterId', 'storyTitle', 'chapterTitle', 'authorName', 'authorId', 'previousChapter', 'likes', 'keywords'];
+const summaryKeys = constants.summaryKeys;
+const loggedOutSummaryKeys = constants.loggedOutSummaryKeys;
 
 function populateUserInfo(newUser) {
     _newUserPrivateProfile = JSON.parse(JSON.stringify(newUser));
@@ -96,6 +97,7 @@ export {
     shouldSendEmail,
     expectedNumberOfEmails,
     summaryKeys,
+    loggedOutSummaryKeys,
     // models
     User,
     Chapter,

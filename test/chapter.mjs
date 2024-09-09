@@ -20,6 +20,7 @@ const {
     // newUserPublicInfo,
     // newUserBasicInfo,
     summaryKeys,
+    loggedOutSummaryKeys,
     // models
     // User,
     Chapter,
@@ -49,7 +50,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -72,7 +73,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys('likedByUser', 'bookmarkedByUser', ...summaryKeys);
+                            expect(chapter).to.have.all.keys(...summaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -95,7 +96,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyId).to.deep.equal(chapter.chapterId);
@@ -109,12 +110,14 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "a:Freddy" } ', function () {
                     it('should return a 200 OK list of chapters with authorName matching "Freddy"', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: "a:Freddy" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -130,12 +133,14 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "c:dd"} ', function () {
                     it('should return a 200 OK list of chapters with chapterTitle matching "dd"', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: 'c:dd' });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -147,12 +152,14 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "s:beginning" } ', function () {
                     it('should return a 200 OK list of chapters with storyTitle matching "beginning"', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: 's:beginning' });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string').which.matches(/beginning/i);
@@ -168,12 +175,14 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "ac:dd" } ', function () {
                     it('should return a 200 OK list of chapters with authorName OR chapter title matching "dd"', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: 'ac:dd' });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -190,13 +199,15 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "o:a" }', function () {
                     it('should return a 200 OK list of chapters sorted in increasing order by author', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: "o:a" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         let previous = res.body[0].authorName;
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -214,13 +225,15 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "o:A" }', function () {
                     it('should return a 200 OK list of chapters sorted in decreasing order by author', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: "o:A" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         let previous = res.body[0].authorName;
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -238,13 +251,15 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "o:c" }', function () {
                     it('should return a 200 OK list of chapters sorted in increasing order by chapterTitle', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: "o:c" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         let previous = res.body[0].chapterTitle;
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -261,13 +276,15 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "o:C" }', function () {
                     it('should return a 200 OK list of chapters sorted in increasing order by chapterTitle', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: "o:C" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         let previous = res.body[0].chapterTitle;
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');
@@ -284,13 +301,15 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter with search query string { search: "o:sC" }', function () {
                     it('should return a 200 OK list of chapters sorted in increasing order by chapterTitle', async function () {
+                        await agent.post('/logout');
+
                         const res = await agent.get('/chapter').query({ search: "o:sC" });
 
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
                         let previous = res.body[0];
                         for (const chapter of res.body) {
-                            expect(chapter).to.have.all.keys(...summaryKeys);
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
                             expectMongoObjectId(chapter.chapterId);
                             expect(chapter.storyTitle).to.be.a('string');

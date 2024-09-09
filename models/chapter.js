@@ -2,6 +2,7 @@
 
 const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
+const constants = require('../helpers/constants');
 const { Schema } = mongoose;
 
 const chapterSchema = new Schema({
@@ -133,19 +134,12 @@ chapterSchema.methods.saveContinuationChapter = async function saveContinuationC
 }
 
 chapterSchema.methods.summary = function summary() {
-    return {
-        storyId: this.storyId,
-        chapterId: this._id,
-        storyTitle: this.storyTitle,
-        chapterTitle: this.chapterTitle,
-        authorName: this.authorName,
-        authorId: this.authorId,
-        previousChapter: this.previousChapter,
-        keywords: this.keywords,
-        likes: this.likes,
-        likedByUser: this.likedByUser,
-        bookmarkedByUser: this.bookmarkedByUser,
-    };
+    const result = {};
+    for (const key of constants.summaryKeys) {
+        result[key] = this[key];
+    }
+    result.chapterId = this._id;
+    return result;
 }
 
 chapterSchema.methods.fullInfo = async function fullInfo() {
