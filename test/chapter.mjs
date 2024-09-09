@@ -528,6 +528,21 @@ describe('Test the chapter handling routes', function () {
                         await Chapter.findByIdAndDelete(chapterRes.body.chapterId);
                     });
                 });
+
+                describe('POST /chapter with "<" in the storyTitle and the bodyText', function () {
+                    it('should replace both of them with HTML entities', async function () {
+                        await agent.post('/login').send(testUserLogin);
+
+                        const res = await agent.post('/chapter').send({ storyTitle: testStory.storyTitle + "<", bodyText: testStory.bodyText + "<" });
+                        const story = await Chapter.findById(res.body.chapterId);
+
+                        expect(res).to.have.status(201);
+                        expect(story.storyTitle).to.deep.equal(testStory.storyTitle + "&lt;");
+                        expect(story.bodyText).to.deep.equal(testStory.bodyText + "&lt;");
+
+                        await Chapter.findByIdAndDelete(story._id);
+                    });
+                });
             });
 
             describe('Sad paths', function () {

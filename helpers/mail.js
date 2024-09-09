@@ -2,6 +2,7 @@
 
 const nodemailer = require('nodemailer');
 const constants = require('./constants');
+const { unescapeHTML } = require('../helpers/validation');
 
 const transporter = nodemailer.createTransport({
     service: 'zoho',
@@ -14,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 async function sendVerificationEmailHelper(user) {
     const userId = user._id;
-    const email = user.email.includes(constants.testString) ? constants.testEmailAddress : user.email;
+    const email = user.email.includes(constants.testString) ? constants.testEmailAddress : unescapeHTML(user.email);
     transporter.sendMail({
         from: constants.siteEmailAddress,
         to: email,
@@ -28,7 +29,7 @@ async function sendVerificationEmailHelper(user) {
 
 async function sendResetPasswordEmailHelper(user) {
     const userId = user._id;
-    const email = user.email.includes(constants.testString) ? constants.testEmailAddress : user.email;
+    const email = user.email.includes(constants.testString) ? constants.testEmailAddress : unescapeHTML(user.email);
     transporter.sendMail({
         from: constants.siteEmailAddress,
         to: email,

@@ -1,5 +1,7 @@
 "use strict";
 
+const { escape, unescape } = require('validator');
+
 // keywords must contain at least one character, and may only contain letters, digits, and the punctuation characters "_", "-", and "."
 const keywordRe = /^[\w.-]+$/;
 
@@ -14,4 +16,6 @@ function isValidKeywordArray(keywordArray) {
 module.exports = {
     isValidKeyword,
     isValidKeywordArray,
+    escapeHTML: escape,
+    unescapeHTML: unescape,
 }

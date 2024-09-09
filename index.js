@@ -20,9 +20,8 @@ if (constants.testing) {
 }
 
 const mongoose = require("mongoose");
-// const cookieParser = require("cookie-parser");
-// const path = require('path');
 const morgan = require('morgan');
+const { escapeHTML } = require('./helpers/validation');
 
 const app = express();
 
@@ -76,6 +75,22 @@ if (constants.localDeploy) {
         }
     }));
 }
+
+function sanitizeStringsInObject(obj) {
+    for (const key in obj) {
+        if (typeof obj[key] == 'string') {
+            obj[key] = escapeHTML(obj[key]);
+        } else if (typeof obj[key] == 'object') {
+            sanitizeStringsInObject(obj[key]);
+        }
+    }
+}
+function sanitizeIncomingStrings(req, res, next) {
+    sanitizeStringsInObject(req.body);
+    sanitizeStringsInObject(req.query);
+    next();
+}
+app.use(sanitizeIncomingStrings);
 
 // API Routes
 app.use('/', require('./routes/routes'))
