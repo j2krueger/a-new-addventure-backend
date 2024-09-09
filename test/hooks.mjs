@@ -44,6 +44,7 @@ const {
 
 export const mochaHooks = {
     async beforeAll() {
+        console.time('Total testing time');
         try {
             mongoose.connect(constants.databaseURI, { dbName: constants.dbName });
             console.log('Database Connected');
@@ -100,6 +101,7 @@ export const mochaHooks = {
         await Like.deleteMany({ user: newUserBasicInfo().userId });
         await Flag.deleteMany({ reason: { $regex: testString } });
         mongoose.disconnect();
+        console.timeEnd('Total testing time');
         console.log(`A total of ${expectedNumberOfEmails()} automatic emails should have reached your inbox.`);
     }
 };
