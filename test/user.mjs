@@ -312,6 +312,22 @@ describe('Test the user handling routes', function () {
             })
 
             describe('get users with query string {page: 2}', function () {
+                before('Set up users to test pagination', async function () {
+                    for (let userCount = 0; userCount <= constants.resultsPerPage; userCount++) {
+                        console.log('Generating user ' + userCount);
+                        const thisRes = await agent.post('/register/').send({ userName: userCount + newUserName, email: userCount + newEmail, password: newPassword });
+                        shouldSendEmail();
+                        expect(thisRes).to.have.status(201);
+                    }
+                })
+
+                after('Teardown users to test pagination', async function () {
+                    for (let userCount = 0; userCount <= constants.resultsPerPage; userCount++) {
+                        console.log('Deleting user ' + userCount);
+                        await User.findOneAndDelete({ userName: userCount + newUserName });
+                    }
+                })
+
                 it('should return a 200 OK and an array of users.publicInfo() corresponding to page 2 of the results', async function () {
                     const res = await agent.get('/user').query({ page: 2 });
 
@@ -580,8 +596,10 @@ describe('Test the user handling routes', function () {
         let followedUserId;
 
         before('Setup userId for testing /user/:userId/follow route', async function () {
-            const user = await User.findOne({ userName: 0 + newUserName });
-            followedUserId = user._id;
+            const userRes = await agent.post('/register').send({ userName: 'followed-' + newUserName, email: 'followed-' + newEmail, password: newPassword });
+            shouldSendEmail();
+            expect(userRes).to.have.status(201)
+            followedUserId = userRes.body.userId;
         });
 
         beforeEach('Setup follow for testing /user/:userId/follow route', async function () {

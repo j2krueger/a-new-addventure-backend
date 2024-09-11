@@ -595,7 +595,7 @@ paths:
           name: i
           schema:
             type: string
-          description: "If set to a non-empty value, regex match is done case insensitively. Ignored if regex is not set."
+          description: "If set to a non-empty value other than 'false' (case insensitive), regex match is done case insensitively. Ignored if regex is not set."
         - in: query
           name: page
           schema:

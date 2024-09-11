@@ -67,8 +67,8 @@ async function getChapterList(req, res) {
     L: ['likes', -1],
     D: ['createDate', -1],
   }
-  const { page, storiesOnlyString, search, } = req.query;
-  const storiesOnly = storiesOnlyString && !/^false$/i.test(storiesOnlyString)?true: false;
+  const { page, storiesOnly, search, } = req.query;
+  const storiesOnlyBoolean = storiesOnly && !/^false$/i.test(storiesOnly) ? true : false;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
 
   // Validate and separate tokens
@@ -102,10 +102,9 @@ async function getChapterList(req, res) {
   }
   sortQuery._id = -1; // make sure the sort order is completely unambiguous so it plays well with pagination
 
-
   // Construct the search query
   const termArray = [];
-  const searchQuery = storiesOnly ? { previousChapter: null } : {};
+  const searchQuery = storiesOnlyBoolean ? { previousChapter: null } : {};
   for (const searchTerm of searchList) {
     const groups = searchRE.exec(searchTerm).groups;
     const fields = groups.fields ?? "scabK";

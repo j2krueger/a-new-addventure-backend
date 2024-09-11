@@ -1,8 +1,8 @@
 "use strict";
 
-const { ObjectId } = require('mongodb');
-const mongoose = require('mongoose');
 const constants = require('../helpers/constants');
+const { ObjectId } = require('mongodb');
+const { mongoose } = constants;
 const { Schema } = mongoose;
 
 const chapterSchema = new Schema({
@@ -96,17 +96,32 @@ chapterSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(i
 }
 
 chapterSchema.statics.findAndPopulate = async function findAndPopulate(chapterQuery, sortQuery, skip, limit, userId) {
-    const result = await Chapter.find(chapterQuery, null, {
-        collation: { locale: 'en' },
-        sort: sortQuery,
-        skip: skip,
-        limit: limit,
-    })
-        .populate('likes')
-        .populate({
-            path: 'authorId',
-            transform: auth => auth._id,
-        });
+    const aggregate = await Chapter.aggregate([
+        { $match: chapterQuery },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "chapter",
+                as: "likes"
+            }
+        },
+        { $set: { likes: { $size: "$likes" } } },
+        { $sort: sortQuery },
+        { $skip: skip },
+        { $limit: limit },
+    ], { collation: { locale: 'en' } });
+    const result = await Promise.all(
+        aggregate.map((chapter) => {
+            return Chapter.findById(chapter._id)
+                .populate('likes')
+                .populate({
+                    path: 'authorId',
+                    transform: auth => auth._id,
+                });
+        })
+    );
+
     await Promise.all(result.map(chapter => chapter.setLikedByUser(userId)));
     await Promise.all(result.map(chapter => chapter.setBookmarkedByUser(userId)));
     return result;

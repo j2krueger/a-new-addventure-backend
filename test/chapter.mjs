@@ -87,14 +87,14 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string {storiesOnly: true}', function () {
+                describe('GET /chapter + { search: testString, storiesOnly: true }', function () {
                     it('should return a 200 status and a list of stories', async function () {
                         await agent.post('/logout');
 
-                        const res = await agent.get('/chapter').query({ storiesOnly: true });
+                        const res = await agent.get('/chapter').query({ search: testString, storiesOnly: true });
 
                         expect(res).to.have.status(200);
-                        expect(res.body).to.be.an('array').with.lengthOf.at.most(constants.resultsPerPage);
+                        expect(res.body).to.be.an('array').with.lengthOf(Math.min(constants.resultsPerPage, 2));
                         for (const chapter of res.body) {
                             expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
                             expectMongoObjectId(chapter.storyId);
@@ -108,7 +108,25 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "a:Freddy" } ', function () {
+                describe('GET /chapter + { search: testString, storiesOnly: false }', function () {
+                    it('should return a 200 status and a list of stories', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.get('/chapter').query({ search: testString, storiesOnly: false });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf(Math.min(constants.resultsPerPage, 5));
+                        for (const chapter of res.body) {
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
+                            expectMongoObjectId(chapter.storyId);
+                            expectMongoObjectId(chapter.chapterId);
+                            expect(chapter.storyTitle).to.be.a('string');
+                            expect(chapter.authorName).to.be.a('string');
+                        }
+                    });
+                });
+
+                describe('GET /chapter + { search: "a:Freddy" } ', function () {
                     it('should return a 200 OK list of chapters with authorName matching "Freddy"', async function () {
                         await agent.post('/logout');
 
@@ -131,7 +149,7 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "c:dd"} ', function () {
+                describe('GET /chapter + { search: "c:dd"} ', function () {
                     it('should return a 200 OK list of chapters with chapterTitle matching "dd"', async function () {
                         await agent.post('/logout');
 
@@ -150,7 +168,7 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "s:beginning" } ', function () {
+                describe('GET /chapter + { search: "s:beginning" } ', function () {
                     it('should return a 200 OK list of chapters with storyTitle matching "beginning"', async function () {
                         await agent.post('/logout');
 
@@ -173,7 +191,7 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "ac:dd" } ', function () {
+                describe('GET /chapter + { search: "ac:dd" } ', function () {
                     it('should return a 200 OK list of chapters with authorName OR chapter title matching "dd"', async function () {
                         await agent.post('/logout');
 
@@ -197,8 +215,60 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "o:a" }', function () {
-                    it('should return a 200 OK list of chapters sorted in increasing order by author', async function () {
+                describe('GET /chapter + { search: testString + " o:l" }', function () {
+                    it('should return a 200 status and a list of chapters sorted in increasing order by likes', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.get('/chapter').query({ search: testString + " o:l" });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf(Math.min(constants.resultsPerPage, 5));
+                        let previous = res.body[0].likes;
+                        for (const chapter of res.body) {
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
+                            expectMongoObjectId(chapter.storyId);
+                            expectMongoObjectId(chapter.chapterId);
+                            expect(chapter.storyTitle).to.be.a('string');
+                            if (chapter.storyId == chapter.chapterId) {
+                                expect(chapter.chapterTitle).to.be.null;
+                            } else {
+                                expect(chapter.chapterTitle).to.be.a('string');
+                            }
+                            expect(chapter.likes).to.be.a('number');
+                            expect(previous <= chapter.likes).to.be.true;
+                            previous = chapter.likes;
+                        }
+                    });
+                });
+
+                describe('GET /chapter + { search: testString + " o:L" }', function () {
+                    it('should return a 200 status and a list of chapters sorted in decreasing order by likes', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.get('/chapter').query({ search: testString + " o:L" });
+
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('array').with.lengthOf(Math.min(constants.resultsPerPage, 5));
+                        let previous = res.body[0].likes;
+                        for (const chapter of res.body) {
+                            expect(chapter).to.have.all.keys(...loggedOutSummaryKeys);
+                            expectMongoObjectId(chapter.storyId);
+                            expectMongoObjectId(chapter.chapterId);
+                            expect(chapter.storyTitle).to.be.a('string');
+                            if (chapter.storyId == chapter.chapterId) {
+                                expect(chapter.chapterTitle).to.be.null;
+                            } else {
+                                expect(chapter.chapterTitle).to.be.a('string');
+                            }
+                            expect(chapter.likes).to.be.a('number');
+                            expect(previous >= chapter.likes).to.be.true;
+                            previous = chapter.likes;
+                        }
+                    });
+                });
+
+                describe('GET /chapter + { search: "o:a" }', function () {
+                    it('should return a 200 OK and a list of chapters sorted in increasing order by author', async function () {
                         await agent.post('/logout');
 
                         const res = await agent.get('/chapter').query({ search: "o:a" });
@@ -223,7 +293,7 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "o:A" }', function () {
+                describe('GET /chapter + { search: "o:A" }', function () {
                     it('should return a 200 OK list of chapters sorted in decreasing order by author', async function () {
                         await agent.post('/logout');
 
@@ -249,7 +319,7 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "o:c" }', function () {
+                describe('GET /chapter + { search: "o:c" }', function () {
                     it('should return a 200 OK list of chapters sorted in increasing order by chapterTitle', async function () {
                         await agent.post('/logout');
 
@@ -274,7 +344,7 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "o:C" }', function () {
+                describe('GET /chapter + { search: "o:C" }', function () {
                     it('should return a 200 OK list of chapters sorted in increasing order by chapterTitle', async function () {
                         await agent.post('/logout');
 
@@ -299,7 +369,7 @@ describe('Test the chapter handling routes', function () {
                     });
                 });
 
-                describe('GET /chapter with search query string { search: "o:sC" }', function () {
+                describe('GET /chapter + { search: "o:sC" }', function () {
                     it('should return a 200 OK list of chapters sorted in increasing order by chapterTitle', async function () {
                         await agent.post('/logout');
 
@@ -330,7 +400,7 @@ describe('Test the chapter handling routes', function () {
             });
 
             describe('Sad paths', function () {
-                describe('GET /chapter with search query string { search: "o:x" }', function () {
+                describe('GET /chapter + { search: "o:x" }', function () {
                     it('should return a 400 status and an error message.', async function () {
                         const res = await agent.get('/chapter').query({ search: "o:x" });
 
@@ -339,7 +409,7 @@ describe('Test the chapter handling routes', function () {
                     });;
                 });
 
-                describe('GET /chapter with search query string { search: "o:aca" }', function () {
+                describe('GET /chapter + { search: "o:aca" }', function () {
                     it('should return a 400 status and an error message.', async function () {
                         const res = await agent.get('/chapter').query({ search: "o:aca" });
 
@@ -348,7 +418,7 @@ describe('Test the chapter handling routes', function () {
                     });;
                 });
 
-                describe('GET /chapter with search query string { search: "o:acA" }', function () {
+                describe('GET /chapter + { search: "o:acA" }', function () {
                     it('should return a 400 status and an error message.', async function () {
                         const res = await agent.get('/chapter').query({ search: "o:acA" });
 
@@ -357,7 +427,7 @@ describe('Test the chapter handling routes', function () {
                     });;
                 });
 
-                describe('GET /chapter with search query string { search: "w:Freddy" }', function () {
+                describe('GET /chapter + { search: "w:Freddy" }', function () {
                     it('should return a 400 status and an error message.', async function () {
                         const res = await agent.get('/chapter').query({ search: "w:Freddy" });
 
@@ -366,7 +436,7 @@ describe('Test the chapter handling routes', function () {
                     });;
                 });
 
-                describe('GET /chapter with search query string { search: "aca:Freddy" }', function () {
+                describe('GET /chapter + { search: "aca:Freddy" }', function () {
                     it('should return a 400 status and an error message.', async function () {
                         const res = await agent.get('/chapter').query({ search: "aca:Freddy" });
 

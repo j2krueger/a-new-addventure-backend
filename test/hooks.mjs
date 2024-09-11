@@ -79,15 +79,12 @@ export const mochaHooks = {
         const story2Res = await agent.post('/chapter').send(testStory2);
         expect(story2Res).to.have.status(201);
 
-        for (let userCount = 0; userCount <= constants.resultsPerPage; userCount++) {
-            console.log('Generating user ' + userCount);
-            const thisRes = await agent.post('/register/').send({ userName: userCount + newUserName, email: userCount + newEmail, password: newPassword });
-            shouldSendEmail();
-            expect(thisRes).to.have.status(201);
-        }
-
         const reUser = await agent.get('/profile');
         populateUserInfo(reUser.body);
+
+        await agent.post('/login').send(globals.adminLogin);
+        const likeRes = await agent.post('/chapter/' + chapter1aRes.body.chapterId + '/like');
+        expect(likeRes).to.have.status(200);
     },
 
     async afterAll() {

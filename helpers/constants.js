@@ -12,6 +12,8 @@ const oneWeekInMilliseconds = 7 * oneDayInMilliseconds;
 const oneMonthInMilliseconds = 30 * oneDayInMilliseconds;
 const oneYearInMilliseconds = 365 * oneDayInMilliseconds;
 
+const mongoose = require('mongoose');
+
 module.exports = {
     // Useful lengths of time
     oneSecondInMilliseconds,
@@ -21,6 +23,8 @@ module.exports = {
     oneWeekInMilliseconds,
     oneMonthInMilliseconds,
     oneYearInMilliseconds,
+
+    mongoose: mongoose,
 
     // Standardise these across the application
     loginExpirationTime: oneWeekInMilliseconds,

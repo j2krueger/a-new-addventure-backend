@@ -1,8 +1,8 @@
 "use strict";
 
-const mongoose = require('mongoose')
-const { Schema } = mongoose
 const constants = require('../helpers/constants');
+const { mongoose } = constants;
+const { Schema } = mongoose;
 const { randomBytes } = require('crypto');
 const { sendVerificationEmailHelper } = require('../helpers/mail');
 

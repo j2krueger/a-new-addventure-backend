@@ -1,7 +1,8 @@
 "use strict";
 
+const constants = require('../helpers/constants');
 const { ObjectId } = require('mongodb');
-const mongoose = require('mongoose');
+const { mongoose } = constants;
 const { Schema } = mongoose;
 const User = require('./user');
 const Chapter = require('./chapter');

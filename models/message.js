@@ -1,8 +1,8 @@
 "use strict";
 
-// const { ObjectId } = require('mongodb');
-const mongoose = require('mongoose')
-const { Schema } = mongoose
+const constants = require('../helpers/constants');
+const { mongoose } = constants;
+const { Schema } = mongoose;
 
 const messageSchema = new Schema({
     name: {

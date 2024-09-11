@@ -1,7 +1,5 @@
 "use strict";
 
-// const process = require('process');
-// require("dotenv").config();
 const constants = require('./helpers/constants')
 const express = require("express");
 const session = require('express-session');
@@ -19,7 +17,7 @@ if (constants.testing) {
     console.log('\n   constants: ', constants);
 }
 
-const mongoose = require("mongoose");
+const { mongoose } = constants;
 const morgan = require('morgan');
 const { escapeHTML } = require('./helpers/validation');
 
