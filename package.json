@@ -4,7 +4,7 @@
   "description": "A collaborative fiction website.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -b --timeout 120000 --require ./test/hooks.mjs",
+    "test": "mocha -b --timeout 120000 --require ./test/hooks.mjs && jplay ~/Alarms/success-1.mp3 || jplay ~/Alarms/sad-trombone.mp3",
     "start": "node index.js",
     "lint": "./node_modules/.bin/eslint *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",
     "finddebug": "! grep Debug -H -n *.js controllers/*.js helpers/*.js models/*.js routes/*.js test/*.*js",

@@ -67,7 +67,8 @@ async function getChapterList(req, res) {
     L: ['likes', -1],
     D: ['createDate', -1],
   }
-  const { page, storiesOnly, search, } = req.query;
+  const { page, storiesOnlyString, search, } = req.query;
+  const storiesOnly = storiesOnlyString && !/^false$/i.test(storiesOnlyString)?true: false;
   const zPage = Number.isSafeInteger(page) && page > 0 ? page - 1 : 0;
 
   // Validate and separate tokens
