@@ -527,7 +527,7 @@ describe('Test the user handling routes', function () {
                 it('should return a 409 status and an error message', async function () {
                     await agent.post('/login').send(testUserLogin);
 
-                    const res = await agent.put('/profile').send({ email: constants.testEmailAddress });
+                    const res = await agent.put('/profile').send({ email: newEmail });
 
                     expect(res).to.have.status(409);
                     expect(res.body).to.deep.equal({ error: "Invalid request: That email is already in use." });

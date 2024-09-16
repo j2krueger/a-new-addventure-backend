@@ -43,11 +43,10 @@ async function sendVerificationEmailHelper(user) {
         subject: "Email Verification from QuiltedChronicles.org",
         html,
     }).then((info) => {
-        console.log(`${Date.now()}: Success! ${info}`);
+        console.log(`${Date.now()}: Success! ${JSON.stringify(info)}`);
     }).catch((error) => {
-        console.log(`${Date.now()}: Oops! transporter.sendMail failed in sendVerificationEmailHelper: ${error}.`);
+        console.log(`${Date.now()}: Oops! transporter.sendMail failed in sendVerificationEmailHelper: ${JSON.stringify(error)}.`);
     });
-    console.log('\n   Debug: ', 'Here!');
 }
 
 async function sendResetPasswordEmailHelper(user) {
@@ -64,11 +63,10 @@ async function sendResetPasswordEmailHelper(user) {
         subject: "Password Reset from QuiltedChronicles.org",
         html,
     }).then((info) => {
-        console.log(`${Date.now()}: Success! ${info}`);
+        console.log(`${Date.now()}: Success! ${JSON.stringify(info)}`);
     }).catch((error) => {
-        console.log(`${Date.now()}: Oops! transporter.sendMail failed in sendVerificationEmailHelper: ${error}.`);
+        console.log(`${Date.now()}: Oops! transporter.sendMail failed in sendVerificationEmailHelper: ${JSON.stringify(error)}.`);
     });
-    console.log('\n   Debug: ', 'Here!');
 }
 
 module.exports = {
