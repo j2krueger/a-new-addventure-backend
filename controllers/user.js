@@ -88,6 +88,7 @@ async function sendVerificationEmail(req, res, next) {
 }
 
 async function verifyEmail(req, res, next) {
+    console.log('\n   Debug: ', 'entering verifyEmail');
     try {
         if (req.paramUser.emailVerified) {
             return res.status(409).json({ error: "Email already verified." });
@@ -254,6 +255,7 @@ async function getProfile(req, res) {
 }
 
 async function putProfile(req, res, next) {
+    console.log('\n   Debug: ', 'entering putProfile');
     try {
         const result = await req.authenticatedUser.applySettings(req.body);
         req.session.user = result;
