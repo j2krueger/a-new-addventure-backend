@@ -2,7 +2,7 @@
 
 const constants = require('../helpers/constants');
 const bcrypt = require('bcrypt');
-const { saltRounds } = constants;
+const { minimumPasswordLength, maximumUserNameLength, saltRounds } = constants;
 const { randomBytes } = require('crypto');
 const { sendResetPasswordEmailHelper } = require('../helpers/mail');
 const User = require('../models/user');
@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 
 async function paramUserId(req, res, next, value) {
     if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
-        return res.status(400).json({ error: "That is not a properly formatted userId." })
+        return res.status(400).json({ error: "That is not a properly formatted userId." });
     }
     try {
         const result = await User.findByIdAndPopulate(value);
@@ -19,7 +19,7 @@ async function paramUserId(req, res, next, value) {
             return res.status(404).json({ error: "There is no user with that userId." });
         }
         req.paramUser = result;
-        return next()
+        return next();
     } catch (error) {
         return next(error);
     }
@@ -45,11 +45,16 @@ async function registerUser(req, res) {
     if (!req.body?.password) {
         return res.status(400).json({ error: "Missing password." });
     }
+    if (req.body.password.length < minimumPasswordLength) {
+        return res.status(400).json({ error: 'Password must be at least ' + minimumPasswordLength + ' characters long.' });
+    }
     const userName = req.body?.userName;
     const email = req.body?.email;
     const passwordHash = await bcrypt.hash(req.body?.password, saltRounds);
     if (!userName) {
         res.status(400).json({ error: "Missing userName." });
+    } else if (userName.length > maximumUserNameLength) {
+        res.status(400).json({ error: "Username may not be longer than " + maximumUserNameLength + " characters." });
     } else if (!email) {
         res.status(400).json({ error: "Missing email." });
     } else if ((await User.find({ userName: userName })).length) {
@@ -108,6 +113,9 @@ async function changePassword(req, res, next) {
         if (!newPassword) {
             return res.status(400).json({ error: "Missing newPassword." });
         }
+        if (newPassword.length < minimumPasswordLength) {
+            return res.status(400).json({ error: 'Password must be at least ' + minimumPasswordLength + ' characters long.' });
+        }
         if (!await bcrypt.compare(password, req.authenticatedUser.passwordHash)) {
             return res.status(403).json({ error: "Incorrect password." });
         }
@@ -147,6 +155,9 @@ async function resetPassword(req, res, next) {
         const { password } = req.body;
         if (typeof password != "string") {
             return res.status(400).json({ error: "Password must be a string." });
+        }
+        if (password.length < minimumPasswordLength) {
+            return res.status(400).json({ error: 'Password must be at least ' + minimumPasswordLength + ' characters long.' });
         }
         if (!req.paramUser.resetPasswordKey) {
             return res.status(403).json({ error: "No resetPasswordKey set for that user." });
@@ -202,7 +213,7 @@ async function loginUser(req, res, next) {
                     const fullUser = await User.findByIdAndPopulate(user._id);
                     return res.status(200).json(fullUser.privateProfile());
                 });
-            })
+            });
         }
     }
 }
@@ -211,7 +222,7 @@ function logoutUser(req, res, next) {
     req.session.destroy(function (error) {
         if (error) return next(error);
         res.status(200).json({ message: "Logout successful." });
-    })
+    });
 }
 
 async function getUser(req, res) {
@@ -229,13 +240,13 @@ async function getUser(req, res) {
     if (result.length) {
         return res.status(200).json(result);
     } else {
-        return res.status(404).json({ error: "No matching users found." })
+        return res.status(404).json({ error: "No matching users found." });
     }
 
 }
 
 async function getUserInfoById(req, res) {
-    return res.status(200).json(await req.paramUser.publicInfo())
+    return res.status(200).json(await req.paramUser.publicInfo());
 }
 
 async function getProfile(req, res) {
@@ -270,7 +281,7 @@ async function followUser(req, res, next) {
         await newFollow.save();
         return res.status(200).json({ message: "Follow successful." });
     } catch (error) {
-        return next(error)
+        return next(error);
     }
 }
 
@@ -310,7 +321,7 @@ async function unlockUser(req, res, next) {
         }
         user.locked = false;
         await user.save();
-        return res.status(200).json({ message: "User successfully unlocked." })
+        return res.status(200).json({ message: "User successfully unlocked." });
     } catch (error) {
         return next(error);
     }

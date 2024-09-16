@@ -4,7 +4,7 @@ const User = require('../models/user.js');
 
 async function userAuth(req, res, next) {
     if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
-        return next()
+        return next();
     }
     if (req?.session?.user?._id) {
         const user = await User.findByIdAndPopulate(req.session.user._id);
@@ -18,7 +18,7 @@ async function userAuth(req, res, next) {
 
 async function unlockedUserAuth(req, res, next) {
     if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
-        return next()
+        return next();
     }
     if (req?.session?.user?._id) {
         const user = await User.findByIdAndPopulate(req.session.user._id);
@@ -32,7 +32,7 @@ async function unlockedUserAuth(req, res, next) {
 
 async function chapterAuthorAuth(req, res, next) {
     if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
-        return next()
+        return next();
     }
     if (req?.session?.user?._id) {
         const user = await User.findByIdAndPopulate(req.session.user._id);
@@ -46,7 +46,7 @@ async function chapterAuthorAuth(req, res, next) {
 
 async function modAuth(req, res, next) {
     if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
-        return next()
+        return next();
     }
     if (req?.session?.user?._id) {
         const user = await User.findByIdAndPopulate(req.session.user._id);
@@ -60,7 +60,7 @@ async function modAuth(req, res, next) {
 
 async function adminAuth(req, res, next) {
     if (req.authenticatedUser) { // We've already done this on this request, no need to hit the database again
-        return next()
+        return next();
     }
     if (req?.session?.user?._id) {
         const user = await User.findByIdAndPopulate(req.session.user._id);

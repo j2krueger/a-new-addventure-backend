@@ -42,6 +42,8 @@ const {
     // deepCopy,
 } = globals;
 
+let likedChapterId;
+
 export const mochaHooks = {
     async beforeAll() {
         console.time('Total testing time');
@@ -49,7 +51,7 @@ export const mochaHooks = {
             mongoose.connect(constants.databaseURI, { dbName: constants.dbName });
             console.log('Database Connected');
         } catch (error) {
-            console.log("Database not conected: ", error)
+            console.log("Database not conected: ", error);
         }
         const userRes = await agent.post('/register').send({ userName: newUserName, email: newEmail, password: newPassword });
         shouldSendEmail();
@@ -83,7 +85,8 @@ export const mochaHooks = {
         populateUserInfo(reUser.body);
 
         await agent.post('/login').send(globals.adminLogin);
-        const likeRes = await agent.post('/chapter/' + chapter1aRes.body.chapterId + '/like');
+        likedChapterId = chapter1aRes.body.chapterId;
+        const likeRes = await agent.post('/chapter/' + likedChapterId + '/like');
         expect(likeRes).to.have.status(200);
     },
 
@@ -96,6 +99,7 @@ export const mochaHooks = {
         await Message.deleteMany({ messageText: { $regex: testString } });
         await Follow.deleteMany({ follower: newUserBasicInfo().userId });
         await Like.deleteMany({ user: newUserBasicInfo().userId });
+        await Like.deleteOne({ chapter: likedChapterId });
         await Flag.deleteMany({ reason: { $regex: testString } });
         mongoose.disconnect();
         console.timeEnd('Total testing time');

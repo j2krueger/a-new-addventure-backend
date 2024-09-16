@@ -48,20 +48,20 @@ chapterSchema.virtual('authorId', {
     localField: 'authorName',
     foreignField: 'userName',
     justOne: true,
-})
+});
 
 chapterSchema.virtual('continuationChapters', {
     ref: 'Chapter',
     localField: '_id',
     foreignField: 'previousChapter',
-})
+});
 
 chapterSchema.virtual('likes', {
     ref: 'Like',
     localField: '_id',
     foreignField: 'chapter',
     count: true,
-})
+});
 
 chapterSchema.methods.setLikedByUser = async function setLikedByUser(userId) {
     if (userId) {

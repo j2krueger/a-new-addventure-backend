@@ -34,6 +34,6 @@ followSchema.statics.getFollowedAuthors = async function getFollowedAuthors(foll
 }
 
 
-const Follow = mongoose.model("Follow", followSchema)
+const Follow = mongoose.model("Follow", followSchema);
 
 module.exports = Follow

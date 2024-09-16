@@ -47,6 +47,6 @@ messageSchema.methods.applySettings = async function applySettings(settings) {
     return (await this.save());
 }
 
-const Message = mongoose.model("Message", messageSchema)
+const Message = mongoose.model("Message", messageSchema);
 
 module.exports = Message

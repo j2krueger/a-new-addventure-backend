@@ -391,7 +391,7 @@ describe('Test the chapter handling routes', function () {
                             if (previous.storyTitle.toLowerCase() == chapter.storyTitle.toLowerCase()) {
                                 expect(chapter.chapterTitle == null || previous.chapterTitle.toLowerCase() >= chapter.chapterTitle.toLowerCase()).to.be.true;
                             } else {
-                                expect(previous.storyTitle.toLowerCase() < chapter.storyTitle.toLowerCase())
+                                expect(previous.storyTitle.toLowerCase() < chapter.storyTitle.toLowerCase());
                             }
                             previous = chapter;
                         }
@@ -405,7 +405,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.get('/chapter').query({ search: "o:x" });
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." });
                     });;
                 });
 
@@ -414,7 +414,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.get('/chapter').query({ search: "o:aca" });
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." });
                     });;
                 });
 
@@ -423,7 +423,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.get('/chapter').query({ search: "o:acA" });
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." });
                     });;
                 });
 
@@ -432,7 +432,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.get('/chapter').query({ search: "w:Freddy" });
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." });
                     });;
                 });
 
@@ -441,7 +441,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.get('/chapter').query({ search: "aca:Freddy" });
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Misformed query string." })
+                        expect(res.body).to.deep.equal({ error: "Misformed query string." });
                     });;
                 });
             });
@@ -498,7 +498,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res.body.chapterId).to.deep.equal(storyRes.body.chapterId);
                         expect(res.body.authorName).to.deep.equal(testUserLogin.name);
                         expectMongoObjectId(res.body.authorId);
-                        expect(res.body.authorId).to.deep.equal(userRes.body.userId)
+                        expect(res.body.authorId).to.deep.equal(userRes.body.userId);
                         expect(res.body.chapterTitle).to.be.null;
                         expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
                         expect(res.body.bodyText).to.deep.equal(testStory.bodyText);
@@ -525,7 +525,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res.body.chapterId).to.deep.equal(chapterRes.body.chapterId);
                         expect(res.body.authorName).to.deep.equal(testUserLogin.name);
                         expectMongoObjectId(res.body.authorId);
-                        expect(res.body.authorId).to.deep.equal(userRes.body.userId)
+                        expect(res.body.authorId).to.deep.equal(userRes.body.userId);
                         expect(res.body.chapterTitle).to.deep.equal(testChapter.chapterTitle);
                         expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
                         expect(res.body.bodyText).to.deep.equal(testChapter.bodyText);
@@ -652,7 +652,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.post('/chapter').send({ storyTitle: "Deterministic story title" });
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Missing story text." })
+                        expect(res.body).to.deep.equal({ error: "Missing story text." });
                     });
                 });
 
@@ -676,7 +676,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.post('/chapter').send(testStoryBadKeywords);
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." })
+                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
 
                         await Chapter.findByIdAndDelete(res.body.chapterId);
                     });
@@ -691,7 +691,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.post('/chapter').send(testStoryBadKeywords);
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." })
+                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
 
                         await Chapter.findByIdAndDelete(res.body.chapterId);
                     });
@@ -706,7 +706,7 @@ describe('Test the chapter handling routes', function () {
                         const res = await agent.post('/chapter').send(testStoryBadKeywords);
 
                         expect(res).to.have.status(400);
-                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." })
+                        expect(res.body).to.deep.equal({ error: "Request body must be an array of strings." });
 
                         await Chapter.findByIdAndDelete(res.body.chapterId);
                     });
@@ -937,7 +937,7 @@ describe('Test the chapter handling routes', function () {
                         expect(chapterIdRes.body.likes).to.deep.equal(1);
                         expect(chapterIdRes.body.likedByUser).to.be.true;
 
-                        const likeIdRes = await Like.findOne({ user: loginRes.body.userId, chapter: storyRes.body.chapterId })
+                        const likeIdRes = await Like.findOne({ user: loginRes.body.userId, chapter: storyRes.body.chapterId });
                         await Like.findByIdAndDelete(likeIdRes._id);
                         await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                     });
@@ -955,7 +955,7 @@ describe('Test the chapter handling routes', function () {
                         expect(chapterIdRes.body).to.be.an('array').with.lengthOf(1);
                         expect(chapterIdRes.body[0].likedByUser).to.be.true;
 
-                        const likeIdRes = await Like.findOne({ user: loginRes.body.userId, chapter: storyRes.body.chapterId })
+                        const likeIdRes = await Like.findOne({ user: loginRes.body.userId, chapter: storyRes.body.chapterId });
                         await Like.findByIdAndDelete(likeIdRes._id);
                         await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                     });
@@ -1213,7 +1213,7 @@ describe('Test the chapter handling routes', function () {
                         expect(bookmark).to.not.be.null;
 
                         await Bookmark.findByIdAndDelete(bookmark._id);
-                        await Chapter.findByIdAndDelete(storyRes.body.chapterId)
+                        await Chapter.findByIdAndDelete(storyRes.body.chapterId);
                     });
 
                 });
@@ -1390,13 +1390,13 @@ describe('Test the chapter handling routes', function () {
             chapterId2 = storyRes2.body.chapterId;
             const storyRes3 = await agent.post('/chapter/' + chapterId2).send(testChapter);
             chapterId3 = storyRes3.body.chapterId;
-        })
+        });
 
         after('Tear down chain', async function () {
             await Chapter.findByIdAndDelete(chapterId3);
             await Chapter.findByIdAndDelete(chapterId2);
             await Chapter.findByIdAndDelete(chapterId1);
-        })
+        });
 
         describe('Happy paths', function () {
             describe('Logout and get a chain of length 1', function () {

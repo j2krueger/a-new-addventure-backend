@@ -12,7 +12,7 @@ const {
 
 async function paramChapterId(req, res, next, value) {
   if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
-    return res.status(400).json({ error: "That is not a properly formatted chapterId." })
+    return res.status(400).json({ error: "That is not a properly formatted chapterId." });
   }
   const chapterId = value;
   try {
@@ -48,7 +48,7 @@ async function paramFlagId(req, res, next, value) {
 
 async function paramKeyword(req, res, next, value) {
   if (!isValidKeyword(value)) {
-    return res.status(400).json({ error: "That is not a valid keyword." })
+    return res.status(400).json({ error: "That is not a valid keyword." });
   }
   req.paramKeyword = value;
   return next();
@@ -320,7 +320,7 @@ async function bookmarkChapter(req, res, next) {
     const bookmarkQuery = { user: req.authenticatedUser._id, chapter: req.paramChapter._id };
     const duplicateBookmark = await Bookmark.findOne(bookmarkQuery);
     if (duplicateBookmark) {
-      return res.status(409).json({ error: "You have already liked that bookmark." })
+      return res.status(409).json({ error: "You have already liked that bookmark." });
     }
     const bookmark = new Bookmark(bookmarkQuery);
     await bookmark.save();
@@ -365,7 +365,7 @@ async function getKeywordList(req, res, next) {
       { $limit: 100 },
     ].filter(stage => stage != undefined && stage != null));
     if (result.length == 0) {
-      return res.status(404).json({ error: "No matching keywords found." })
+      return res.status(404).json({ error: "No matching keywords found." });
     }
     return res.status(200).json(result.map(x => { return { keyword: x._id, count: x.count } }));
   } catch (error) {

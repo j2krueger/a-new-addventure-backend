@@ -34,6 +34,7 @@ const {
     // populateUserInfo,
     expectMongoObjectId,
 } = globals;
+const { minimumPasswordLength, maximumUserNameLength } = constants;
 
 
 describe('Test the user handling routes', function () {
@@ -66,9 +67,9 @@ describe('Test the user handling routes', function () {
                     const res = await agent.post('/register').send({ userName: newUserName, email: 'notAdupe@example.com', password: "notAsecret" });
 
                     expect(res).to.have.status(409);
-                    expect(res.body).to.deep.equal({ error: "Username already in use." })
-                })
-            })
+                    expect(res.body).to.deep.equal({ error: "Username already in use." });
+                });
+            });
 
             describe('Register a user with a duplicate email', function () {
                 it('should return a 409 conflict status code', async function () {
@@ -76,17 +77,35 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(409);
                     expect(res.body).to.deep.equal({ error: "Email already in use." });
-                })
-            })
+                });
+            });
 
             describe('Register a user with no userName', function () {
-                it('should return a 400 bad request status code', async function () {
+                it('should return a 400 status and an error message', async function () {
                     const res = await agent.post('/register').send({ email: 'notAdupe@example.com', password: "notAsecret" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Missing userName." });
-                })
-            })
+                });
+            });
+
+            describe('register a user with an empty userName', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const res = await agent.post('/register').send({ userName: "", email: 'notAdupe@example.com', password: "notAsecret" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Missing userName." });
+                });
+            });
+
+            describe('register a user with a userName longer than maximumUserNameLength', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const res = await agent.post('/register').send({ userName: newUserName + 'x'.repeat(maximumUserNameLength + 1 - newUserName.length), email: 'notAdupe@example.com', password: "notAsecret" });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: "Username may not be longer than " + maximumUserNameLength + " characters." });
+                });
+            });
 
             describe('Register a user with no email', function () {
                 it('should return a 400 bad request status code', async function () {
@@ -94,17 +113,30 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Missing email." });
-                })
-            })
+                });
+            });
 
             describe('Register a user with no password', function () {
-                it('should return a 400 bad request status code', async function () {
+                it('should return a 400 status and an error message', async function () {
                     const res = await agent.post('/register').send({ userName: 'notAdupe', email: "notAdupe@example.com" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Missing password." });
-                })
-            })
+                });
+            });
+
+            describe('Register a user with a password shorter than minimumPasswordLength characters', function () {
+                it('should return a 400 status and an error message', async function () {
+                    const res = await agent.post('/register').send({
+                        userName: 'notAdupe' + testString,
+                        email: 'notAdupe' + testString + '@example.com',
+                        password: 'x'.repeat(minimumPasswordLength - 1),
+                    });
+
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.deep.equal({ error: 'Password must be at least ' + minimumPasswordLength + ' characters long.' });
+                });
+            });
         });
     });
 
@@ -112,7 +144,7 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('Register user and logout and POST /verify/:userId/:emailVerificationKey', function () {
                 it('should return a 200 status and a success message, and set user\'s emailVerified field to true', async function () {
-                    const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
                     shouldSendEmail();
                     await agent.post('/logout');
 
@@ -133,7 +165,7 @@ describe('Test the user handling routes', function () {
         describe('Sad paths', function () {
             describe('POST /verify/:userId/:emailVerificationKey with the wrong key', function () {
                 it('should return a 403 status and an error message, and not set emailVerified to true', async function () {
-                    const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
                     shouldSendEmail();
                     await agent.post('/logout');
 
@@ -151,7 +183,7 @@ describe('Test the user handling routes', function () {
 
             describe('POST /verify/:userId/:emailVerificationKey with misformed key', function () {
                 it('should return a 400 status and an error message, and not set emailVerified to true', async function () {
-                    const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
                     shouldSendEmail();
                     await agent.post('/logout');
 
@@ -169,7 +201,7 @@ describe('Test the user handling routes', function () {
 
             describe('POST /verify/:userId/:emailVerificationKey with user whose email has already been verified', function () {
                 it('should return a 409 status and an error message', async function () {
-                    const userRes = await agent.post('/register').send({ userName: "verifyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
                     shouldSendEmail();
                     await agent.post('/logout');
 
@@ -198,8 +230,8 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.cookie('connect.sid');
                     expect(res).to.have.cookie('token');
                     expect(res.body).to.deep.equal(newUserPrivateProfile());
-                })
-            })
+                });
+            });
 
             describe('login by email', function () {
                 it('should return a 200 ok and return a user.privateProfile() with the given email', async function () {
@@ -209,8 +241,8 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.cookie('connect.sid');
                     expect(res).to.have.cookie('token');
                     expect(res.body).to.deep.equal(newUserPrivateProfile());
-                })
-            })
+                });
+            });
         });
 
         describe('Sad paths', function () {
@@ -220,8 +252,8 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(401);
                     expect(res.body).to.deep.equal({ error: "Incorrect name or password." });
-                })
-            })
+                });
+            });
 
             describe('login with bad password', function () {
                 it('should return a 401 unauthorized and an error message', async function () {
@@ -229,8 +261,8 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(401);
                     expect(res.body).to.deep.equal({ error: "Incorrect name or password." });
-                })
-            })
+                });
+            });
 
             describe('login with missing name', function () {
                 it('should return a 400 bad request and an error message', async function () {
@@ -238,8 +270,8 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Missing name." });
-                })
-            })
+                });
+            });
 
             describe('login with missing password', function () {
                 it('should return a 400 bad request and an error message', async function () {
@@ -247,8 +279,8 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Missing password." });
-                })
-            })
+                });
+            });
         });
     });
 
@@ -258,7 +290,7 @@ describe('Test the user handling routes', function () {
 
             expect(res).to.have.status(200);
             expect(res.body).to.deep.equal({ message: "Logout successful." });
-        })
+        });
     });
 
     describe('Test the GET /users route', function () {
@@ -274,10 +306,10 @@ describe('Test the user handling routes', function () {
                         expect(user.userName).to.be.a('string');
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
-                        expect(user.publishedChapters).to.be.an('array')
+                        expect(user.publishedChapters).to.be.an('array');
                     }
-                })
-            })
+                });
+            });
 
             describe('get users with query string {regex: F}', function () {
                 it('should return a 200 OK and an array of users.publicInfo() with each userName including an F', async function () {
@@ -290,10 +322,10 @@ describe('Test the user handling routes', function () {
                         expect(user.userName).to.be.a('string').that.matches(/F/);
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
-                        expect(user.publishedChapters).to.be.an('array')
+                        expect(user.publishedChapters).to.be.an('array');
                     }
-                })
-            })
+                });
+            });
 
             describe('get users with query string {regex: f, i:1}', function () {
                 it('should return a 200 OK and an array of users.publicInfo() with each userName including an F or an f', async function () {
@@ -306,10 +338,10 @@ describe('Test the user handling routes', function () {
                         expect(user.userName).to.be.a('string').which.matches(/f/i);
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
-                        expect(user.publishedChapters).to.be.an('array')
+                        expect(user.publishedChapters).to.be.an('array');
                     }
-                })
-            })
+                });
+            });
 
             describe('get users with query string {page: 2}', function () {
                 before('Set up users to test pagination', async function () {
@@ -319,14 +351,14 @@ describe('Test the user handling routes', function () {
                         shouldSendEmail();
                         expect(thisRes).to.have.status(201);
                     }
-                })
+                });
 
                 after('Teardown users to test pagination', async function () {
                     for (let userCount = 0; userCount <= constants.resultsPerPage; userCount++) {
                         console.log('Deleting user ' + userCount);
                         await User.findOneAndDelete({ userName: userCount + newUserName });
                     }
-                })
+                });
 
                 it('should return a 200 OK and an array of users.publicInfo() corresponding to page 2 of the results', async function () {
                     const res = await agent.get('/user').query({ page: 2 });
@@ -338,10 +370,10 @@ describe('Test the user handling routes', function () {
                         expect(user.userName).to.be.a('string');
                         expect(user.email).to.be.a('string');
                         expect(user.bio).to.be.a('string');
-                        expect(user.publishedChapters).to.be.an('array')
+                        expect(user.publishedChapters).to.be.an('array');
                     }
-                })
-            })
+                });
+            });
         });
 
         describe('Sad paths', function () {
@@ -396,8 +428,8 @@ describe('Test the user handling routes', function () {
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal(newUserPublicInfo());
-                })
-            })
+                });
+            });
         });
     });
 
@@ -455,7 +487,7 @@ describe('Test the user handling routes', function () {
                     await User.findByIdAndUpdate(userRes.body.userId, { emailVerified: true });
 
                     const res = await agent.put('/profile').send({ email: "putProfile" + newEmail });
-                    shouldSendEmail()
+                    shouldSendEmail();
                     const user = await User.findById(res.body.userId);
 
                     expect(res).to.have.status(200);
@@ -521,7 +553,7 @@ describe('Test the user handling routes', function () {
 
         after('Teardown user for follow testing', async function () {
             await User.findByIdAndDelete(followedUserId);
-        })
+        });
 
         describe('Happy paths', function () {
             describe('Login and POST /user/:userId/follow', function () {
@@ -598,7 +630,7 @@ describe('Test the user handling routes', function () {
         before('Setup userId for testing /user/:userId/follow route', async function () {
             const userRes = await agent.post('/register').send({ userName: 'followed-' + newUserName, email: 'followed-' + newEmail, password: newPassword });
             shouldSendEmail();
-            expect(userRes).to.have.status(201)
+            expect(userRes).to.have.status(201);
             followedUserId = userRes.body.userId;
         });
 
@@ -643,7 +675,7 @@ describe('Test the user handling routes', function () {
                     const res = await agent.delete('/user/' + newUserPrivateProfile().userId + '/follow');
 
                     expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: 'No follow to remove.' })
+                    expect(res.body).to.deep.equal({ error: 'No follow to remove.' });
                 });
             });
         });
@@ -655,7 +687,7 @@ describe('Test the user handling routes', function () {
 
             before('Setup user for /changepassword testing', async function () {
                 const res = await agent.post('/register')
-                    .send({ userName: 'changePassword-' + newUserName, email: 'changePassword-' + newEmail, password: newPassword });
+                    .send({ userName: 'chPass' + newUserName, email: 'chPass' + newEmail, password: newPassword });
                 shouldSendEmail();
                 passwordTestUserId = res.body.userId;
             });
@@ -666,12 +698,12 @@ describe('Test the user handling routes', function () {
 
             after('Teardown user for /changepassword testing', async function () {
                 await User.findByIdAndDelete(passwordTestUserId);
-            })
+            });
 
             describe('Happy paths', function () {
                 describe('Login and POST /changepassword with correct password and newPassword', function () {
                     it('should return a 200 status and a success message and change the passwordHash in the database', async function () {
-                        await agent.post('/login').send({ name: 'changePassword-' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ password: newPassword, newPassword: "2x" + newPassword });
                         const user = await User.findById(passwordTestUserId);
@@ -696,7 +728,7 @@ describe('Test the user handling routes', function () {
 
                 describe('Login and POST /changepassword with incorrect password', function () {
                     it('should return a 403 status and an error message', async function () {
-                        await agent.post('/login').send({ name: 'changePassword-' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ password: "5x" + newPassword, newPassword: "2x" + newPassword });
 
@@ -707,7 +739,7 @@ describe('Test the user handling routes', function () {
 
                 describe('Login and POST /changepassword with no password', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send({ name: 'changePassword-' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ newPassword: "2x" + newPassword });
 
@@ -716,9 +748,20 @@ describe('Test the user handling routes', function () {
                     });
                 });
 
+                describe('Login and POST /changepassword to a password shorter than minimumPasswordLength characters.', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
+
+                        const res = await agent.post('/changepassword').send({ password: newPassword, newPassword: 'x'.repeat(minimumPasswordLength - 1) });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: 'Password must be at least ' + minimumPasswordLength + ' characters long.' });
+                    });
+                });
+
                 describe('Login and POST /changepassword with no newPassword', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send({ name: 'changePassword-' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ password: newPassword });
 
@@ -736,7 +779,7 @@ describe('Test the user handling routes', function () {
 
             before('Setup user for /resetpassword tests', async function () {
                 const res = await agent.post('/register')
-                    .send({ userName: 'resetPassword-' + newUserName, email: 'resetPassword-' + newEmail, password: newPassword });
+                    .send({ userName: 'rstPass' + newUserName, email: 'rstPass' + newEmail, password: newPassword });
                 shouldSendEmail();
                 const user = await User.findById(res.body.userId);
                 user.emailVerified = true;
@@ -748,7 +791,7 @@ describe('Test the user handling routes', function () {
 
             after('Teardown user for /resetpassword tests', async function () {
                 await User.findByIdAndDelete(resetPasswordUserId);
-            })
+            });
 
             describe('Happy paths', function () {
                 describe('Logout and POST /resetpassword with { name: email }', function () {
@@ -840,7 +883,7 @@ describe('Test the user handling routes', function () {
 
             before('Setup user for testing POST /resetpassword/:userId/:resetPasswordKey', async function () {
                 const userRes = await agent.post('/register')
-                    .send({ userName: "resetPassword-" + newUserName, email: "resetPassword-" + newEmail, password: newPassword });
+                    .send({ userName: "rstPass" + newUserName, email: "rstPass" + newEmail, password: newPassword });
                 shouldSendEmail();
                 resetPasswordUserId = userRes.body.userId;
                 resetPasswordUserName = userRes.body.userName;
@@ -860,7 +903,7 @@ describe('Test the user handling routes', function () {
 
             after('Teardown user for testing POST /resetpassword/:userId/:resetPasswordKey', async function () {
                 await User.findByIdAndDelete(resetPasswordUserId);
-            })
+            });
 
             describe('Happy paths', function () {
                 describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with { newPassword: "newPassword" }', function () {
@@ -889,6 +932,17 @@ describe('Test the user handling routes', function () {
 
                         expect(res).to.have.status(403);
                         expect(res.body).to.deep.equal({ error: "No resetPasswordKey set for that user." });
+                    });
+                });
+
+                describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with password shorter than minimumPasswordLength characters.', function () {
+                    it('should return a 400 status and an error message', async function () {
+                        await agent.post('/logout');
+
+                        const res = await agent.post('/resetpassword/' + resetPasswordUserId + '/' + resetPasswordUserKey).send({ password: 'x'.repeat(minimumPasswordLength - 1) });
+
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.deep.equal({ error: 'Password must be at least ' + minimumPasswordLength + ' characters long.' });
                     });
                 });
 

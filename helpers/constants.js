@@ -29,6 +29,8 @@ module.exports = {
     // Standardise these across the application
     loginExpirationTime: oneWeekInMilliseconds,
     passwordResetTime: 15 * oneMinuteInMilliseconds,
+    minimumPasswordLength: 6,
+    maximumUserNameLength: 20,
     saltRounds: 10,
     summaryKeys: [
         'storyId',

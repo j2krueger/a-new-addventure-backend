@@ -68,25 +68,25 @@ userSchema.virtual('publishedChapters', {
   ref: 'Chapter',
   localField: 'userName',
   foreignField: 'authorName'
-})
+});
 
 userSchema.virtual('followedAuthors', {
   ref: 'Follow',
   localField: '_id',
   foreignField: 'follower',
-})
+});
 
 userSchema.virtual('likedChapters', {
   ref: 'Like',
   localField: '_id',
   foreignField: 'user'
-})
+});
 
 userSchema.virtual('bookmarkedChapters', {
   ref: 'Bookmark',
   localField: '_id',
   foreignField: 'user'
-})
+});
 
 userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) {
   const result = await User.findById(id)
@@ -133,7 +133,7 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
     result.followedAuthors.sort((a, b) => {
       const al = a.userName.toLowerCase(), bl = b.userName.toLowerCase();
       return (al < bl) ? -1 : (al > bl) ? 1 : 0;
-    })
+    });
   }
   return result;
 }
@@ -196,7 +196,7 @@ const userSettable = {
 userSchema.methods.unverifyEmail = async function unverifyEmail() {
   this.emailVerified = false;
   this.emailVerificationKey = randomBytes(10).toString('hex');
-  await sendVerificationEmailHelper(this)
+  await sendVerificationEmailHelper(this);
 }
 
 userSchema.methods.applySettings = async function applySettings(settings) {

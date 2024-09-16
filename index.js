@@ -1,6 +1,6 @@
 "use strict";
 
-const constants = require('./helpers/constants')
+const constants = require('./helpers/constants');
 const express = require("express");
 const session = require('express-session');
 
@@ -26,7 +26,7 @@ const app = express();
 //Database Connection
 mongoose.connect(constants.databaseURI, { dbName: constants.dbName })
     .then(() => console.log('Database Connected'))
-    .catch(() => console.log("Database not conected"))
+    .catch(() => console.log("Database not conected"));
 
 
 //middleware
@@ -42,7 +42,7 @@ app.use(morgan(function (tokens, req, res) {
         tokens.res(req, res, 'content-length'), '-',
         tokens['response-time'](req, res), 'ms',
         "req.body:", JSON.stringify(req.body)
-    ].join(' ')
+    ].join(' ');
 }));
 
 if (constants.localDeploy) {
@@ -91,7 +91,7 @@ function sanitizeIncomingStrings(req, res, next) {
 app.use(sanitizeIncomingStrings);
 
 // API Routes
-app.use('/', require('./routes/routes'))
+app.use('/', require('./routes/routes'));
 
 
 app.listen(constants.port, () => {

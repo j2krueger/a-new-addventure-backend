@@ -7,7 +7,7 @@ const Chapter = require('../models/chapter');
 
 async function paramMessageId(req, res, next, value) {
     if (typeof value != 'string' || !/^[0-9a-f]{24}$/.test(value)) {
-        return res.status(400).json({ error: "That is not a properly formatted messageId." })
+        return res.status(400).json({ error: "That is not a properly formatted messageId." });
     }
     try {
         const result = await Message.findById(value);
@@ -15,7 +15,7 @@ async function paramMessageId(req, res, next, value) {
             return res.status(404).json({ error: "There is no message with that messageId." });
         }
         req.paramMessage = result;
-        return next()
+        return next();
     } catch (error) {
         return next(error);
     }
@@ -82,7 +82,7 @@ async function getStats(req, res, next) {
     try {
         const result = {};
         result.users = await User.countDocuments();
-        result.stories = await Chapter.countDocuments({ previousChapter: null })
+        result.stories = await Chapter.countDocuments({ previousChapter: null });
         result.chapters = await Chapter.countDocuments();
         return res.status(200).json(result);
     } catch (error) {

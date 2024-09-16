@@ -400,7 +400,7 @@ describe('Test the admin routes', function () {
                     const res = await agent.put('/admin/message/' + message._id).send({ read: "string" });
 
                     expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "Invalid request." })
+                    expect(res.body).to.deep.equal({ error: "Invalid request." });
 
                     await Message.findByIdAndDelete(message._id);
                 });
@@ -413,7 +413,7 @@ describe('Test the admin routes', function () {
                     const res = await agent.put('/admin/message/000000000000000000000000').send({ read: true });
 
                     expect(res).to.have.status(404);
-                    expect(res.body).to.deep.equal({ error: "There is no message with that messageId." })
+                    expect(res.body).to.deep.equal({ error: "There is no message with that messageId." });
                 });
             });
 
@@ -424,7 +424,7 @@ describe('Test the admin routes', function () {
                     const res = await agent.put('/admin/message/0').send({ read: true });
 
                     expect(res).to.have.status(400);
-                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted messageId." })
+                    expect(res.body).to.deep.equal({ error: "That is not a properly formatted messageId." });
                 });
             });
 
@@ -537,7 +537,7 @@ describe('Test the admin routes', function () {
             after('Tear down users for lock testing', async function () {
                 await User.findByIdAndDelete(lockedUserId);
                 await User.findByIdAndDelete(unlockedUserId);
-            })
+            });
 
             describe('Happy paths', function () {
                 describe('Login as admin and lock an unlocked user', function () {
@@ -647,7 +647,7 @@ describe('Test the admin routes', function () {
             after('Tear down users for lock testing', async function () {
                 await User.findByIdAndDelete(lockedUserId);
                 await User.findByIdAndDelete(unlockedUserId);
-            })
+            });
 
             describe('Happy paths', function () {
                 describe('Login as admin and unlock a locked user', function () {
@@ -708,7 +708,7 @@ describe('Test the admin routes', function () {
 
                         expect(res).to.have.status(200);
                         expect(res.body.locked).to.be.false;
-                        expect(res.body._id).to.deep.equal(newUserPrivateProfile().userId)
+                        expect(res.body._id).to.deep.equal(newUserPrivateProfile().userId);
                     });
                 });
             });
@@ -764,7 +764,7 @@ describe('Test the admin routes', function () {
             after('Teardown test users', async function () {
                 await User.findByIdAndDelete(testUserId);
                 await User.findByIdAndDelete(testAdminId);
-            })
+            });
 
             describe('Happy paths', function () {
                 describe('Login as admin and PUT { admin: true }', function () {
