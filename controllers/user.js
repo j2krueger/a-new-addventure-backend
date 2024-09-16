@@ -78,6 +78,7 @@ async function registerUser(req, res) {
 }
 
 async function sendVerificationEmail(req, res, next) {
+    console.log('\n   Debug: ', 'entering sendVerificationEmail');
     try {
         await req.authenticatedUser.unverifyEmail();
         await req.authenticatedUser.save();
