@@ -200,6 +200,7 @@ userSchema.methods.unverifyEmail = async function unverifyEmail() {
 }
 
 userSchema.methods.applySettings = async function applySettings(settings) {
+  console.log(`Settings: set to ${JSON.stringify(settings, null, 4)}`);
   for (const key in settings) {
     if (!(key in userSettable && typeof settings[key] == userSettable[key])) {
       const error = new Error("Invalid request.");
@@ -214,10 +215,12 @@ userSchema.methods.applySettings = async function applySettings(settings) {
       error.code = 409;
       throw error;
     }
-    this.unverifyEmail();
   }
   for (const key in settings) {
     this[key] = settings[key];
+  }
+  if (settings.email) {
+    this.unverifyEmail();
   }
   return (await this.save());
 }

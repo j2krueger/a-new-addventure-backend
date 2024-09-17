@@ -36,16 +36,16 @@ async function sendVerificationEmailHelper(user) {
     const html = commonPreHtml + `<p>Hello, ${user.userName}, and welcome to QuiltedChronicles.org!</p>
     <p>To verify your email address at QuiltedChronicles.org, just
     <a href="https://quiltedchronicles.org/verify/${userId}/${user.emailVerificationKey}">Click here</a>.</p>` + commonPostHtml;
-    console.log(`${Date.now()}: Sending verification email to ${user.userName} with userId ${userId} at ${email}...`);
+    console.log(`Mail: Sending verification email to ${user.userName} with userId ${userId} at ${email}...`);
     transporter.sendMail({
         from: constants.siteEmailAddress,
         to: email,
         subject: "Email Verification from QuiltedChronicles.org",
         html,
     }).then((info) => {
-        console.log(`${Date.now()}: Success! ${JSON.stringify(info)}`);
+        console.log(`Mail: Success! ${JSON.stringify(info, null, 4)}`);
     }).catch((error) => {
-        console.log(`${Date.now()}: Oops! transporter.sendMail failed in sendVerificationEmailHelper: ${JSON.stringify(error)}.`);
+        console.log(`Mail: Oops! transporter.sendMail failed in sendVerificationEmailHelper: ${JSON.stringify(error, null, 4)}.`);
     });
 }
 
@@ -56,16 +56,16 @@ async function sendResetPasswordEmailHelper(user) {
     const html = commonPreHtml + `<p>Hello, ${user.userName}, we&apos;ve recieved your request to reset your password. Just
         <a href="https://quiltedchronicles.org/resetpassword/${userId}/${resetKey}">click here</a> and follow the
         instructions on the page it takes you to.</p>`+ commonPostHtml;
-    console.log(`${Date.now()}: Sending password reset email to ${user.userName} with userId ${userId} and ${resetKey} at ${email}...`);
+    console.log(`Mail: Sending password reset email to ${user.userName} with userId ${userId} and ${resetKey} at ${email}...`);
     transporter.sendMail({
         from: constants.siteEmailAddress,
         to: email,
         subject: "Password Reset from QuiltedChronicles.org",
         html,
     }).then((info) => {
-        console.log(`${Date.now()}: Success! ${JSON.stringify(info)}`);
+        console.log(`Mail: Success! ${JSON.stringify(info, null, 4)}`);
     }).catch((error) => {
-        console.log(`${Date.now()}: Oops! transporter.sendMail failed in sendVerificationEmailHelper: ${JSON.stringify(error)}.`);
+        console.log(`Mail: Oops! transporter.sendMail failed in sendVerificationEmailHelper: ${JSON.stringify(error, null, 4)}.`);
     });
 }
 
