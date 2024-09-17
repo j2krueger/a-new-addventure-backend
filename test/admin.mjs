@@ -9,10 +9,10 @@ const {
     // constants
     constants,
     testString,
-    newUserName,
-    newEmail,
+    newUser1Name,
+    newUser1Email,
     newPassword,
-    testUserLogin,
+    testUser1Login,
     adminLogin,
     testStory,
     testChapter,
@@ -39,7 +39,7 @@ describe('Test the admin routes', function () {
         describe('Happy paths', function () {
             describe('Login as admin and delete a chapter', function () {
                 it('should return a 200 status and a success message and delete the chapter from the database', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     const storyRes = await agent.post('/chapter').send(testStory);
                     await agent.post('/login').send(adminLogin);
 
@@ -54,7 +54,7 @@ describe('Test the admin routes', function () {
 
             describe('Like a chapter, then DELETE /admin/chapter/:chapterId', function () {
                 it('should delete the like from the database', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     const storyRes = await agent.post('/chapter').send(testStory);
                     await agent.post('/login').send(adminLogin);
                     await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
@@ -97,7 +97,7 @@ describe('Test the admin routes', function () {
 
             describe('Continue a chapter, then delete the chapter', function () {
                 it('should also delete the continuation chapter', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     const storyRes = await agent.post('/chapter').send(testStory);
                     const chapterRes = await agent.post('/chapter/' + storyRes.body.chapterId).send(testChapter);
                     await agent.post('/login').send(adminLogin);
@@ -117,7 +117,7 @@ describe('Test the admin routes', function () {
         describe('Sad paths', function () {
             describe('Login as non-admin and delete a chapter', function () {
                 it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     const storyRes = await agent.post('/chapter').send(testStory);
 
                     const res = await agent.delete('/admin/chapter/' + storyRes.body.chapterId);
@@ -130,7 +130,7 @@ describe('Test the admin routes', function () {
 
             describe('Logout and delete a chapter', function () {
                 it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     const storyRes = await agent.post('/chapter').send(testStory);
                     await agent.post('/logout');
 
@@ -185,11 +185,11 @@ describe('Test the admin routes', function () {
 
             describe('Login as non-admin and DELETE', function () {
                 it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     const storyRes = await agent.post('/chapter').send(testStory);
                     await agent.post('/chapter/' + storyRes.body.chapterId + '/flag').send({ reason: testString });
                     const flag = await Flag.findOne({ chapter: storyRes.body.chapterId });
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.delete('/admin/flag/' + flag._id);
 
@@ -261,7 +261,7 @@ describe('Test the admin routes', function () {
 
             describe('Login as non-admin ang GET /admin/flag', function () {
                 it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.get('/admin/flag');
 
@@ -333,7 +333,7 @@ describe('Test the admin routes', function () {
         describe('Sad paths', function () {
             describe('Login as non-admin and GET /admin/message', function () {
                 it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.get('/admin/message');
 
@@ -430,7 +430,7 @@ describe('Test the admin routes', function () {
 
             describe('Login as non-admin and try to mark a message as read', function () {
                 it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     await agent.post('/message').send({ messageText: testString });
                     const message = await Message.findOne({ messageText: testString });
 
@@ -444,7 +444,7 @@ describe('Test the admin routes', function () {
 
             describe('Logout and try to mark a message as read', function () {
                 it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     await agent.post('/message').send({ messageText: testString });
                     const message = await Message.findOne({ messageText: testString });
                     await agent.post('/logout');
@@ -482,7 +482,7 @@ describe('Test the admin routes', function () {
         describe('Sad paths', function () {
             describe('Login as non admin and try to delete a message', function () {
                 it('should redirect to /login', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     await agent.post('/message').send({ messageText: testString });
                     const message = await Message.findOne({ messageText: testString });
 
@@ -516,11 +516,11 @@ describe('Test the admin routes', function () {
 
             before('Set up users for lock testing', async function () {
                 const res = await agent.post('/register')
-                    .send({ userName: 'unlocked' + newUserName, email: 'unlocked' + newEmail, password: newPassword });
+                    .send({ userName: 'unlocked' + newUser1Name, email: 'unlocked' + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 unlockedUserId = res.body.userId;
                 const res2 = await agent.post('/register')
-                    .send({ userName: 'locked' + newUserName, email: 'locked' + newEmail, password: newPassword });
+                    .send({ userName: 'locked' + newUser1Name, email: 'locked' + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 lockedUserId = res2.body.userId;
             });
@@ -555,17 +555,17 @@ describe('Test the admin routes', function () {
 
                 describe('Login as locked user', function () {
                     it('should return a 200 status and the users user.privateProfile()', async function () {
-                        const res = await agent.post('/login').send({ name: 'locked' + newUserName, password: newPassword });
+                        const res = await agent.post('/login').send({ name: 'locked' + newUser1Name, password: newPassword });
 
                         expect(res).to.have.status(200);
-                        expect(res.body.userName).to.deep.equal('locked' + newUserName);
+                        expect(res.body.userName).to.deep.equal('locked' + newUser1Name);
                         expect(res.body.locked).to.be.true;
                     });
                 });
 
                 describe('Login as locked user and POST /chapter', function () {
                     it('should redirect to login', async function () {
-                        await agent.post('/login').send({ name: 'locked' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'locked' + newUser1Name, password: newPassword });
 
                         const res = await agent.post('/chapter').send(testChapter);
 
@@ -575,7 +575,7 @@ describe('Test the admin routes', function () {
 
                 describe('Login as unlocked user, lock user, and POST /chapter', function () {
                     it('should redirect to login', async function () {
-                        const loginRes = await agent.post('/login').send({ name: 'unlocked' + newUserName, password: newPassword });
+                        const loginRes = await agent.post('/login').send({ name: 'unlocked' + newUser1Name, password: newPassword });
                         const user = await User.findById(loginRes.body.userId);
                         user.locked = true;
                         user.save();
@@ -600,7 +600,7 @@ describe('Test the admin routes', function () {
 
                 describe('Login as non-admin and lock an unlocked user', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.post('/admin/user/' + unlockedUserId + '/lock');
 
@@ -626,11 +626,11 @@ describe('Test the admin routes', function () {
 
             before('Set up users for lock testing', async function () {
                 const unlockedUserRes = await agent.post('/register')
-                    .send({ userName: 'unlocked' + newUserName, email: 'unlocked' + newEmail, password: newPassword });
+                    .send({ userName: 'unlocked' + newUser1Name, email: 'unlocked' + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 unlockedUserId = unlockedUserRes.body.userId;
                 const lockedUserRes = await agent.post('/register')
-                    .send({ userName: 'locked' + newUserName, email: 'locked' + newEmail, password: newPassword });
+                    .send({ userName: 'locked' + newUser1Name, email: 'locked' + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 lockedUserId = lockedUserRes.body.userId;
             });
@@ -677,7 +677,7 @@ describe('Test the admin routes', function () {
 
                 describe('Login as non admin and unlock a locked user', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.delete('/admin/user/' + lockedUserId + '/lock');
 
@@ -726,7 +726,7 @@ describe('Test the admin routes', function () {
 
                 describe('Login as non-admin and GET /admin/user/:userId', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.get('/admin/user/' + newUserPrivateProfile().userId);
 
@@ -741,11 +741,11 @@ describe('Test the admin routes', function () {
 
             before('Setup users for testing PUT /admin/user/:userId route', async function () {
                 const testUserRes = await agent.post('/register')
-                    .send({ userName: 'testUser' + newUserName, email: 'testUser' + newEmail, password: newPassword });
+                    .send({ userName: 'testUser' + newUser1Name, email: 'testUser' + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 testUserId = testUserRes.body.userId;
                 const testAdminRes = await agent.post('/register')
-                    .send({ userName: 'testAdmin' + newUserName, email: 'testAdmin' + newEmail, password: newPassword });
+                    .send({ userName: 'testAdmin' + newUser1Name, email: 'testAdmin' + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 testAdminId = testAdminRes.body.userId;
             });
@@ -837,7 +837,7 @@ describe('Test the admin routes', function () {
 
                 describe('Login as non-admin and PUT /admin/user/:userId with { admin: true }', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.put('/admin/user/' + testUserId).send({ admin: true });
 
@@ -863,7 +863,7 @@ describe('Test the admin routes', function () {
         let story;
 
         beforeEach('Setup chapter for keyword testing', async function () {
-            await agent.post('/login').send(testUserLogin);
+            await agent.post('/login').send(testUser1Login);
             const storyRes = await agent.post('/chapter').send(testStory);
             story = storyRes.body;
         });
@@ -892,7 +892,7 @@ describe('Test the admin routes', function () {
             describe('Sad paths', function () {
                 describe('Login as a non-admin and add a keyword', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.put('/admin/chapter/' + story.chapterId + '/keyword').send(["silly"]);
 
@@ -953,7 +953,7 @@ describe('Test the admin routes', function () {
             describe('Sad paths', function () {
                 describe('Login as a non-admin and delete a keyword', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.delete('/admin/chapter/' + story.chapterId + '/keyword/' + story.keywords[2]);
 

@@ -209,11 +209,15 @@ userSchema.methods.applySettings = async function applySettings(settings) {
     }
   }
   if (settings.email) {
-    const result = await User.findOne({ email: settings.email });
-    if (result) {
-      const error = new Error("Invalid request: That email is already in use.");
-      error.code = 409;
-      throw error;
+    if (settings.email == this.email) {
+      delete settings.email;
+    } else {
+      const result = await User.findOne({ email: settings.email });
+      if (result) {
+        const error = new Error("Invalid request: That email is already in use.");
+        error.code = 409;
+        throw error;
+      }
     }
   }
   for (const key in settings) {

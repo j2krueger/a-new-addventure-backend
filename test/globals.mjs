@@ -16,10 +16,12 @@ import Flag from '../models/flag.js';
 import Bookmark from '../models/bookmark.js';
 
 const { testString } = constants;
-const newUserName = testString;
-const newEmail = newUserName + "@example.com";
+const newUser1Name = testString;
+const newUser1Email = newUser1Name + "@example.com";
+const newUser2Name = 'second' + testString;
+const newUser2Email = newUser2Name + "@example.com";
 const newPassword = Math.random() + "-" + Math.random();
-const testUserLogin = { name: newUserName, password: newPassword };
+const testUser1Login = { name: newUser1Name, password: newPassword };
 const adminLogin = { name: "Freddy", password: constants.adminPassword };
 const testStory = { storyTitle: testString, bodyText: testString, keywords: ["testStory", testString, testString + '1'] };
 const testStory1 = { storyTitle: "Test story 1", bodyText: testString, keywords: ["testStory", testString, testString + '1'] };
@@ -79,10 +81,12 @@ export {
     // constants
     constants,
     testString,
-    newUserName,
-    newEmail,
+    newUser1Name,
+    newUser1Email,
+    newUser2Name,
+    newUser2Email,
     newPassword,
-    testUserLogin,
+    testUser1Login,
     adminLogin,
     testStory,
     testStory1,

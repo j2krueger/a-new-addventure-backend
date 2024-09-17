@@ -9,10 +9,10 @@ const {
     // constants
     constants,
     testString,
-    // newUserName,
-    // newEmail,
+    // newUser1Name,
+    // newUser1Email,
     // newPassword,
-    testUserLogin,
+    testUser1Login,
     adminLogin,
     testStory,
     testChapter,
@@ -66,7 +66,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login and GET /chapter', function () {
                     it('should return a 200 OK and a list of chapters', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.get('/chapter');
 
@@ -451,7 +451,7 @@ describe('Test the chapter handling routes', function () {
             describe('Happy paths', function () {
                 describe('GET /chapter/:chapterId with an existing chapterId', function () {
                     it('should return a 200 status', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.get('/chapter/' + storyRes.body.chapterId);
@@ -488,7 +488,7 @@ describe('Test the chapter handling routes', function () {
             describe('Happy paths', function () {
                 describe('GET /chapter/:chapterId on a new story', function () {
                     it('should return a 200 OK and the chapter.fullInfoWithContinuations()', async function () {
-                        const userRes = await agent.post('/login').send(testUserLogin);
+                        const userRes = await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.get('/chapter/' + storyRes.body.chapterId);
@@ -496,7 +496,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res).to.have.status(200);
                         expectMongoObjectId(res.body.chapterId);
                         expect(res.body.chapterId).to.deep.equal(storyRes.body.chapterId);
-                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expect(res.body.authorName).to.deep.equal(testUser1Login.name);
                         expectMongoObjectId(res.body.authorId);
                         expect(res.body.authorId).to.deep.equal(userRes.body.userId);
                         expect(res.body.chapterTitle).to.be.null;
@@ -514,7 +514,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('GET /chapter/:chapterId on a new chapter', function () {
                     it('should return a 200 OK and the chapter.fullInfoWithContinuations()', async function () {
-                        const userRes = await agent.post('/login').send(testUserLogin);
+                        const userRes = await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         const chapterRes = await agent.post('/chapter/' + storyRes.body.chapterId).send(testChapter);
 
@@ -523,7 +523,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res).to.have.status(200);
                         expectMongoObjectId(res.body.chapterId);
                         expect(res.body.chapterId).to.deep.equal(chapterRes.body.chapterId);
-                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expect(res.body.authorName).to.deep.equal(testUser1Login.name);
                         expectMongoObjectId(res.body.authorId);
                         expect(res.body.authorId).to.deep.equal(userRes.body.userId);
                         expect(res.body.chapterTitle).to.deep.equal(testChapter.chapterTitle);
@@ -548,7 +548,7 @@ describe('Test the chapter handling routes', function () {
             describe('Happy paths', function () {
                 describe('POST /chapter with testStory', function () {
                     it('should return a 201 CREATED and the chapter.fullInfo()', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.post('/chapter').send(testStory);
 
@@ -557,7 +557,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res.body.chapterId).to.deep.equal(res.body.storyId);
                         expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
                         expect(res.body.chapterTitle).to.be.null;
-                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expect(res.body.authorName).to.deep.equal(testUser1Login.name);
                         expectMongoObjectId(res.body.authorId);
                         expect(res.body.bodyText).to.deep.equal(testStory.bodyText);
                         expect(res.body.previousChapter).to.be.null;
@@ -571,7 +571,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter with testStory but no keywords', function () {
                     it('should return a keywords value of an empty array', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const testStoryNoKeywords = deepCopy(testStory);
                         delete testStoryNoKeywords.keywords;
 
@@ -585,7 +585,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter with testStory and GET /profile', function () {
                     it('should return testStory from GET /profile in the publishedChapters field', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const chapterRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.get('/profile');
@@ -604,7 +604,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter with testStory and GET /user/:userId', function () {
                     it('should return testStory from GET /user/:userId in the publishedChapters field', async function () {
-                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const loginRes = await agent.post('/login').send(testUser1Login);
                         const chapterRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.get("/user/" + loginRes.body.userId);
@@ -620,7 +620,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter with "<" in the storyTitle and the bodyText', function () {
                     it('should replace both of them with HTML entities', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.post('/chapter').send({ storyTitle: testStory.storyTitle + "<", bodyText: testStory.bodyText + "<" });
                         const story = await Chapter.findById(res.body.chapterId);
@@ -647,7 +647,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter with missing story text', function () {
                     it('should return a 400 bad request and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.post('/chapter').send({ storyTitle: "Deterministic story title" });
 
@@ -658,7 +658,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Post /chapter with missing story title', function () {
                     it('should return a 400 bad request and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.post('/chapter').send({ bodyText: "Deterministic text" });
 
@@ -669,7 +669,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Post /chapter with keywords defined to be something other than an array', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const testStoryBadKeywords = deepCopy(testStory);
                         testStoryBadKeywords.keywords = "string";
 
@@ -684,7 +684,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Post /chapter with keywords defined to be an array containing a non-string', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const testStoryBadKeywords = deepCopy(testStory);
                         testStoryBadKeywords.keywords.push(1);
 
@@ -699,7 +699,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Post /chapter with keywords defined to be an array containing an invalid keyword', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const testStoryBadKeywords = deepCopy(testStory);
                         testStoryBadKeywords.keywords.push("keyword?");
 
@@ -718,7 +718,7 @@ describe('Test the chapter handling routes', function () {
             describe('Happy paths', function () {
                 describe('POST /chapter/:chapterId with testChapter', function () {
                     it('should return a 201 status and the chapter.fullInfo()', async function () {
-                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const loginRes = await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.post('/chapter/' + storyRes.body.chapterId).send(testChapter);
@@ -728,7 +728,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res.body.storyId).to.deep.equal(storyRes.body.storyId);
                         expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
                         expect(res.body.chapterTitle).to.deep.equal(testChapter.chapterTitle);
-                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expect(res.body.authorName).to.deep.equal(testUser1Login.name);
                         expect(res.body.authorId).to.deep.equal(loginRes.body.userId);
                         expect(res.body.bodyText).to.deep.equal(testChapter.bodyText);
                         expect(res.body.previousChapter).to.deep.equal(storyRes.body.chapterId);
@@ -743,7 +743,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter/:chapterId with testChapter but no keywords', function () {
                     it('should return a 201 status and the chapter.fullInfo()', async function () {
-                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const loginRes = await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         const testChapterNoKeywords = deepCopy(testChapter);
                         delete testChapterNoKeywords.keywords;
@@ -755,7 +755,7 @@ describe('Test the chapter handling routes', function () {
                         expect(res.body.storyId).to.deep.equal(storyRes.body.storyId);
                         expect(res.body.storyTitle).to.deep.equal(testStory.storyTitle);
                         expect(res.body.chapterTitle).to.deep.equal(testChapter.chapterTitle);
-                        expect(res.body.authorName).to.deep.equal(testUserLogin.name);
+                        expect(res.body.authorName).to.deep.equal(testUser1Login.name);
                         expect(res.body.authorId).to.deep.equal(loginRes.body.userId);
                         expect(res.body.bodyText).to.deep.equal(testChapter.bodyText);
                         expect(res.body.previousChapter).to.deep.equal(storyRes.body.chapterId);
@@ -770,7 +770,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter/:chapterId with testChapter and check GET /profile', function () {
                     it('should return the chapter in the publishedChapters field', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         const chapterRes = await agent.post('/chapter/' + storyRes.body.chapterId).send(testChapter);
 
@@ -791,7 +791,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter/:chapterId with testChapter and check GET /user/:userId', function () {
                     it('should return the chapter in the publishedChapters field', async function () {
-                        const userRes = await agent.post('/login').send(testUserLogin);
+                        const userRes = await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         const chapterRes = await agent.post('/chapter/' + storyRes.body.chapterId).send(testChapter);
 
@@ -811,7 +811,7 @@ describe('Test the chapter handling routes', function () {
             describe('Sad paths', function () {
                 describe('Logout and POST /chapter/:chapterId with testChapter', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         await agent.post('/logout');
 
@@ -825,7 +825,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter/:chapterId with missing story text', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.post('/chapter/' + storyRes.body.chapterId).send({ chapterTitle: "Deterministic chapter title" });
@@ -839,7 +839,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter/:chapterId with missing chapterTitle', function () {
                     it('should return a 400 misformed and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.post('/chapter/' + storyRes.body.chapterId).send({ bodyText: "Deterministic text" });
@@ -853,7 +853,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter/:chapterId with keywords defined to be something other than an array', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         const testChapterBadKeywords = deepCopy(testChapter);
                         testChapterBadKeywords.keywords = "string";
@@ -869,7 +869,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter/:chapterId with keywords defined to be an array containing a non-string', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         const testChapterBadKeywords = deepCopy(testChapter);
                         testChapterBadKeywords.keywords.push(1);
@@ -885,7 +885,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('POST /chapter/:chapterId with keywords defined to be an array containing an invalid keyword', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         const testChapterBadKeywords = deepCopy(testChapter);
                         testChapterBadKeywords.keywords.push("keyword?");
@@ -911,7 +911,7 @@ describe('Test the chapter handling routes', function () {
                     it('should return a 200 status and a success message, and add a like to the database', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const loginRes = await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
                         const likeRes = await Like.findOne({ user: loginRes.body.userId, chapter: storyRes.body.chapterId });
@@ -929,7 +929,7 @@ describe('Test the chapter handling routes', function () {
                     it('should count the like in the likes field and the likedByUser field', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const loginRes = await agent.post('/login').send(testUser1Login);
 
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
                         const chapterIdRes = await agent.get('/chapter/' + storyRes.body.chapterId);
@@ -947,7 +947,7 @@ describe('Test the chapter handling routes', function () {
                     it('should return bookmarkedByUser is true in the chapter', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const loginRes = await agent.post('/login').send(testUser1Login);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
 
                         const chapterIdRes = await agent.get('/chapter').query({ search: "s:" + testString });
@@ -965,7 +965,7 @@ describe('Test the chapter handling routes', function () {
                     it('should have the liked chapter in the likedChapters field', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
                         const like = await Like.findOne({ chapter: storyRes.body.chapterId });
 
@@ -984,7 +984,7 @@ describe('Test the chapter handling routes', function () {
             describe('Sad paths', function () {
                 describe('Logout and POST a like to a story', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         await agent.post('/logout');
 
@@ -998,7 +998,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login, post a chapter, and like the chapter', function () {
                     it('should return a 409 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const chapterRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.post('/chapter/' + chapterRes.body.chapterId + '/like');
@@ -1014,7 +1014,7 @@ describe('Test the chapter handling routes', function () {
                     it('should return a 409 status and an error message', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
                         const res = await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
@@ -1031,7 +1031,7 @@ describe('Test the chapter handling routes', function () {
                     it('should remove that like from the user\'s likedChapters list and not crash the backend', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
                         const like = await Like.findOne({ chapter: storyRes.body.chapterId });
                         await Chapter.findByIdAndDelete(storyRes.body.chapterId);
@@ -1053,7 +1053,7 @@ describe('Test the chapter handling routes', function () {
                     it('should return a 200 status and return a success message and remove the like from the database', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
 
                         const res = await agent.delete('/chapter/' + storyRes.body.chapterId + '/like');
@@ -1071,7 +1071,7 @@ describe('Test the chapter handling routes', function () {
             describe('Sad paths', function () {
                 describe('Logout and unlike a liked chapter', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/like');
                         await agent.post('/logout');
@@ -1088,7 +1088,7 @@ describe('Test the chapter handling routes', function () {
                     it('should return a 404 status and an error message', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.delete('/chapter/' + storyRes.body.chapterId + '/like');
 
@@ -1108,7 +1108,7 @@ describe('Test the chapter handling routes', function () {
             describe('Happy paths', function () {
                 describe('Logout and flag a chapter', function () {
                     it('should return a 200 status and a success message, and put a flag in the database', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         await agent.post('/logout');
 
@@ -1128,7 +1128,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login and flag a chapter', function () {
                     it('should return a 200 status and a success message, and put a flag in the database', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
 
@@ -1150,7 +1150,7 @@ describe('Test the chapter handling routes', function () {
             describe('Sad paths', function () {
                 describe('Flag without a reason', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.post('/chapter/' + storyRes.body.chapterId + '/flag');
@@ -1164,7 +1164,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Flag with an empty reason', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.post('/chapter/' + storyRes.body.chapterId + '/flag').send({ reason: "" });
@@ -1202,7 +1202,7 @@ describe('Test the chapter handling routes', function () {
             describe('Happy paths', function () {
                 describe('Login and POST a bookmark', function () {
                     it('should return a 200 status and a success message, and add a bookmark to the database', async function () {
-                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const loginRes = await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
 
                         const res = await agent.post('/chapter/' + storyRes.body.chapterId + '/bookmark');
@@ -1220,7 +1220,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login, post a bookmark, and GET /profile', function () {
                     it('should return the bookmarked chapter in bookmarkedChapters', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/bookmark');
                         const bookmark = await Bookmark.findOne({ chapter: storyRes.body.chapterId });
@@ -1237,7 +1237,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login, post a bookmark, and GET /chapter/:chapterId', function () {
                     it('should return bookmarkedByUser is true in the chapter', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/bookmark');
                         const bookmark = await Bookmark.findOne({ chapter: storyRes.body.chapterId });
@@ -1254,7 +1254,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login, post a bookmark, and GET /chapter?search=<testString>', function () {
                     it('should return bookmarkedByUser is true in the chapter', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/bookmark');
                         const bookmark = await Bookmark.findOne({ chapter: storyRes.body.chapterId });
@@ -1274,7 +1274,7 @@ describe('Test the chapter handling routes', function () {
             describe('Sad paths', function () {
                 describe('Logout and POST a bookmark', function () {
                     it('should redirect to /login', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const chapter = await agent.post('/chapter').send(testStory);
                         await agent.post('/logout');
 
@@ -1288,7 +1288,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login and POST a duplicate bookmark', function () {
                     it('should return 409 status and an error message', async function () {
-                        const loginRes = await agent.post('/login').send(testUserLogin);
+                        const loginRes = await agent.post('/login').send(testUser1Login);
                         const chapter = await agent.post('/chapter').send(testStory);
 
                         await agent.post('/chapter/' + chapter.body.chapterId + '/bookmark');
@@ -1303,7 +1303,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login, bookmark a chapter, then delete the chapter from the database, and GET /profile and check bookmarkedChapters', function () {
                     it('should not include the bookmark for the deleted chapter, and should not crash the backend', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         const storyRes = await agent.post('/chapter').send(testStory);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/bookmark');
                         const bookmark = await Bookmark.findOne({ chapter: storyRes.body.chapterId });
@@ -1327,7 +1327,7 @@ describe('Test the chapter handling routes', function () {
                     it('should return a 200 status and a success message, and remove the bookmark from the database', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/bookmark');
 
                         const res = await agent.delete('/chapter/' + storyRes.body.chapterId + '/bookmark');
@@ -1347,7 +1347,7 @@ describe('Test the chapter handling routes', function () {
                     it('should return a 404 status and an error message', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.delete('/chapter/' + storyRes.body.chapterId + '/bookmark');
 
@@ -1362,7 +1362,7 @@ describe('Test the chapter handling routes', function () {
                     it('should redirect to /login', async function () {
                         await agent.post('/login').send(adminLogin);
                         const storyRes = await agent.post('/chapter').send(testStory);
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
                         await agent.post('/chapter/' + storyRes.body.chapterId + '/bookmark');
                         const bookmark = await Bookmark.findOne({ chapter: storyRes.body.chapterId });
                         await agent.post('/logout');
@@ -1383,7 +1383,7 @@ describe('Test the chapter handling routes', function () {
         let chapterId1, chapterId2, chapterId3;
 
         before('Set up chain', async function () {
-            await agent.post('/login').send(testUserLogin);
+            await agent.post('/login').send(testUser1Login);
             const storyRes1 = await agent.post('/chapter').send(testStory);
             chapterId1 = storyRes1.body.chapterId;
             const storyRes2 = await agent.post('/chapter/' + chapterId1).send(testChapter);
@@ -1442,7 +1442,7 @@ describe('Test the chapter handling routes', function () {
         describe('Sad paths', function () {
             describe('Logout and get a broken chain', function () {
                 it('should return as much of the chain as it can', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     const storyRes1 = await agent.post('/chapter').send(testStory);
                     const storyRes2 = await agent.post('/chapter/' + storyRes1.body.chapterId).send(testChapter);
                     const storyRes3 = await agent.post('/chapter/' + storyRes2.body.chapterId).send(testChapter);
@@ -1467,7 +1467,7 @@ describe('Test the chapter handling routes', function () {
         let story;
 
         before('Setup chapter for keyword testing', async function () {
-            await agent.post('/login').send(testUserLogin);
+            await agent.post('/login').send(testUser1Login);
             const storyRes = await agent.post('/chapter').send(testStory);
             story = storyRes.body;
         });
@@ -1515,7 +1515,7 @@ describe('Test the chapter handling routes', function () {
         let story;
 
         beforeEach('Setup chapter for keyword testing', async function () {
-            await agent.post('/login').send(testUserLogin);
+            await agent.post('/login').send(testUser1Login);
             const storyRes = await agent.post('/chapter').send(testStory);
             story = storyRes.body;
         });
@@ -1528,7 +1528,7 @@ describe('Test the chapter handling routes', function () {
             describe('Happy paths', function () {
                 describe('Login as the user who created the chapter, and add a keyword', function () {
                     it('should return a 200 status and a success message, and add the keyword to the chapter in the database.', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.put('/chapter/' + story.chapterId + '/keyword').send(["silly"]);
                         const chapter = await Chapter.findById(story.chapterId);
@@ -1564,7 +1564,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login as author and do a PUT with a non-array', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.put('/chapter/' + story.chapterId + '/keyword').send("silly");
 
@@ -1575,7 +1575,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login as author and add an invalid keyword', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.put('/chapter/' + story.chapterId + '/keyword').send(["silly?"]);
 
@@ -1590,7 +1590,7 @@ describe('Test the chapter handling routes', function () {
             describe('Happy paths', function () {
                 describe('Login as author and delete a keyword', function () {
                     it('should return a 200 status and a success message, and remove the keyword from the chapter', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.delete('/chapter/' + story.chapterId + '/keyword/' + story.keywords[2]);
                         const chapter = await Chapter.findById(story.chapterId);
@@ -1625,7 +1625,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login as author and DELETE with an invalid keyword', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.delete('/chapter/' + story.chapterId + '/keyword/silly!');
 
@@ -1636,7 +1636,7 @@ describe('Test the chapter handling routes', function () {
 
                 describe('Login as author and DELETE with a keyword that the chapter doesn\'t have', function () {
                     it('should return a 404 status and an error message', async function () {
-                        await agent.post('/login').send(testUserLogin);
+                        await agent.post('/login').send(testUser1Login);
 
                         const res = await agent.delete('/chapter/' + story.chapterId + '/keyword/silly');
 

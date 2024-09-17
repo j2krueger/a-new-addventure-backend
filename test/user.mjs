@@ -10,10 +10,12 @@ const {
     // constants
     constants,
     testString,
-    newUserName,
-    newEmail,
+    newUser1Name,
+    newUser1Email,
+    // newUser2Name,
+    newUser2Email,
     newPassword,
-    testUserLogin,
+    testUser1Login,
     // adminLogin,
     // testStory,
     // testChapter,
@@ -44,12 +46,12 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('POST /register with unique userName, unique email, and password', function () {
                 it('should return 201 status and the new user\'s privateProfile()', async function () {
-                    const res = await agent.post('/register').send({ userName: 'test' + newUserName, email: 'test' + newEmail, password: newPassword });
+                    const res = await agent.post('/register').send({ userName: 'test' + newUser1Name, email: 'test' + newUser1Email, password: newPassword });
                     shouldSendEmail();
 
                     expect(res).to.have.status(201);
-                    expect(res.body.userName).to.equal('test' + newUserName);
-                    expect(res.body.email).to.equal('test' + newEmail);
+                    expect(res.body.userName).to.equal('test' + newUser1Name);
+                    expect(res.body.email).to.equal('test' + newUser1Email);
                     expectMongoObjectId(res.body.userId);
                     expect(res.body.bio).to.equal("I haven't decided what to put in my bio yet.");
                     expect(res.body.publishEmail).to.equal(false);
@@ -64,7 +66,7 @@ describe('Test the user handling routes', function () {
         describe('Sad paths', function () {
             describe('Register a user with a duplicate userName', function () {
                 it('should return a 409 conflict status code', async function () {
-                    const res = await agent.post('/register').send({ userName: newUserName, email: 'notAdupe@example.com', password: "notAsecret" });
+                    const res = await agent.post('/register').send({ userName: newUser1Name, email: 'notAdupe@example.com', password: "notAsecret" });
 
                     expect(res).to.have.status(409);
                     expect(res.body).to.deep.equal({ error: "Username already in use." });
@@ -73,7 +75,7 @@ describe('Test the user handling routes', function () {
 
             describe('Register a user with a duplicate email', function () {
                 it('should return a 409 conflict status code', async function () {
-                    const res = await agent.post('/register').send({ userName: 'notAdupe', email: newEmail, password: "notAsecret" });
+                    const res = await agent.post('/register').send({ userName: 'notAdupe', email: newUser1Email, password: "notAsecret" });
 
                     expect(res).to.have.status(409);
                     expect(res.body).to.deep.equal({ error: "Email already in use." });
@@ -100,7 +102,7 @@ describe('Test the user handling routes', function () {
 
             describe('register a user with a userName longer than maximumUserNameLength', function () {
                 it('should return a 400 status and an error message', async function () {
-                    const res = await agent.post('/register').send({ userName: newUserName + 'x'.repeat(maximumUserNameLength + 1 - newUserName.length), email: 'notAdupe@example.com', password: "notAsecret" });
+                    const res = await agent.post('/register').send({ userName: newUser1Name + 'x'.repeat(maximumUserNameLength + 1 - newUser1Name.length), email: 'notAdupe@example.com', password: "notAsecret" });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Username may not be longer than " + maximumUserNameLength + " characters." });
@@ -144,7 +146,7 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('Register user and logout and POST /verify/:userId/:emailVerificationKey', function () {
                 it('should return a 200 status and a success message, and set user\'s emailVerified field to true', async function () {
-                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUser1Name, email: "verifyEmail" + newUser1Email, password: newPassword });
                     shouldSendEmail();
                     await agent.post('/logout');
 
@@ -165,7 +167,7 @@ describe('Test the user handling routes', function () {
         describe('Sad paths', function () {
             describe('POST /verify/:userId/:emailVerificationKey with the wrong key', function () {
                 it('should return a 403 status and an error message, and not set emailVerified to true', async function () {
-                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUser1Name, email: "verifyEmail" + newUser1Email, password: newPassword });
                     shouldSendEmail();
                     await agent.post('/logout');
 
@@ -183,7 +185,7 @@ describe('Test the user handling routes', function () {
 
             describe('POST /verify/:userId/:emailVerificationKey with misformed key', function () {
                 it('should return a 400 status and an error message, and not set emailVerified to true', async function () {
-                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUser1Name, email: "verifyEmail" + newUser1Email, password: newPassword });
                     shouldSendEmail();
                     await agent.post('/logout');
 
@@ -201,7 +203,7 @@ describe('Test the user handling routes', function () {
 
             describe('POST /verify/:userId/:emailVerificationKey with user whose email has already been verified', function () {
                 it('should return a 409 status and an error message', async function () {
-                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUserName, email: "verifyEmail" + newEmail, password: newPassword });
+                    const userRes = await agent.post('/register').send({ userName: "vrfyEmail" + newUser1Name, email: "verifyEmail" + newUser1Email, password: newPassword });
                     shouldSendEmail();
                     await agent.post('/logout');
 
@@ -224,7 +226,7 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('login by userName', function () {
                 it('should return a 200 ok and return a user.privateProfile() with the given userName', async function () {
-                    const res = await agent.post('/login').send(testUserLogin);
+                    const res = await agent.post('/login').send(testUser1Login);
 
                     expect(res).to.have.status(200);
                     expect(res).to.have.cookie('connect.sid');
@@ -235,7 +237,7 @@ describe('Test the user handling routes', function () {
 
             describe('login by email', function () {
                 it('should return a 200 ok and return a user.privateProfile() with the given email', async function () {
-                    const res = await agent.post('/login').send({ name: newEmail, password: newPassword });
+                    const res = await agent.post('/login').send({ name: newUser1Email, password: newPassword });
 
                     expect(res).to.have.status(200);
                     expect(res).to.have.cookie('connect.sid');
@@ -248,7 +250,7 @@ describe('Test the user handling routes', function () {
         describe('Sad paths', function () {
             describe('login with nonexistant userName/email', function () {
                 it('should return a 401 unauthorized and an error message', async function () {
-                    const res = await agent.post('/login').send({ name: newEmail + "blahblahblah" + testString, password: newPassword });
+                    const res = await agent.post('/login').send({ name: newUser1Email + "blahblahblah" + testString, password: newPassword });
 
                     expect(res).to.have.status(401);
                     expect(res.body).to.deep.equal({ error: "Incorrect name or password." });
@@ -257,7 +259,7 @@ describe('Test the user handling routes', function () {
 
             describe('login with bad password', function () {
                 it('should return a 401 unauthorized and an error message', async function () {
-                    const res = await agent.post('/login').send({ name: newUserName, password: newPassword + '!' });
+                    const res = await agent.post('/login').send({ name: newUser1Name, password: newPassword + '!' });
 
                     expect(res).to.have.status(401);
                     expect(res.body).to.deep.equal({ error: "Incorrect name or password." });
@@ -275,7 +277,7 @@ describe('Test the user handling routes', function () {
 
             describe('login with missing password', function () {
                 it('should return a 400 bad request and an error message', async function () {
-                    const res = await agent.post('/login').send({ name: newUserName });
+                    const res = await agent.post('/login').send({ name: newUser1Name });
 
                     expect(res).to.have.status(400);
                     expect(res.body).to.deep.equal({ error: "Missing password." });
@@ -347,7 +349,7 @@ describe('Test the user handling routes', function () {
                 before('Set up users to test pagination', async function () {
                     for (let userCount = 0; userCount <= constants.resultsPerPage; userCount++) {
                         console.log('Generating user ' + userCount);
-                        const thisRes = await agent.post('/register/').send({ userName: userCount + newUserName, email: userCount + newEmail, password: newPassword });
+                        const thisRes = await agent.post('/register/').send({ userName: userCount + newUser1Name, email: userCount + newUser1Email, password: newPassword });
                         shouldSendEmail();
                         expect(thisRes).to.have.status(201);
                     }
@@ -356,7 +358,7 @@ describe('Test the user handling routes', function () {
                 after('Teardown users to test pagination', async function () {
                     for (let userCount = 0; userCount <= constants.resultsPerPage; userCount++) {
                         console.log('Deleting user ' + userCount);
-                        await User.findOneAndDelete({ userName: userCount + newUserName });
+                        await User.findOneAndDelete({ userName: userCount + newUser1Name });
                     }
                 });
 
@@ -379,7 +381,7 @@ describe('Test the user handling routes', function () {
         describe('Sad paths', function () {
             describe('search for a nonexistant userName', function () {
                 it('should return a 404 not found and an error message', async function () {
-                    const res = await agent.get('/user').query({ regex: newUserName + newUserName });
+                    const res = await agent.get('/user').query({ regex: newUser1Name + newUser1Name });
 
                     expect(res).to.have.status(404);
                     expect(res.body).to.deep.equal({ error: "No matching users found." });
@@ -437,7 +439,7 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('login and get profile', function () {
                 it('should return 200 OK and logged in users.privateProfile()', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.get('/profile');
 
@@ -468,7 +470,7 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('login and put profile', function () {
                 it('should return 200 OK and logged in user\'s privateProfile()', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.put('/profile').send({ darkMode: true });
                     const tempNewUserPrivateProfile = newUserPrivateProfile();
@@ -483,19 +485,19 @@ describe('Test the user handling routes', function () {
 
             describe('Login and put profile with a new email', function () {
                 it('should return 200 status and logged in user\'s privateProfile(), and send a verification email, and set emailVerified to false, and set emailVerificationKey', async function () {
-                    const userRes = await agent.post('/login').send(testUserLogin);
+                    const userRes = await agent.post('/login').send(testUser1Login);
                     await User.findByIdAndUpdate(userRes.body.userId, { emailVerified: true });
 
-                    const res = await agent.put('/profile').send({ email: "putProfile" + newEmail });
+                    const res = await agent.put('/profile').send({ email: "putProfile" + newUser1Email });
                     shouldSendEmail();
                     const user = await User.findById(res.body.userId);
 
                     expect(res).to.have.status(200);
-                    expect(res.body.email).to.deep.equal("putProfile" + newEmail);
+                    expect(res.body.email).to.deep.equal("putProfile" + newUser1Email);
                     expect(res.body.emailVerified).to.be.false;
                     expect(user.emailVerificationKey).to.be.a('string').and.match(/^[0-9a-f]{20}$/);
 
-                    await agent.put('/profile').send({ email: newEmail });
+                    await agent.put('/profile').send({ email: newUser1Email });
                     shouldSendEmail();
                 });
             });
@@ -514,7 +516,7 @@ describe('Test the user handling routes', function () {
 
             describe('login and do a bad put on profile', function () {
                 it('should return 400 OK and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.put('/profile').send({ darkMode: "notAboolean" });
 
@@ -525,9 +527,9 @@ describe('Test the user handling routes', function () {
 
             describe('Login and change the email to a duplicate of an existing email', function () {
                 it('should return a 409 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
-                    const res = await agent.put('/profile').send({ email: newEmail });
+                    const res = await agent.put('/profile').send({ email: newUser2Email });
 
                     expect(res).to.have.status(409);
                     expect(res.body).to.deep.equal({ error: "Invalid request: That email is already in use." });
@@ -541,7 +543,7 @@ describe('Test the user handling routes', function () {
 
         before('Set up user for follow testing', async function () {
             const res = await agent.post('/register')
-                .send({ userName: 'followed-' + newUserName, email: 'followed-' + newEmail, password: newPassword });
+                .send({ userName: 'followed-' + newUser1Name, email: 'followed-' + newUser1Email, password: newPassword });
             shouldSendEmail();
             expect(res).to.have.status(201);
             followedUserId = res.body.userId;
@@ -558,7 +560,7 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('Login and POST /user/:userId/follow', function () {
                 it('should return 200 ok and a success message, and add a follow to the database', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.post('/user/' + followedUserId + '/follow');
                     const follows = await Follow.find({ following: followedUserId });
@@ -583,7 +585,7 @@ describe('Test the user handling routes', function () {
 
             describe('Login and POST /user/blarg/follow', function () {
                 it('should return a 400 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.post('/user/blarg/follow');
 
@@ -594,7 +596,7 @@ describe('Test the user handling routes', function () {
 
             describe('Login and POST /user/:userId/follow again', function () {
                 it('should return a 409 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     await agent.post('/user/' + followedUserId + '/follow');
                     const res = await agent.post('/user/' + followedUserId + '/follow');
@@ -606,10 +608,10 @@ describe('Test the user handling routes', function () {
 
             describe('Login, follow a user, then delete the user from the database, then GET /profile', function () {
                 it('should remove the broken follow from followedAuthors', async function () {
-                    const userRes = await agent.post('/register').send({ userName: 'followDel-' + newUserName, email: 'followDel-' + newEmail, password: 'password' });
+                    const userRes = await agent.post('/register').send({ userName: 'followDel-' + newUser1Name, email: 'followDel-' + newUser1Email, password: 'password' });
                     shouldSendEmail();
                     expect(userRes).to.have.status(201);
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
                     await agent.post('/user/' + userRes.body.userId + '/follow');
                     await User.findByIdAndDelete(userRes.body.userId);
 
@@ -628,14 +630,14 @@ describe('Test the user handling routes', function () {
         let followedUserId;
 
         before('Setup userId for testing /user/:userId/follow route', async function () {
-            const userRes = await agent.post('/register').send({ userName: 'followed-' + newUserName, email: 'followed-' + newEmail, password: newPassword });
+            const userRes = await agent.post('/register').send({ userName: 'followed-' + newUser1Name, email: 'followed-' + newUser1Email, password: newPassword });
             shouldSendEmail();
             expect(userRes).to.have.status(201);
             followedUserId = userRes.body.userId;
         });
 
         beforeEach('Setup follow for testing /user/:userId/follow route', async function () {
-            await agent.post('/login').send(testUserLogin);
+            await agent.post('/login').send(testUser1Login);
 
             await agent.post('/user/' + followedUserId + '/follow');
         });
@@ -647,7 +649,7 @@ describe('Test the user handling routes', function () {
         describe('Happy paths', function () {
             describe('Login, follow a user, and unfollow the user', function () {
                 it('should return a 200 status and return a success message.', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.delete('/user/' + followedUserId + '/follow');
 
@@ -670,7 +672,7 @@ describe('Test the user handling routes', function () {
 
             describe('Login and unfollow someone not followed', function () {
                 it('should return a 404 status and an error message', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.delete('/user/' + newUserPrivateProfile().userId + '/follow');
 
@@ -687,7 +689,7 @@ describe('Test the user handling routes', function () {
 
             before('Setup user for /changepassword testing', async function () {
                 const res = await agent.post('/register')
-                    .send({ userName: 'chPass' + newUserName, email: 'chPass' + newEmail, password: newPassword });
+                    .send({ userName: 'chPass' + newUser1Name, email: 'chPass' + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 passwordTestUserId = res.body.userId;
             });
@@ -703,7 +705,7 @@ describe('Test the user handling routes', function () {
             describe('Happy paths', function () {
                 describe('Login and POST /changepassword with correct password and newPassword', function () {
                     it('should return a 200 status and a success message and change the passwordHash in the database', async function () {
-                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUser1Name, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ password: newPassword, newPassword: "2x" + newPassword });
                         const user = await User.findById(passwordTestUserId);
@@ -728,7 +730,7 @@ describe('Test the user handling routes', function () {
 
                 describe('Login and POST /changepassword with incorrect password', function () {
                     it('should return a 403 status and an error message', async function () {
-                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUser1Name, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ password: "5x" + newPassword, newPassword: "2x" + newPassword });
 
@@ -739,7 +741,7 @@ describe('Test the user handling routes', function () {
 
                 describe('Login and POST /changepassword with no password', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUser1Name, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ newPassword: "2x" + newPassword });
 
@@ -750,7 +752,7 @@ describe('Test the user handling routes', function () {
 
                 describe('Login and POST /changepassword to a password shorter than minimumPasswordLength characters.', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUser1Name, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ password: newPassword, newPassword: 'x'.repeat(minimumPasswordLength - 1) });
 
@@ -761,7 +763,7 @@ describe('Test the user handling routes', function () {
 
                 describe('Login and POST /changepassword with no newPassword', function () {
                     it('should return a 400 status and an error message', async function () {
-                        await agent.post('/login').send({ name: 'chPass' + newUserName, password: newPassword });
+                        await agent.post('/login').send({ name: 'chPass' + newUser1Name, password: newPassword });
 
                         const res = await agent.post('/changepassword').send({ password: newPassword });
 
@@ -779,7 +781,7 @@ describe('Test the user handling routes', function () {
 
             before('Setup user for /resetpassword tests', async function () {
                 const res = await agent.post('/register')
-                    .send({ userName: 'rstPass' + newUserName, email: 'rstPass' + newEmail, password: newPassword });
+                    .send({ userName: 'rstPass' + newUser1Name, email: 'rstPass' + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 const user = await User.findById(res.body.userId);
                 user.emailVerified = true;
@@ -834,7 +836,7 @@ describe('Test the user handling routes', function () {
                     it('should return a 403 status and an error message', async function () {
                         await agent.post('/logout');
 
-                        const res = await agent.post('/resetpassword').send({ name: newUserName });
+                        const res = await agent.post('/resetpassword').send({ name: newUser1Name });
 
                         expect(res).to.have.status(403);
                         expect(res.body).to.deep.equal({ error: "That account does not have a verified email address." });
@@ -845,7 +847,7 @@ describe('Test the user handling routes', function () {
                     it('should return a 403 status and an error message', async function () {
                         await agent.post('/logout');
 
-                        const res = await agent.post('/resetpassword').send({ name: newEmail });
+                        const res = await agent.post('/resetpassword').send({ name: newUser1Email });
 
                         expect(res).to.have.status(403);
                         expect(res.body).to.deep.equal({ error: "That account does not have a verified email address." });
@@ -883,7 +885,7 @@ describe('Test the user handling routes', function () {
 
             before('Setup user for testing POST /resetpassword/:userId/:resetPasswordKey', async function () {
                 const userRes = await agent.post('/register')
-                    .send({ userName: "rstPass" + newUserName, email: "rstPass" + newEmail, password: newPassword });
+                    .send({ userName: "rstPass" + newUser1Name, email: "rstPass" + newUser1Email, password: newPassword });
                 shouldSendEmail();
                 resetPasswordUserId = userRes.body.userId;
                 resetPasswordUserName = userRes.body.userName;
@@ -926,7 +928,7 @@ describe('Test the user handling routes', function () {
                 describe('Logout and POST /resetpassword/:userId/:resetPasswordKey with { newPassword: "newPassword" } with user with no resetPasswordKey', function () {
                     it('should return a 403 status and an error message', async function () {
                         await agent.post('/logout');
-                        const user = await User.findOne({ userName: newUserName });
+                        const user = await User.findOne({ userName: newUser1Name });
 
                         const res = await agent.post('/resetpassword/' + user._id + '/' + resetPasswordUserKey).send({ password: "2x" + newPassword });
 

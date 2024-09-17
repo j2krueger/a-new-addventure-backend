@@ -10,10 +10,12 @@ const {
     // constants
     constants,
     testString,
-    newUserName,
-    newEmail,
+    newUser1Name,
+    newUser1Email,
+    newUser2Name,
+    newUser2Email,
     newPassword,
-    testUserLogin,
+    testUser1Login,
     // adminLogin,
     // testStory,
     testStory1,
@@ -53,21 +55,26 @@ export const mochaHooks = {
         } catch (error) {
             console.log("Database not conected: ", error);
         }
-        const userRes = await agent.post('/register').send({ userName: newUserName, email: newEmail, password: newPassword });
+        const user1Res = await agent.post('/register').send({ userName: newUser1Name, email: newUser1Email, password: newPassword });
         shouldSendEmail();
 
-        expect(userRes).to.have.status(201);
-        expect(userRes.body).to.be.an('object');
-        expect(userRes.body.userName).to.equal(newUserName);
-        expect(userRes.body.email).to.equal(newEmail);
-        expectMongoObjectId(userRes.body.userId);
-        expect(userRes.body.bio).to.equal("I haven't decided what to put in my bio yet.");
-        expect(userRes.body.publishEmail).to.equal(false);
-        expect(userRes.body.darkMode).to.equal(false);
-        expect(userRes.body.publishedChapters).to.be.an('array');
-        expect(userRes.body.publishedChapters).to.have.lengthOf(0);
+        expect(user1Res).to.have.status(201);
+        expect(user1Res.body).to.be.an('object');
+        expect(user1Res.body.userName).to.equal(newUser1Name);
+        expect(user1Res.body.email).to.equal(newUser1Email);
+        expectMongoObjectId(user1Res.body.userId);
+        expect(user1Res.body.bio).to.equal("I haven't decided what to put in my bio yet.");
+        expect(user1Res.body.publishEmail).to.equal(false);
+        expect(user1Res.body.darkMode).to.equal(false);
+        expect(user1Res.body.publishedChapters).to.be.an('array');
+        expect(user1Res.body.publishedChapters).to.have.lengthOf(0);
 
-        await agent.post('/login').send(testUserLogin);
+        const user2Res = await agent.post('/register').send({ userName: newUser2Name, email: newUser2Email, password: newPassword });
+        shouldSendEmail();
+
+        expect(user2Res).to.have.status(201);
+
+        await agent.post('/login').send(testUser1Login);
 
         const story1Res = await agent.post('/chapter').send(testStory1);
         expect(story1Res).to.have.status(201);

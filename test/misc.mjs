@@ -9,10 +9,10 @@ const {
     constants,
     // constants,
     testString,
-    newUserName,
-    newEmail,
+    newUser1Name,
+    newUser1Email,
     // newPassword,
-    testUserLogin,
+    testUser1Login,
     // adminLogin,
     // newUserPrivateProfile,
     // newUserPublicInfo,
@@ -70,15 +70,15 @@ describe('Test miscelaneous routes', function () {
 
             describe('Login and POST /message with {useLoginInfo: true, messageText: testString}', function () {
                 it('should return a 200 status code and a success message, and add the message to the database', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
                     const res = await agent.post('/message').send({ useLoginInfo: true, messageText: testString });
                     const message = await Message.findOne({ messageText: testString });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Message sent." });
-                    expect(message.name).to.deep.equal(newUserName);
-                    expect(message.email).to.deep.equal(newEmail);
+                    expect(message.name).to.deep.equal(newUser1Name);
+                    expect(message.email).to.deep.equal(newUser1Email);
                     expect(message.messageText).to.deep.equal(testString);
                     expect(message.verified).to.be.true;
 
@@ -86,17 +86,17 @@ describe('Test miscelaneous routes', function () {
                 });
             });
 
-            describe('Login and POST /message with {name: newUserName, email: newEmail, messageText: testString + "unique3"}', function () {
+            describe('Login and POST /message with {name: newUser1Name, email: newUser1Email, messageText: testString + "unique3"}', function () {
                 it('should return a 200 status code and a success message, and add the message to the database', async function () {
-                    await agent.post('/login').send(testUserLogin);
+                    await agent.post('/login').send(testUser1Login);
 
-                    const res = await agent.post('/message').send({ name: newUserName, email: newEmail, messageText: testString + "unique3" });
+                    const res = await agent.post('/message').send({ name: newUser1Name, email: newUser1Email, messageText: testString + "unique3" });
                     const message = await Message.findOne({ messageText: testString + "unique3" });
 
                     expect(res).to.have.status(200);
                     expect(res.body).to.deep.equal({ message: "Message sent." });
-                    expect(message.name).to.deep.equal(newUserName);
-                    expect(message.email).to.deep.equal(newEmail);
+                    expect(message.name).to.deep.equal(newUser1Name);
+                    expect(message.email).to.deep.equal(newUser1Email);
                     expect(message.messageText).to.deep.equal(testString + "unique3");
                     expect(message.verified).to.be.true;
 
@@ -143,7 +143,7 @@ describe('Test miscelaneous routes', function () {
 
         describe('Login and GET /stats', function () {
             it('should return a 200 status and some statistics', async function () {
-                await agent.post('/login').send(testUserLogin);
+                await agent.post('/login').send(testUser1Login);
 
                 const res = await agent.get('/stats');
 
