@@ -87,6 +87,7 @@ chapterSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(i
         .populate({
             path: 'continuationChapters',
             transform: chapter => chapter.summary(),
+            populate: 'likes'
         });
     if (result) {
         await result.setLikedByUser(userId);
