@@ -1092,47 +1092,30 @@ paths:
             application/json:
               example:
                 {
-                  "storyId": "6688142fb004b799a5a29d03",
-                  "chapterId": "6688142fb004b799a5a29d03",
+                  "storyId": "66df18c63ecabb4d57111d42",
+                  "chapterId": "66df18c63ecabb4d57111d42",
                   "authorName": "Freddy",
-                  "authorId": "668490250029a28118a8d1be",
+                  "authorId": "66db1e32bb8f1cbaa7d1c388",
                   "chapterTitle": null,
-                  "storyTitle": "Random Title",
-                  "bodyText": "Genji no monogatari",
+                  "storyTitle": "In the beginning...",
+                  "bodyText": "In the beginning, there was the word, and the word was \"Wakamolensis,\" and nobody knew what it meant.\n\nAnd so it came to pass that Lerrald the inquisitive spake unto Vred the persistent, \"Let us seek the Divine Dictionary of Quantanonalog, so that we might learn the meaning of Wakamolensis.\"\n\n\"Right,\" said Vred. \"But we're going to have to walk, because it turns out that I'm too sexy for my donkey,\" and indicated the beast of burden in question.\n\n\"Verily,\" said Lerrald, \"A half dead ogre wouldst be too sexy for that donkey.\"\n\nAnd thus, they set out on foot.",
                   "previousChapter": null,
-                  "createDate": "2024-07-05T15:41:35.510Z",
-                  "keywords": ["sad"],
-                  "likes": 0,
-                  "likedByUser": false,
-                  "bookmarkedByUser": false,
+                  "createDate": "2024-09-09T15:48:22.282Z",
+                  "keywords": ["silly"],
+                  "likes": 1,
                   "continuationChapters":
                     [
                       {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "chapterId": "668820191cb99dfdc244c23c",
-                        "storyTitle": "Random Title",
-                        "chapterTitle": "Chapter the first",
+                        "storyId": "66df18c63ecabb4d57111d42",
+                        "chapterId": "66df18f43ecabb4d57111d73",
+                        "storyTitle": "In the beginning...",
+                        "chapterTitle": "Lerrald and Vred sought the Cartesian Bear",
                         "authorName": "Freddy",
-                        "previousChapter": "6688142fb004b799a5a29d03",
-                        "keywords": ["happy", "cat"],
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "chapterId": "668c4771e0989ccd9cd6ec8a",
-                        "storyTitle": "Random Title",
-                        "chapterTitle": "adding to this chapters list of sub chapters",
-                        "authorName": "apmanager",
-                        "previousChapter": "6688142fb004b799a5a29d03",
-                        "keywords": [],
-                      },
-                      {
-                        "storyId": "6688142fb004b799a5a29d03",
-                        "chapterId": "668c47c3e0989ccd9cd6eca8",
-                        "storyTitle": "Random Title",
-                        "chapterTitle": "adding another to list of chapters",
-                        "authorName": "apmanager",
-                        "previousChapter": "6688142fb004b799a5a29d03",
-                        "keywords": [],
+                        "bodyText": "Lerrald and Vred set forth to find the greatest mapmaker in all the land, the Cartesian Bear. This meant that they were going south, because the Cartesian Bear was well known to dislike Polar Bears, and stay as far away from them as possible.\n\n\"So,\" spake Vred, as they travelled, \"do you think the whole story is going to be full of referential humor and obscure math jokes like this?\"\n\n\"Indeed,\" replied Lerrald, \"for the author art a nerd of the greatest magnitude. Also, the breaking of the fourth wall shalt most likely continue unabated.\"\n\nWhereupon Vred stopped walking for a moment, frowned, exclaimed \"Dang it!\" and hurried to catch up with Lerrald.",
+                        "previousChapter": "66df18c63ecabb4d57111d42",
+                        "createDate": "2024-09-09T15:49:08.338Z",
+                        "keywords": ["silly"],
+                        "likes": 0,
                       },
                     ],
                 }
@@ -1233,7 +1216,8 @@ paths:
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted chapterId." }
+              example:
+                { "error": "That is not a properly formatted chapterId." }
         "404":
           description: chapterId not found."
           content:
@@ -1274,7 +1258,8 @@ paths:
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted chapterId." }
+              example:
+                { "error": "That is not a properly formatted chapterId." }
         "404":
           description: chapterId not found."
           content:
@@ -1360,7 +1345,8 @@ paths:
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted chapterId." }
+              example:
+                { "error": "That is not a properly formatted chapterId." }
         "404":
           description: Chapter not found
           content:
@@ -1398,7 +1384,8 @@ paths:
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted chapterId." }
+              example:
+                { "error": "That is not a properly formatted chapterId." }
         "404":
           description: Chapter not found
           content:
@@ -1842,7 +1829,8 @@ paths:
           description: Bad request.
           content:
             application/json:
-              example: { "error": "That is not a properly formatted chapterId." }
+              example:
+                { "error": "That is not a properly formatted chapterId." }
         "404":
           description: Chapter not found.
           content:
@@ -2280,7 +2268,8 @@ paths:
           description: "malformed request."
           content:
             application/json:
-              example: { "error": "That is not a properly formatted chapterId." }
+              example:
+                { "error": "That is not a properly formatted chapterId." }
         "404":
           description: "chapterId does not exist."
           content:
