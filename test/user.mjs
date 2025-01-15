@@ -20,7 +20,7 @@ const {
     // testStory,
     // testChapter,
     newUserPrivateProfile,
-    newUserPublicInfo,
+    // newUserPublicInfo,
     // newUserBasicInfo,
     shouldSendEmail,
     // summaryKeys,
@@ -33,7 +33,7 @@ const {
     // Flag,
     // Bookmark,
     // functions
-    // populateUserInfo,
+    getInfoByUserName,
     expectMongoObjectId,
 } = globals;
 const { minimumPasswordLength, maximumUserNameLength } = constants;
@@ -231,7 +231,8 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res).to.have.cookie('connect.sid');
                     expect(res).to.have.cookie('token');
-                    expect(res.body).to.deep.equal(newUserPrivateProfile());
+                    
+                    expect(res.body).to.deep.equal((await getInfoByUserName(testUser1Login.name)).privateProfile);
                 });
             });
 
@@ -242,7 +243,7 @@ describe('Test the user handling routes', function () {
                     expect(res).to.have.status(200);
                     expect(res).to.have.cookie('connect.sid');
                     expect(res).to.have.cookie('token');
-                    expect(res.body).to.deep.equal(newUserPrivateProfile());
+                    expect(res.body).to.deep.equal((await getInfoByUserName(newUser1Name)).privateProfile);
                 });
             });
         });
@@ -429,7 +430,7 @@ describe('Test the user handling routes', function () {
                     const res = await agent.get('/user/' + newUserPrivateProfile().userId);
 
                     expect(res).to.have.status(200);
-                    expect(res.body).to.deep.equal(newUserPublicInfo());
+                    expect(res.body).to.deep.equal((await getInfoByUserName(testUser1Login.name)).publicInfo);
                 });
             });
         });
@@ -448,7 +449,7 @@ describe('Test the user handling routes', function () {
                     expect(res.body.followedAuthors).to.be.an('array');
                     expect(res.body.likedChapters).to.be.an('array');
                     expect(res.body.bookmarkedChapters).to.be.an('array');
-                    expect(res.body).to.deep.equal(newUserPrivateProfile());
+                    expect(res.body).to.deep.equal((await getInfoByUserName(testUser1Login.name)).privateProfile);
                 });
             });
         });
@@ -472,8 +473,8 @@ describe('Test the user handling routes', function () {
                 it('should return 200 OK and logged in user\'s privateProfile()', async function () {
                     await agent.post('/login').send(testUser1Login);
 
+                    const tempNewUserPrivateProfile = (await getInfoByUserName(testUser1Login.name)).privateProfile;
                     const res = await agent.put('/profile').send({ darkMode: true });
-                    const tempNewUserPrivateProfile = newUserPrivateProfile();
                     tempNewUserPrivateProfile.darkMode = !tempNewUserPrivateProfile.darkMode;
 
                     expect(res).to.have.status(200);

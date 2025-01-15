@@ -30,7 +30,6 @@ const {
     Flag,
     Bookmark,
     // functions
-    // populateUserInfo,
     expectMongoObjectId,
 } = globals;
 

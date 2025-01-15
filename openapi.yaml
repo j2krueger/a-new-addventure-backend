@@ -351,6 +351,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": "6695b2573550c66db1ab9106",
                         "keywords": [],
+                        "likes": 2,
                       },
                       {
                         "storyId": "6695b2573550c66db1ab9106",
@@ -360,6 +361,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": null,
                         "keywords": [],
+                        "likes": 3,
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -369,6 +371,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
+                        "likes": 0,
                       },
                     ],
                   "followedAuthors":
@@ -713,6 +716,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": "6695b2573550c66db1ab9106",
                         "keywords": [],
+                        "likes": 2,
                       },
                       {
                         "storyId": "6695b2573550c66db1ab9106",
@@ -722,6 +726,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": null,
                         "keywords": [],
+                        "likes": 3,
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -731,6 +736,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
+                        "likes": 0,
                       },
                       {
                         "storyId": "66885d8e6715f290d4ce03a9",
@@ -740,6 +746,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": null,
                         "keywords": [],
+                        "likes": 0,
                       },
                       {
                         "storyId": "668857a03f120ae7785257d4",
@@ -749,6 +756,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": null,
                         "keywords": [],
+                        "likes": 0,
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -758,6 +766,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": "6688142fb004b799a5a29d03",
                         "keywords": [],
+                        "likes": 0,
                       },
                       {
                         "storyId": "6688142fb004b799a5a29d03",
@@ -767,6 +776,7 @@ paths:
                         "authorName": "Freddy",
                         "previousChapter": null,
                         "keywords": [],
+                        "likes": 0,
                       },
                     ],
                 }

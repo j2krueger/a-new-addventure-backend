@@ -45,6 +45,20 @@ function populateUserInfo(newUser) {
     _newUserBasicInfo = { userId, userName };
 }
 
+async function getInfoByUserName(userName) {
+    const user = await User.findOne({ userName: userName });
+    if (user._id){
+        const foundUser = (await User.findByIdAndPopulate(user._id)).privateProfile();
+        const privateProfile = JSON.parse(JSON.stringify(foundUser));
+        const { userId, userName, email, publishEmail, bio, publishedChapters } = privateProfile;
+        const publicInfo = { userId, userName, email: publishEmail ? email : "", bio, publishedChapters };
+        const basicInfo = { userId, userName };
+        return {privateProfile, publicInfo, basicInfo};
+    } else{
+        return undefined;
+    }
+}
+
 function newUserPrivateProfile() {
     return _newUserPrivateProfile;
 }
@@ -112,6 +126,7 @@ export {
     Bookmark,
     // functions
     populateUserInfo,
+    getInfoByUserName,
     expectMongoObjectId,
     deepCopy,
 };

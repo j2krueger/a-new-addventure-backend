@@ -23,7 +23,6 @@ const {
     // Follow,
     Message,
     // functions
-    // populateUserInfo,
     // expectMongoObjectId,
 } = globals;
 

@@ -105,6 +105,7 @@ userSchema.statics.findByIdAndPopulate = async function findByIdAndPopulate(id) 
       path: 'publishedChapters',
       limit: constants.resultsPerPage,
       options: { sort: { createDate: -1 } },
+      populate: 'likes',
       transform: chapter => chapter.summary(),
     })
     .populate({
