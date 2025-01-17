@@ -9,7 +9,8 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: constants.siteEmailAddress,
         pass: constants.siteEmailPassword,
-    }
+    },
+    proxy: constants.siteEmailProxy,
 });
 
 const commonPreHtml = `<!doctype html>

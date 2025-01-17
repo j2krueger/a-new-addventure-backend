@@ -77,6 +77,7 @@ module.exports = {
     adminPassword: process.env.ADMIN_PASSWORD,
     siteEmailAddress: process.env.EMAIL_ADDRESS,
     siteEmailPassword: process.env.EMAIL_PASSWORD,
+    siteEmailProxy: process.env.EMAIL_PROXY,
     testString: process.env.TEST_STRING,
     testEmailAddress: process.env.TEST_EMAIL_ADDRESS,
 }
