@@ -84,8 +84,10 @@ function sanitizeStringsInObject(obj) {
     }
 }
 function sanitizeIncomingStrings(req, res, next) {
+    console.log('\n   Debug: ', req.body);
     sanitizeStringsInObject(req.body);
     sanitizeStringsInObject(req.query);
+    console.log('\n   Debug: ', req.body);
     next();
 }
 app.use(sanitizeIncomingStrings);
