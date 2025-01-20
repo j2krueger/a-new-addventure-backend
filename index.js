@@ -90,7 +90,7 @@ function sanitizeIncomingStrings(req, res, next) {
     console.log('\n   Debug: ', req.body);
     next();
 }
-// app.use(sanitizeIncomingStrings);
+app.use(sanitizeIncomingStrings);
 
 // API Routes
 app.use('/', require('./routes/routes'));
